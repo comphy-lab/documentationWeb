@@ -70,12 +70,10 @@ event writingFiles (t=0.; t += tsnap; t < tmax+tsnap) {
 }
 
 /**
- * @brief Logs simulation progress and convergence details.
- *
- * On each iteration, this event updates the stored x-velocity field for convergence checking and logs the
- * current iteration number, timestep (dt), simulation time (t), and the convergence error (difference between
- * the current and previous x-velocity fields) to the log file.
- */
+### Logs simulation progress and convergence details.
+
+On each iteration, this event updates the stored x-velocity field for convergence checking and logs the current iteration number, timestep (dt), simulation time (t), and the convergence error (difference between the current and previous x-velocity fields) to the log file.
+*/
 event logfile (i++; i <= imax) {
   foreach() {
     un[] = u.x[];
@@ -84,26 +82,22 @@ event logfile (i++; i <= imax) {
 }
 
 /**
- * @brief Outputs final simulation results for visualization.
- *
- * When the simulation reaches the end time, this event outputs the final state of simulation fields
- * to a file named "results" for post-processing and visualization.
- */
+### Outputs final simulation results for visualization.
+
+When the simulation reaches the end time, this event outputs the final state of simulation fields to a file named "results" for post-processing and visualization.
+*/
 event end (t = end) {  
   // Output fields in a format suitable for visualization
   dump(file="results");
 }
 
 /**
- * @brief Entry point for the lid-driven cavity flow simulation with die injection.
- *
- * Initializes the computational grid and simulation parameters (domain size, timestep, tolerance, and CFL condition),
- * and stores the initial velocity field for convergence monitoring. Configures die injection settings by defining
- * the injection time and location, creates a directory for saving intermediate simulation snapshots, and triggers
- * the simulation run.
- *
- * @return int Exit status code (typically 0 upon successful completion).
- */
+### Entry point for the lid-driven cavity flow simulation with die injection.
+
+Initializes the computational grid and simulation parameters (domain size, timestep, tolerance, and CFL condition), and stores the initial velocity field for convergence monitoring. Configures die injection settings by defining the injection time and location, creates a directory for saving intermediate simulation snapshots, and triggers the simulation run.
+
+@return int Exit status code (typically 0 upon successful completion).
+*/
 int main() {
   // Initialize grid and parameters
   init_grid(1<<LEVEL);
