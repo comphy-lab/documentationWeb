@@ -221,6 +221,51 @@ int main() {
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+## Reporting Issues and Feature Requests
+
+We use GitHub Issues to track bugs, feature requests, and example requests for this repository. When creating an issue, please select the appropriate template to help us address your needs efficiently.
+
+### Issue Templates
+
+#### Bug Report:
+[Report here](https://github.com/comphy-lab/documentationWeb/issues/new?template=bug_report.md)
+
+- For problems with installation, compilation, or running code. 
+Please include:
+- Detailed description of the issue
+- Your environment (OS, compiler version)
+- Steps to reproduce
+- Expected vs. actual behavior
+- Error messages and logs
+- Code snippets or files that demonstrate the issue
+
+#### Feature/Topic Request:
+[Report here](https://github.com/comphy-lab/documentationWeb/issues/new?template=feature_request.md)
+- For requesting specific topics or functionality
+- New examples or tutorials
+- Additional functionality in the codebase
+- Improvements to existing materials
+
+#### Example Request:
+[Report here](https://github.com/comphy-lab/documentationWeb/issues/new?template=example_request.md)
+- For requesting specific examples that demonstrate:
+- Particular Basilisk features
+- Solutions to common problems
+- Implementation of specific physics or numerical methods
+
+#### General Question:
+[Report here](https://github.com/comphy-lab/documentationWeb/issues/new?template=general_question.md)
+- For any other questions
+
+### How to Create an Issue
+
+1. Go to the ["Issues" tab](https://github.com/comphy-lab/documentationWeb/issues) in the GitHub repository
+2. Click the ["New Issue"](https://github.com/comphy-lab/documentationWeb/issues/new/choose) button
+3. Select the appropriate template from the options
+4. Fill in the required information according to the template
+5. Add relevant labels if available
+6. Submit the issue
+
 ## License
 
 This project is licensed under the [GNU General Public License v3.0](LICENSE) - see the LICENSE file for details.
