@@ -1,18 +1,18 @@
 /**
-# Lid-Driven Cavity Flow of a Newtonian Fluid with Die Injection
+# Lid-Driven Cavity Flow of a Newtonian Fluid with dye Injection
 
 This simulation models a lid-driven cavity flow for a Newtonian fluid with
-constant viscosity and includes die injection for flow visualization. 
+constant viscosity and includes dye injection for flow visualization. 
 This extends the classic benchmark case with a passive tracer to visualize flow patterns.
 
 ## Parameters
 - Reynolds number: Re = ρUL/μ = 1/μ (with ρ=1, U=1, L=1)
 - We use μ = 1.0 by default (Re = 1)
-- Die injection at t=0.05 in the upper center of the cavity
+- dye injection at t=0.05 in the upper center of the cavity
 */
 
 #include "navier-stokes/centered.h"
-#include "die-injection.h"
+#include "dye-injection.h"
 
 // Constants
 #define LEVEL   8       // Grid refinement level
@@ -92,9 +92,9 @@ event end (t = end) {
 }
 
 /**
-### Entry point for the lid-driven cavity flow simulation with die injection.
+### Entry point for the lid-driven cavity flow simulation with dye injection.
 
-Initializes the computational grid and simulation parameters (domain size, timestep, tolerance, and CFL condition), and stores the initial velocity field for convergence monitoring. Configures die injection settings by defining the injection time and location, creates a directory for saving intermediate simulation snapshots, and triggers the simulation run.
+Initializes the computational grid and simulation parameters (domain size, timestep, tolerance, and CFL condition), and stores the initial velocity field for convergence monitoring. Configures dye injection settings by defining the injection time and location, creates a directory for saving intermediate simulation snapshots, and triggers the simulation run.
 
 @return int Exit status code (typically 0 upon successful completion).
 */
@@ -112,8 +112,8 @@ int main() {
     un[] = u.x[];
   }
 
-  // Die injection parameters
-  tInjection = 0.05;        // Inject the die after flow is established
+  // dye injection parameters
+  tInjection = 0.05;        // Inject the dye after flow is established
   xInjection = 0.00;        // X position (center of cavity)
   yInjection = 0.40;        // Y position (center of cavity)
 
