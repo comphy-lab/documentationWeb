@@ -5,9 +5,9 @@ set -e
 
 # Define the project root relative to the script location
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
-PROJECT_ROOT="$SCRIPT_DIR"
+PROJECT_ROOT=$(dirname $(dirname "$SCRIPT_DIR")) # Go two levels up from script dir
 DOCS_DIR="$PROJECT_ROOT/docs"
-PYTHON_SCRIPT="$PROJECT_ROOT/scripts/generate_docs.py"
+PYTHON_SCRIPT="$PROJECT_ROOT/.github/scripts/generate_docs.py"
 
 echo "Running documentation generation script..."
 python3 "$PYTHON_SCRIPT"
