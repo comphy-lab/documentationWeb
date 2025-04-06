@@ -118,7 +118,7 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
 
     # Add CSS if specified
     if CSS_PATH and CSS_PATH.is_file():
-        pandoc_cmd.extend(['--css', CSS_PATH.name]) # Use relative name
+        pandoc_cmd.extend(['--css', Path(CSS_PATH).name]) # Use relative name
 
     # --- Define Postprocessing Command (cpostproc equivalent) ---
     # awk -v tags="$1.tags" -f $BASILISK/darcsit/decl_anchors.awk
@@ -161,6 +161,27 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
                 except OSError:
                     pass # Ignore error if file couldn't be removed
                 return False
+
+        # --- Post-process HTML to remove trailing line numbers added by literate-c ---
+        try:
+            with open(output_html_path, 'r', encoding='utf-8') as f:
+                html_content = f.read()
+            
+            # Regex to find space(s) + digit(s) + optional space(s) right before </span>
+            # cleaned_html_content = re.sub(r'\s+\d+\s*</span>', '</span>', html_content)
+            # Updated regex: accounts for optional inner span around the number (e.g., <span class="dv">35</span>)
+            # cleaned_html_content = re.sub(r'\s*(?:<span class="[^"]*">\s*)?\d+\s*(?:</span>)?\s*</span>', '</span>', html_content)
+            # Third attempt: Capture the closing span and replace the whole match (number part + closing span) with just the captured closing span.
+            # cleaned_html_content = re.sub(r'(?:\s*<span class="[^"]*">\s*\d+\s*</span>|\s+\d+)(\s*</span>)', r'\1', html_content)
+            # Fourth attempt: Match one or more number segments (group 1), capture final closing span (group 2), replace with group 2.
+            cleaned_html_content = re.sub(r'(\s*(?:<span class="[^"]*">\s*\d+\s*</span>|\s+\d+)\s*)+(\s*</span>)', r'\2', html_content)
+
+            with open(output_html_path, 'w', encoding='utf-8') as f:
+                f.write(cleaned_html_content)
+        except Exception as e:
+            print(f"  Error during HTML cleanup for {output_html_path}: {e}")
+            return False
+        # --- End post-processing --- 
 
         # print(f"  Successfully generated {output_html_path.relative_to(repo_root / 'docs')}")
         return True
