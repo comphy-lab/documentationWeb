@@ -3,15 +3,38 @@ import subprocess
 import re
 import shutil
 from pathlib import Path
+import shlex # Import shlex for safe command splitting
 
 # Configuration
-REPO_ROOT = Path(__file__).parent.parent # Assumes script is in 'scripts/' directory
-SOURCE_DIRS = ['src-local', 'testCases', 'postProcess']
+# Assume the script is in .github/scripts, REPO_ROOT is the parent of .github
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+SOURCE_DIRS = ['src-local', 'testCases', 'postProcess'] # Directories within REPO_ROOT to scan
 DOCS_DIR = REPO_ROOT / 'docs'
 README_PATH = REPO_ROOT / 'README.md'
 INDEX_PATH = DOCS_DIR / 'index.html'
-HTML_TEMPLATE_PATH = None # Optional: Path to a custom Pandoc HTML template
-CSS_PATH = None # Optional: Path to a custom CSS file to copy
+# --- New configuration based on page2html ---
+BASILISK_DIR = REPO_ROOT / 'basilisk' # Assuming basilisk dir is at the root
+DARCSIT_DIR = BASILISK_DIR / 'src' / 'darcsit'
+TEMPLATE_PATH = DARCSIT_DIR / 'templates' / 'page.static'
+LITERATE_C_SCRIPT = DARCSIT_DIR / 'literate-c' # Path to the literate-c script
+BASE_URL = "/" # Relative base URL for links within the site
+WIKI_TITLE = "CoMPhy-Lab Documentation"
+# Check if essential directories/files exist
+if not BASILISK_DIR.is_dir():
+    print(f"Error: BASILISK_DIR not found at {BASILISK_DIR}")
+    exit(1)
+if not DARCSIT_DIR.is_dir():
+    print(f"Error: DARCSIT_DIR not found at {DARCSIT_DIR}")
+    exit(1)
+if not TEMPLATE_PATH.is_file():
+    print(f"Error: TEMPLATE_PATH not found at {TEMPLATE_PATH}")
+    exit(1)
+if not LITERATE_C_SCRIPT.is_file():
+    print(f"Error: literate-c script not found at {LITERATE_C_SCRIPT}")
+    exit(1)
+# --- End new configuration ---
+
+CSS_PATH = REPO_ROOT / '.github' / 'assets' / 'custom_styles.css' # Path to custom CSS
 
 
 def find_source_files(root_dir, source_dirs):
@@ -24,83 +47,132 @@ def find_source_files(root_dir, source_dirs):
             files.extend(src_path.rglob('*.h'))
     return files
 
-def extract_documentation(file_path):
-    """Extracts documentation comments (/** ... */) and code from a file."""
-    content = file_path.read_text(encoding='utf-8', errors='ignore')
-    # Basic extraction: treat /** */ blocks as Markdown, rest as code
-    # A more sophisticated parser could handle inline comments, etc.
-    # This regex finds /** ... */ blocks, making sure not to be too greedy
-    # It assumes comments are properly formatted and don't contain '*/' inside.
-    # It captures the comment content (group 1) and the code after it (group 2)
-    # or just code if no comment precedes it (group 3).
-    
-    # Simplified approach: Extract /** */ as markdown, everything else as C code block
-    in_doc_comment = False
-    markdown_content = ""
-    
-    for line in content.splitlines():
-        stripped_line = line.strip()
-        if stripped_line.startswith('/**'):
-            in_doc_comment = True
-            # Remove start token, handle single-line comments
-            comment_content = stripped_line[3:]
-            if comment_content.endswith('*/'):
-                 comment_content = comment_content[:-2].strip()
-                 markdown_content += comment_content + "\n"
-                 in_doc_comment = False
-            else:
-                 markdown_content += comment_content.strip() + "\n"
-        elif in_doc_comment and stripped_line.endswith('*/'):
-            in_doc_comment = False
-            # Remove end token
-            comment_content = stripped_line[:-2].strip()
-            if comment_content:
-                 markdown_content += comment_content + "\n"
-        elif in_doc_comment:
-            # Remove potential leading '*' often used in C comments
-            if stripped_line.startswith('*'):
-                markdown_content += stripped_line[1:].strip() + "\n"
-            else:
-                 markdown_content += stripped_line + "\n"
-        elif not in_doc_comment and stripped_line:
-            # This line is code. Wrap non-comment lines in a C code block later.
-            # For now, just accumulate the raw content to ensure ordering is kept.
-            # A better approach would be to structure markdown and code blocks distinctly.
-            pass # We'll handle code formatting during Pandoc conversion
+def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, repo_root: Path, basilisk_dir: Path, darcsit_dir: Path, template_path: Path, base_url: str, wiki_title: str, literate_c_script: Path):
+    """Processes a source file using logic similar to page2html, calling literate-c directly."""
+    print(f"  Processing {file_path.relative_to(repo_root)} -> {output_html_path.relative_to(repo_root / 'docs')}")
 
-    # Create a basic Markdown structure: Doc comments + full code block
-    # This needs refinement for better presentation.
-    final_markdown = markdown_content
-    final_markdown += "\n\n## Source Code\n"
-    final_markdown += "\n```c\n"
-    final_markdown += content # Add the original code
-    final_markdown += "\n```\n"
+    # --- Call literate-c script for preprocessing --- 
+    literate_c_cmd = [str(literate_c_script), str(file_path), '0'] # Use magic=0 for standard C files
+    try:
+        # Run literate-c, capture its output
+        preproc_proc = subprocess.Popen(literate_c_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8')
+        pandoc_input_content, preproc_stderr = preproc_proc.communicate()
 
-    return final_markdown
+        if preproc_proc.returncode != 0:
+            print(f"  Error during literate-c preprocessing for {file_path}:")
+            print(f"  literate-c stderr: {preproc_stderr}")
+            return False
+        # Replace the specific marker literate-c uses with standard pandoc 'c'
+        pandoc_input_content = pandoc_input_content.replace('~~~literatec', '~~~c')
 
-def generate_html(markdown_content, output_html_path, file_path):
-    """Converts Markdown content to HTML using Pandoc."""
-    cmd = [
-        'pandoc',
-        '-f', 'markdown', # Input format
-        '-t', 'html5',    # Output format
-        '--metadata', f'title={file_path.name}', # Use filename as title
-        '--standalone', # Create a full HTML document
-        '--toc',        # Add table of contents
-        '--highlight-style=pygments', # Syntax highlighting style
-        '-o', str(output_html_path)
-    ]
-    if HTML_TEMPLATE_PATH:
-        cmd.extend(['--template', str(HTML_TEMPLATE_PATH)])
-    if CSS_PATH:
-        cmd.extend(['--css', Path(CSS_PATH).name]) # Pandoc needs relative name if copied
+        # Handle case where preprocessing yields no output
+        if not pandoc_input_content.strip():
+             print(f"  Warning: Preprocessing yielded empty content for {file_path}. Skipping.")
+             # Optionally create an empty file or just skip
+             # output_html_path.touch() 
+             return True # Consider skipped as success
 
-    process = subprocess.run(cmd, input=markdown_content, text=True, capture_output=True, check=False)
-    if process.returncode != 0:
-        print(f"Error generating HTML for {file_path}:")
-        print(process.stderr)
+    except FileNotFoundError:
+         print(f"  Error: literate-c script not found at {literate_c_script} or is not executable.")
+         return False
+    except Exception as e:
+        print(f"  Error running literate-c preprocessing for {file_path}: {e}")
         return False
-    return True
+
+    # --- Pandoc Command Definition (remains mostly the same) ---
+    # Note: Highlighting type (.c, .py etc) is now handled by literate-c outputting ~~~c
+    # Determine file type for highlighting (simplified: only C for .c/.h)
+    pandoc_lang_type = ".c" # Default to C
+    if file_path.suffix.lower() == '.py':
+        pandoc_lang_type = ".python"
+    elif file_path.suffix.lower() == '.m':
+         pandoc_lang_type = ".octave"
+    # Add more types if needed based on page2html logic
+
+    # --- Define Pandoc Command ---
+    # Calculate relative URL path for the page
+    # Ensure URL starts with / and uses forward slashes
+    page_url = (base_url + output_html_path.relative_to(repo_root / 'docs').as_posix()).replace('//', '/')
+    page_title = file_path.relative_to(repo_root).as_posix() # Use relative path as title
+
+    pandoc_cmd = [
+        'pandoc',
+        '-f', 'markdown+smart', # Use markdown input with smart typography extension
+        '-t', 'html5',
+        '--katex',          # Enable KaTeX for math
+        '--toc',            # Generate Table of Contents
+        '--preserve-tabs',
+        '--standalone',     # Create full HTML doc
+        '--template', str(template_path),
+        # Variables passed to the template (-V key=value)
+        '-V', f'wikititle={wiki_title}',
+        '-V', f'base={base_url}',
+        '-V', f'pageUrl={page_url}',
+        '-V', f'pagetitle={page_title}',
+        # Add other variables from page2html if needed (tabs, users, etc.)
+        # '-V', 'tabs=<li class=selected><a href="$url">view</a></li><li><a href="$url?history">history</a></li>', # Example
+        # '-V', 'javascripts=<script src="/js/status.js" type="text/javascript"></script>', # Example
+        '-V', 'sitenav=true', # Assuming these are desired based on template
+        '-V', 'pagetools=true',
+    ]
+
+    # Add CSS if specified
+    if CSS_PATH and CSS_PATH.is_file():
+        pandoc_cmd.extend(['--css', CSS_PATH.name]) # Use relative name
+
+    # --- Define Postprocessing Command (cpostproc equivalent) ---
+    # awk -v tags="$1.tags" -f $BASILISK/darcsit/decl_anchors.awk
+    # Note: The .tags file generation is not included here, assuming decl_anchors handles its absence or it's not critical initially.
+    decl_anchors_script = darcsit_dir / 'decl_anchors.awk'
+    if not decl_anchors_script.is_file():
+        print(f"  Error: decl_anchors.awk script not found at {decl_anchors_script}")
+        return False
+    # Construct the expected tags file path relative to the repo root for awk
+    relative_tags_path = file_path.relative_to(repo_root).with_suffix(file_path.suffix + '.tags')
+    postproc_cmd = ['awk', '-v', f'tags={relative_tags_path}', '-f', str(decl_anchors_script)]
+
+
+    # --- Execute the pipeline: PANDOC | POSTPROC > output_file ---
+    # We feed the preprocessed content directly to pandoc's stdin
+    try:
+        # Start pandoc process, pipe input from string, pipe output to postprocessor
+        pandoc_proc = subprocess.Popen(pandoc_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8')
+        pandoc_stdout, pandoc_stderr = pandoc_proc.communicate(input=pandoc_input_content)
+
+        if pandoc_proc.returncode != 0:
+            print(f"  Error during pandoc processing for {file_path}:")
+            print(f"  Pandoc stderr: {pandoc_stderr}")
+            return False
+        if not pandoc_stdout:
+             print(f"  Warning: Pandoc generated empty output for {file_path}.")
+             # return False # Decide if empty output is an error
+
+        # Start postprocessor process, pipe input from pandoc's output, pipe output to final file
+        with open(output_html_path, 'w', encoding='utf-8') as f_out:
+            postproc_proc = subprocess.Popen(postproc_cmd, stdin=subprocess.PIPE, stdout=f_out, stderr=subprocess.PIPE, text=True, encoding='utf-8')
+            postproc_stdout, postproc_stderr = postproc_proc.communicate(input=pandoc_stdout)
+
+            if postproc_proc.returncode != 0:
+                print(f"  Error during post-processing (awk) for {file_path}:")
+                print(f"  Postproc stderr: {postproc_stderr}")
+                # Attempt to remove the potentially corrupted output file
+                try:
+                    output_html_path.unlink()
+                except OSError:
+                    pass # Ignore error if file couldn't be removed
+                return False
+
+        # print(f"  Successfully generated {output_html_path.relative_to(repo_root / 'docs')}")
+        return True
+
+    except FileNotFoundError as e:
+        print(f"  Error: Command not found during processing of {file_path}. Is '{e.filename}' installed and in PATH?")
+        print(f"  Failed command (or part of pipeline): {' '.join(pandoc_cmd)} | {' '.join(postproc_cmd)}")
+        return False
+    except Exception as e:
+        print(f"  An unexpected error occurred processing {file_path}: {e}")
+        return False
+
 
 def generate_index(readme_path, index_path, generated_files, docs_dir, repo_root):
     """Generates index.html from README.md and adds links to generated files."""
@@ -112,7 +184,8 @@ def generate_index(readme_path, index_path, generated_files, docs_dir, repo_root
 
     # Simple placeholder replacement or append links
     # You might want a specific marker like <!-- DOC_LINKS_START -->
-    links_markdown = "\n## Generated Documentation\n\n"
+    # Ensure blank line before heading for robust parsing
+    links_markdown = "\n\n## Generated Documentation\n\n"
     
     # Group links by top-level directory (src-local, testCases, etc.)
     grouped_links = {}
@@ -138,13 +211,19 @@ def generate_index(readme_path, index_path, generated_files, docs_dir, repo_root
         'pandoc',
         '-f', 'markdown',
         '-t', 'html5',
-        '--metadata', 'title=Project Documentation',
+        '--metadata', 'title=Project Documentation', # Changed title slightly
         '--standalone',
         '--toc',
-        '--highlight-style=pygments',
+        '--highlight-style=pygments', # Keep pygments for index, or change if template affects it
         '-o', str(index_path)
     ]
-    if CSS_PATH:
+    # Apply the same template to the index page? Optional.
+    # if TEMPLATE_PATH.is_file():
+    #     cmd.extend(['--template', str(TEMPLATE_PATH)])
+    #     cmd.extend(['-V', f'wikititle={WIKI_TITLE}', '-V', f'base={BASE_URL}']) # Add vars if using template
+
+    # Add CSS to index page command as well
+    if CSS_PATH and CSS_PATH.is_file():
         cmd.extend(['--css', Path(CSS_PATH).name])
 
     process = subprocess.run(cmd, input=final_readme_content, text=True, capture_output=True, check=False)
@@ -153,6 +232,7 @@ def generate_index(readme_path, index_path, generated_files, docs_dir, repo_root
         print(process.stderr)
         return False
     return True
+
 
 def main():
     """Main function to orchestrate documentation generation."""
@@ -168,26 +248,39 @@ def main():
     generated_files = {}
     errors = 0
 
+    # --- Copy CSS file to docs directory before processing files ---
+    if CSS_PATH and CSS_PATH.is_file():
+        print(f"Copying CSS: {CSS_PATH} to {DOCS_DIR}")
+        shutil.copy(CSS_PATH, DOCS_DIR)
+    else:
+        print("Warning: Custom CSS file not found or not specified. Code blocks might not have custom styling.")
+
     for file_path in source_files:
-        print(f"Processing: {file_path.relative_to(REPO_ROOT)}")
+        # print(f"Processing: {file_path.relative_to(REPO_ROOT)}") # Moved inside helper
         relative_path = file_path.relative_to(REPO_ROOT)
+        # Create a parallel structure in docs/
         output_html_path = DOCS_DIR / relative_path.with_suffix('.html')
         output_html_path.parent.mkdir(parents=True, exist_ok=True)
 
-        markdown_content = extract_documentation(file_path)
-
-        if generate_html(markdown_content, output_html_path, file_path):
+        # --- Use the new processing function ---
+        if process_file_with_page2html_logic(
+            file_path, output_html_path,
+            REPO_ROOT, BASILISK_DIR, DARCSIT_DIR, TEMPLATE_PATH, BASE_URL, WIKI_TITLE, LITERATE_C_SCRIPT
+        ):
             generated_files[file_path] = output_html_path
         else:
             errors += 1
+            print(f"-> Failed processing {file_path.relative_to(REPO_ROOT)}") # Add failure marker
+
 
     if errors > 0:
         print(f"\nEncountered {errors} errors during HTML generation.")
 
     print("\nGenerating index.html...")
-    if CSS_PATH and Path(CSS_PATH).exists():
-        print(f"Copying CSS: {CSS_PATH} to {DOCS_DIR}")
-        shutil.copy(CSS_PATH, DOCS_DIR)
+    # CSS is already copied, no need to copy again here
+    # if CSS_PATH and Path(CSS_PATH).exists():
+    #     print(f"Copying CSS: {CSS_PATH} to {DOCS_DIR}")
+    #     shutil.copy(CSS_PATH, DOCS_DIR)
     
     if not generate_index(README_PATH, INDEX_PATH, generated_files, DOCS_DIR, REPO_ROOT):
          print("Failed to generate index.html.")
