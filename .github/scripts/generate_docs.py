@@ -38,109 +38,126 @@ CSS_PATH = REPO_ROOT / '.github' / 'assets' / 'custom_styles.css' # Path to cust
 
 
 def find_source_files(root_dir, source_dirs):
-    """Finds all .c, .h, and .py files in the specified source directories."""
+    """Finds all .c, .h, .py, and .sh files in the specified source directories.
+    Also finds .sh files in the root directory."""
     files = []
+    # Search in source directories
     for dir_name in source_dirs:
         src_path = root_dir / dir_name
         if src_path.is_dir():
             files.extend(src_path.rglob('*.c'))
             files.extend(src_path.rglob('*.h'))
             files.extend(src_path.rglob('*.py'))
+            files.extend(src_path.rglob('*.sh'))
+    
+    # Also search for .sh files directly in the root directory
+    for sh_file in root_dir.glob('*.sh'):
+        files.append(sh_file)
+        
     return files
 
 def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, repo_root: Path, basilisk_dir: Path, darcsit_dir: Path, template_path: Path, base_url: str, wiki_title: str, literate_c_script: Path, docs_dir: Path):
     """Processes a source file using logic similar to page2html, calling literate-c directly."""
     print(f"  Processing {file_path.relative_to(repo_root)} -> {output_html_path.relative_to(repo_root / 'docs')}")
 
-    # Check if this is a Python file
+    # Check if this is a Python or Shell file
     is_python_file = file_path.suffix.lower() == '.py'
+    is_shell_file = file_path.suffix.lower() == '.sh'
     
-    if is_python_file:
-        # For Python files, we'll process them to separate comments from code
+    if is_python_file or is_shell_file:
+        # For Python or Shell files, process accordingly
         try:
-            # Read the Python file content
+            # Read the file content
             with open(file_path, 'r', encoding='utf-8') as f:
-                python_content = f.read()
+                file_content = f.read()
             
-            # Process the Python content to separate comments from code
-            # This is a simplified version of what literate-c does for C files
-            lines = python_content.split('\n')
-            processed_lines = []
-            in_code_block = False
-            code_block = []
-            in_docstring = False
-            docstring_lines = []
-            
-            for line in lines:
-                # Check for docstring comments (triple quotes)
-                if line.strip().startswith('"""') or line.strip().startswith("'''"):
-                    # If we're in a docstring, end it
+            if is_shell_file:
+                # For shell files, simply wrap the entire content in a single code block
+                # This will make it appear as one code block in the HTML with a copy button
+                pandoc_input_content = f"```bash\n{file_content}\n```"
+            else:  # is_python_file
+                # Process the Python content to separate comments from code
+                # This is a simplified version of what literate-c does for C files
+                lines = file_content.split('\n')
+                processed_lines = []
+                in_code_block = False
+                code_block = []
+                in_docstring = False
+                docstring_lines = []
+                
+                for line in lines:
+                    # Check for docstring comments (triple quotes)
+                    if line.strip().startswith('"""') or line.strip().startswith("'''"):
+                        # If we're in a docstring, end it
+                        if in_docstring:
+                            in_docstring = False
+                            # Add the docstring as text, but skip any lines that only contain quotes
+                            clean_docstring = []
+                            for doc_line in docstring_lines:
+                                # Skip lines that only contain quotes
+                                if doc_line.strip() in ('"""', "'''"):
+                                    continue
+                                # Remove starting/ending quotes from lines that have content
+                                doc_line = doc_line.strip()
+                                if doc_line.startswith('"""') or doc_line.startswith("'''"):
+                                    doc_line = doc_line[3:]
+                                if doc_line.endswith('"""') or doc_line.endswith("'''"):
+                                    doc_line = doc_line[:-3]
+                                clean_docstring.append(doc_line.strip())
+                            
+                            # Only add non-empty lines
+                            if clean_docstring:
+                                processed_lines.append("")
+                                processed_lines.extend(clean_docstring)
+                                processed_lines.append("")
+                            docstring_lines = []
+                        else:
+                            # Start a new docstring
+                            in_docstring = True
+                            # If we're in a code block, end it
+                            if in_code_block:
+                                processed_lines.append("```python")
+                                processed_lines.extend(code_block)
+                                processed_lines.append("```")
+                                code_block = []
+                                in_code_block = False
+                        continue
+                    
+                    # If we're in a docstring, add the line to docstring_lines
                     if in_docstring:
-                        in_docstring = False
-                        # Add the docstring as text, but skip any lines that only contain quotes
-                        clean_docstring = []
-                        for doc_line in docstring_lines:
-                            # Skip lines that only contain quotes
-                            if doc_line.strip() in ('"""', "'''"):
-                                continue
-                            # Remove starting/ending quotes from lines that have content
-                            doc_line = doc_line.strip()
-                            if doc_line.startswith('"""') or doc_line.startswith("'''"):
-                                doc_line = doc_line[3:]
-                            if doc_line.endswith('"""') or doc_line.endswith("'''"):
-                                doc_line = doc_line[:-3]
-                            clean_docstring.append(doc_line.strip())
-                        
-                        # Only add non-empty lines
-                        if clean_docstring:
-                            processed_lines.append("")
-                            processed_lines.extend(clean_docstring)
-                            processed_lines.append("")
-                        docstring_lines = []
+                        docstring_lines.append(line)
+                        continue
+                    
+                    # For regular code lines (including # comments)
+                    if not in_code_block and line.strip():
+                        in_code_block = True
+                        code_block.append(line)
+                    elif in_code_block:
+                        code_block.append(line)
                     else:
-                        # Start a new docstring
-                        in_docstring = True
-                        # If we're in a code block, end it
-                        if in_code_block:
-                            processed_lines.append("```python")
-                            processed_lines.extend(code_block)
-                            processed_lines.append("```")
-                            code_block = []
-                            in_code_block = False
-                    continue
+                        # Empty line outside of a code block
+                        processed_lines.append(line)
                 
-                # If we're in a docstring, add the line to docstring_lines
+                # End any remaining code block
+                if in_code_block:
+                    processed_lines.append("```python")
+                    processed_lines.extend(code_block)
+                    processed_lines.append("```")
+                
+                # End any remaining docstring
                 if in_docstring:
-                    docstring_lines.append(line)
-                    continue
+                    processed_lines.append("")
+                    processed_lines.extend(docstring_lines)
+                    processed_lines.append("")
                 
-                # For regular code lines (including # comments)
-                if not in_code_block and line.strip():
-                    in_code_block = True
-                    code_block.append(line)
-                elif in_code_block:
-                    code_block.append(line)
-                else:
-                    # Empty line outside of a code block
-                    processed_lines.append(line)
-            
-            # End any remaining code block
-            if in_code_block:
-                processed_lines.append("```python")
-                processed_lines.extend(code_block)
-                processed_lines.append("```")
-            
-            # End any remaining docstring
-            if in_docstring:
-                processed_lines.append("")
-                processed_lines.extend(docstring_lines)
-                processed_lines.append("")
-            
-            # Join the processed lines
-            pandoc_input_content = '\n'.join(processed_lines)
+                # Join the processed lines
+                pandoc_input_content = '\n'.join(processed_lines)
             
         except Exception as e:
-            print(f"  Error processing Python file {file_path}: {e}")
+            if is_shell_file:
+                print(f"  Error processing Shell file {file_path}: {e}")
+            else:
+                print(f"  Error processing Python file {file_path}: {e}")
             return False
     else:
         # --- Call literate-c script for preprocessing (for C files) --- 
@@ -216,8 +233,8 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
              print(f"  Warning: Pandoc generated empty output for {file_path}.")
              # return False # Decide if empty output is an error
 
-        # For Python files, we still need to post-process for copy buttons
-        if is_python_file:
+        # For Python and Shell files, we still need to post-process for copy buttons
+        if is_python_file or is_shell_file:
             # First write the pandoc output to the file
             with open(output_html_path, 'w', encoding='utf-8') as f_out:
                 f_out.write(pandoc_stdout)
@@ -407,13 +424,26 @@ def generate_index(readme_path, index_path, generated_files, docs_dir, repo_root
     for original_path, html_path in generated_files.items():
         relative_html_path = html_path.relative_to(docs_dir)
         relative_original_path = original_path.relative_to(repo_root)
-        top_dir = relative_original_path.parts[0]
+        
+        # Handle files in the root directory
+        if len(relative_original_path.parts) == 1:  # File is directly in the root
+            top_dir = "root"
+        else:
+            top_dir = relative_original_path.parts[0]
+            
         if top_dir not in grouped_links:
             grouped_links[top_dir] = []
         grouped_links[top_dir].append(f"- [{relative_original_path}]({relative_html_path})")
 
+    # Add a section for files in the root directory
+    if 'root' in grouped_links and grouped_links['root']:
+        links_markdown += f"### Root Directory\n\n"
+        links_markdown += "\n".join(sorted(grouped_links['root']))
+        links_markdown += "\n\n"
+    
+    # Add sections for files in the source directories
     for top_dir in sorted(grouped_links.keys()):
-         if top_dir in SOURCE_DIRS: # Only include specified source dirs
+         if top_dir in SOURCE_DIRS: # Source dirs
              links_markdown += f"### {top_dir}\n\n"
              links_markdown += "\n".join(sorted(grouped_links[top_dir]))
              links_markdown += "\n\n"
