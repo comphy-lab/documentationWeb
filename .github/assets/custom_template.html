@@ -36,6 +36,7 @@
     <div id="doc3" class="yui-t1">
         <div id="yui-main">
           <div id="maincol" class="yui-b">
+<!-- Removed userbox div 
 <div id="userbox">
   <noscript>
     <a href="$base$/_login">Login</a>
@@ -45,6 +46,7 @@
   <a id="loginlink" class="login" href="$base$/_login">Login / Get an account</a>
   <a id="logoutlink" class="login" href="$base$/_logout">Logout <span id="logged_in_user"></span></a>
 </div>
+-->
 $if(tabs)$
 <ul class="tabs">
   $tabs$
@@ -56,7 +58,9 @@ $endif$
   $endif$
   $if(notitle)$
   $else$
+<!-- Removed page title h1 
     <h1 class="pageTitle"><a href="$pageUrl$">$pagetitle$</a></h1>
+-->
   $endif$
 <ul class="messages" id="messages">$messages$</ul>
   <div id="status"></div>

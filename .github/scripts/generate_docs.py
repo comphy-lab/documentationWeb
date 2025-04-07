@@ -248,12 +248,24 @@ def generate_index(readme_path, index_path, generated_files, docs_dir, repo_root
     if CSS_PATH and CSS_PATH.is_file():
         cmd.extend(['--css', Path(CSS_PATH).name])
 
+    print(f"  [Debug Index] Target path: {index_path}") # DEBUG
+    print(f"  [Debug Index] Command: {' '.join(cmd)}") # DEBUG
+    # print(f"  [Debug Index] Input Content:\n{final_readme_content[:200]}...") # DEBUG (optional, can be long)
+
     process = subprocess.run(cmd, input=final_readme_content, text=True, capture_output=True, check=False)
+
+    # --- DEBUGGING: Print results unconditionally ---
+    print(f"  [Debug Index] Pandoc Return Code: {process.returncode}")
+    if process.stdout:
+        print(f"  [Debug Index] Pandoc STDOUT:\n{process.stdout}")
+    if process.stderr:
+        print(f"  [Debug Index] Pandoc STDERR:\n{process.stderr}")
+    # --- END DEBUGGING ---
+
     if process.returncode != 0:
-        print("Error generating index.html:")
-        print(process.stderr)
-        return False
-    return True
+        print("Error generating index.html:") # Keep original error message
+        # print(process.stderr) # Already printed in debug block
+    return process.returncode == 0
 
 
 def main():
