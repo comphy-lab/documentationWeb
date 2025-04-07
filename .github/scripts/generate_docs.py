@@ -47,7 +47,7 @@ def find_source_files(root_dir, source_dirs):
             files.extend(src_path.rglob('*.h'))
     return files
 
-def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, repo_root: Path, basilisk_dir: Path, darcsit_dir: Path, template_path: Path, base_url: str, wiki_title: str, literate_c_script: Path):
+def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, repo_root: Path, basilisk_dir: Path, darcsit_dir: Path, template_path: Path, base_url: str, wiki_title: str, literate_c_script: Path, docs_dir: Path):
     """Processes a source file using logic similar to page2html, calling literate-c directly."""
     print(f"  Processing {file_path.relative_to(repo_root)} -> {output_html_path.relative_to(repo_root / 'docs')}")
 
@@ -181,10 +181,54 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
             # Using re.DOTALL to ensure matching across potential newlines within the div.
             cleaned_html_content = re.sub(r'<div class="sourceCode" id="cb\d+"[^>]*>(.*?)</div>', r'\1', cleaned_html_content, flags=re.DOTALL | re.IGNORECASE)
 
+            # --- Add links to #include statements ---
+            def create_include_link(match):
+                prefix = match.group(1) # e.g., <span class="pp">#include </span>
+                span_tag_open = match.group(2) # e.g., <span class="im">
+                filename = match.group(3) # e.g., filename.h or path/filename.h
+                span_tag_close = match.group(4) # </span>
+
+                # Reconstruct original full span tag assuming literal quotes
+                # (Based on previous debug output, Pandoc uses literal quotes here)
+                original_span_tag = f'{span_tag_open}\"{filename}\"{span_tag_close}'
+
+                # Correctly handle potential paths in included filename for local check
+                # Split filename by '/' and take the last part for checking in src-local root
+                # Note: This assumes local includes are directly in src-local, not subdirs.
+                # If includes can be in src-local/subdir/, adjust this logic.
+                check_filename = filename.split('/')[-1]
+                local_file_path = repo_root / 'src-local' / check_filename
+                
+                if local_file_path.is_file():
+                    # Link to local generated HTML file
+                    # Use the *original* filename (with path) for the link target
+                    target_html_path = (docs_dir / 'src-local' / check_filename).with_suffix('.html')
+                    # Calculate relative path from the *current* HTML file's directory
+                    try:
+                        relative_link = os.path.relpath(target_html_path, start=output_html_path.parent)
+                        link_url = relative_link.replace('\\', '/') # Ensure forward slashes
+                    except ValueError:
+                        # Handle cases where paths are on different drives (should not happen here)
+                        link_url = target_html_path.as_uri() # Fallback to absolute URI
+                    link_title = f"Link to local documentation for {filename}"
+                else:
+                    # Link to basilisk.fr, preserving original path if present
+                    link_url = f"http://basilisk.fr/src/{filename}"
+                    link_title = f"Link to Basilisk source for {filename}"
+                
+                # Return the prefix span, followed by the link wrapping the filename span
+                return f'{prefix}<a href="{link_url}" title="{link_title}">{original_span_tag}</a>'
+
+            # Corrected regex: Find pp span followed by im span, allowing flexible space
+            # and handle potential HTML entity quotes (&quot;)
+            include_pattern = r'(<span class="pp">#include\s*</span>)(<span class=\"im\">)(?:\"|&quot;)(.*?)(?:\"|&quot;)(</span>)'
+            cleaned_html_content = re.sub(include_pattern, create_include_link, cleaned_html_content, flags=re.DOTALL)
+
             with open(output_html_path, 'w', encoding='utf-8') as f:
                 f.write(cleaned_html_content)
+            
         except Exception as e:
-            print(f"  Error during HTML cleanup for {output_html_path}: {e}")
+            print(f"Error during HTML cleanup for {output_html_path}: {e}")
             return False
         # --- End post-processing --- 
 
@@ -368,7 +412,7 @@ def main():
         # --- Use the new processing function ---
         if process_file_with_page2html_logic(
             file_path, output_html_path,
-            REPO_ROOT, BASILISK_DIR, DARCSIT_DIR, TEMPLATE_PATH, BASE_URL, WIKI_TITLE, LITERATE_C_SCRIPT
+            REPO_ROOT, BASILISK_DIR, DARCSIT_DIR, TEMPLATE_PATH, BASE_URL, WIKI_TITLE, LITERATE_C_SCRIPT, DOCS_DIR
         ):
             generated_files[file_path] = output_html_path
         else:
