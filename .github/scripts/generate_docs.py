@@ -116,9 +116,9 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
         '-V', 'pagetools=true',
     ]
 
-    # Add CSS if specified
-    if CSS_PATH and CSS_PATH.is_file():
-        pandoc_cmd.extend(['--css', Path(CSS_PATH).name]) # Use relative name
+    # Add CSS if specified - but we'll insert it directly later
+    # if CSS_PATH and CSS_PATH.is_file():
+    #     pandoc_cmd.extend(['--css', CSS_PATH.name]) # Use relative name
 
     # --- Define Postprocessing Command (cpostproc equivalent) ---
     # awk -v tags="$1.tags" -f $BASILISK/darcsit/decl_anchors.awk
@@ -183,6 +183,10 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
             return False
         # --- End post-processing --- 
 
+        # --- Insert CSS link directly into the HTML file ---
+        is_root = output_html_path.parent == DOCS_DIR
+        insert_css_link_in_html(output_html_path, CSS_PATH, is_root)
+
         # print(f"  Successfully generated {output_html_path.relative_to(repo_root / 'docs')}")
         return True
 
@@ -244,9 +248,9 @@ def generate_index(readme_path, index_path, generated_files, docs_dir, repo_root
     #     cmd.extend(['--template', str(TEMPLATE_PATH)])
     #     cmd.extend(['-V', f'wikititle={WIKI_TITLE}', '-V', f'base={BASE_URL}']) # Add vars if using template
 
-    # Add CSS to index page command as well
-    if CSS_PATH and CSS_PATH.is_file():
-        cmd.extend(['--css', Path(CSS_PATH).name])
+    # Add CSS to index page command as well - but we'll insert it directly later
+    # if CSS_PATH and CSS_PATH.is_file():
+    #     cmd.extend(['--css', Path(CSS_PATH).name])
 
     print(f"  [Debug Index] Target path: {index_path}") # DEBUG
     print(f"  [Debug Index] Command: {' '.join(cmd)}") # DEBUG
@@ -265,8 +269,49 @@ def generate_index(readme_path, index_path, generated_files, docs_dir, repo_root
     if process.returncode != 0:
         print("Error generating index.html:") # Keep original error message
         # print(process.stderr) # Already printed in debug block
-    return process.returncode == 0
+        return False
+    
+    # --- Insert CSS link directly into the index.html file ---
+    insert_css_link_in_html(index_path, CSS_PATH, True)
+    
+    return True
 
+
+# --- Define a custom function to add CSS link to each HTML file ---
+def insert_css_link_in_html(html_file_path, css_path, is_root=True):
+    """Insert the CSS link tag in the HTML file's head section."""
+    try:
+        with open(html_file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # Define the CSS path - relative to the HTML file
+        if is_root:
+            css_link = f'<link href="{Path(css_path).name}" rel="stylesheet" type="text/css" />'
+        else:
+            css_link = f'<link href="../{Path(css_path).name}" rel="stylesheet" type="text/css" />'
+        
+        # Find the head section to insert the CSS link
+        head_end_idx = content.find('</head>')
+        if head_end_idx == -1:
+            print(f"Warning: Could not find </head> tag in {html_file_path}")
+            return False
+        
+        # Check if the CSS link is already included
+        if 'link href="' + Path(css_path).name + '"' in content or 'link href="../' + Path(css_path).name + '"' in content:
+            # CSS link is already included, no need to add it
+            return True
+        
+        # Insert the CSS link tag just before the closing head tag
+        modified_content = content[:head_end_idx] + '    ' + css_link + '\n    ' + content[head_end_idx:]
+        
+        # Write back the modified content
+        with open(html_file_path, 'w', encoding='utf-8') as f:
+            f.write(modified_content)
+        
+        return True
+    except Exception as e:
+        print(f"Error inserting CSS link in {html_file_path}: {e}")
+        return False
 
 def main():
     """Main function to orchestrate documentation generation."""
@@ -286,8 +331,12 @@ def main():
     if CSS_PATH and CSS_PATH.is_file():
         print(f"Copying CSS: {CSS_PATH} to {DOCS_DIR}")
         shutil.copy(CSS_PATH, DOCS_DIR)
+        # Make sure CSS is directly included in HTML rather than relying on --css flag
+        with open(CSS_PATH, 'r') as css_file:
+            css_content = css_file.read()
     else:
         print("Warning: Custom CSS file not found or not specified. Code blocks might not have custom styling.")
+        css_content = ""
 
     for file_path in source_files:
         # print(f"Processing: {file_path.relative_to(REPO_ROOT)}") # Moved inside helper
