@@ -7,7 +7,7 @@ import shlex # Import shlex for safe command splitting
 
 # Configuration
 # Assume the script is in .github/scripts, REPO_ROOT is the parent of .github
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+REPO_ROOT = Path(__file__).parent.parent.parent
 SOURCE_DIRS = ['src-local', 'testCases', 'postProcess'] # Directories within REPO_ROOT to scan
 DOCS_DIR = REPO_ROOT / 'docs'
 README_PATH = REPO_ROOT / 'README.md'
@@ -15,7 +15,7 @@ INDEX_PATH = DOCS_DIR / 'index.html'
 # --- New configuration based on page2html ---
 BASILISK_DIR = REPO_ROOT / 'basilisk' # Assuming basilisk dir is at the root
 DARCSIT_DIR = BASILISK_DIR / 'src' / 'darcsit'
-TEMPLATE_PATH = DARCSIT_DIR / 'templates' / 'page.static'
+TEMPLATE_PATH = REPO_ROOT / '.github' / 'assets' / 'custom_template.html' # Use the modified local template
 LITERATE_C_SCRIPT = DARCSIT_DIR / 'literate-c' # Path to the literate-c script
 BASE_URL = "/" # Relative base URL for links within the site
 WIKI_TITLE = "CoMPhy-Lab Documentation"
@@ -230,12 +230,13 @@ def generate_index(readme_path, index_path, generated_files, docs_dir, repo_root
     # Convert the combined README + links to HTML for index.html
     cmd = [
         'pandoc',
-        '-f', 'markdown',
+        '-f', 'markdown+tex_math_dollars',
         '-t', 'html5',
-        '--metadata', 'title=Project Documentation', # Changed title slightly
         '--standalone',
-        '--toc',
-        '--highlight-style=pygments', # Keep pygments for index, or change if template affects it
+        '--mathjax',
+        '--template', str(TEMPLATE_PATH),
+        '-V', f'wikititle={WIKI_TITLE}',
+        '-V', f'base={BASE_URL}',
         '-o', str(index_path)
     ]
     # Apply the same template to the index page? Optional.

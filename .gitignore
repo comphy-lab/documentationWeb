@@ -73,7 +73,6 @@ deps/
 
 # Project specific files
 **/_darcs
-**/*.html
 **/intermediate*
 **/log*.dat
 **/restart*
