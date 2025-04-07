@@ -10,7 +10,7 @@ The codebase implements a classical lid driven cavity flow problem with dye inje
 
 *   `basilisk/src/` - Core Basilisk CFD library (reference only, do not modify)
 *   `postProcess/` - Project-specific post-processing tools
-    *   `2-LidDrivenCavity-Newtonian-dyeInjection.py` - Visualization script for post-processing
+    *   [`2-LidDrivenCavity-Newtonian-dyeInjection.py`](postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.html) - Visualization script for post-processing
     *   [`getData-LidDriven.c`](postProcess/getData-LidDriven.html) - Data extraction utility
 *   `src-local/` - Custom header files extending Basilisk functionality
     *   [`dye-injection.h`](src-local/dye-injection.html) - Dye injection for flow visualization
@@ -19,7 +19,7 @@ The codebase implements a classical lid driven cavity flow problem with dye inje
 
 ### src-local/ Directory
 
-The `src-local/` directory contains custom header files that extend the base Basilisk functionality:
+The [`src-local/`](src-local) directory contains custom header files that extend the base Basilisk functionality:
 
 - **dye-injection.h**: Implements a circular tracer (dye) injection for flow visualization with:
   - Configurable injection time and position
@@ -28,7 +28,7 @@ The `src-local/` directory contains custom header files that extend the base Bas
 
 ### postProcess/ Directory
 
-The `postProcess/` directory provides tools for analyzing and visualizing simulation results:
+The [`postProcess/`](postProcess) directory provides tools for analyzing and visualizing simulation results:
 
 - **2-LidDrivenCavity-Newtonian-dyeInjection.py**: Python script for generating visualizations that:
   - Processes simulation timesteps in parallel
@@ -40,7 +40,7 @@ The `postProcess/` directory provides tools for analyzing and visualizing simula
 
 ### testCases/ Directory
 
-The `testCases/` directory contains simulation configurations:
+The [`testCases/`](testCases) directory contains simulation configurations:
 
 - **LidDrivenCavity-Newtonian-dyeInjection.c**: Main simulation case that implements:
   - Classical lid-driven cavity flow for a Newtonian fluid

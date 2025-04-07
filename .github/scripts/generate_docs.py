@@ -38,58 +38,140 @@ CSS_PATH = REPO_ROOT / '.github' / 'assets' / 'custom_styles.css' # Path to cust
 
 
 def find_source_files(root_dir, source_dirs):
-    """Finds all .c and .h files in the specified source directories."""
+    """Finds all .c, .h, and .py files in the specified source directories."""
     files = []
     for dir_name in source_dirs:
         src_path = root_dir / dir_name
         if src_path.is_dir():
             files.extend(src_path.rglob('*.c'))
             files.extend(src_path.rglob('*.h'))
+            files.extend(src_path.rglob('*.py'))
     return files
 
 def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, repo_root: Path, basilisk_dir: Path, darcsit_dir: Path, template_path: Path, base_url: str, wiki_title: str, literate_c_script: Path, docs_dir: Path):
     """Processes a source file using logic similar to page2html, calling literate-c directly."""
     print(f"  Processing {file_path.relative_to(repo_root)} -> {output_html_path.relative_to(repo_root / 'docs')}")
 
-    # --- Call literate-c script for preprocessing --- 
-    literate_c_cmd = [str(literate_c_script), str(file_path), '0'] # Use magic=0 for standard C files
-    try:
-        # Run literate-c, capture its output
-        preproc_proc = subprocess.Popen(literate_c_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8')
-        pandoc_input_content, preproc_stderr = preproc_proc.communicate()
-
-        if preproc_proc.returncode != 0:
-            print(f"  Error during literate-c preprocessing for {file_path}:")
-            print(f"  literate-c stderr: {preproc_stderr}")
+    # Check if this is a Python file
+    is_python_file = file_path.suffix.lower() == '.py'
+    
+    if is_python_file:
+        # For Python files, we'll process them to separate comments from code
+        try:
+            # Read the Python file content
+            with open(file_path, 'r', encoding='utf-8') as f:
+                python_content = f.read()
+            
+            # Process the Python content to separate comments from code
+            # This is a simplified version of what literate-c does for C files
+            lines = python_content.split('\n')
+            processed_lines = []
+            in_code_block = False
+            code_block = []
+            in_docstring = False
+            docstring_lines = []
+            
+            for line in lines:
+                # Check for docstring comments (triple quotes)
+                if line.strip().startswith('"""') or line.strip().startswith("'''"):
+                    # If we're in a docstring, end it
+                    if in_docstring:
+                        in_docstring = False
+                        # Add the docstring as text, but skip any lines that only contain quotes
+                        clean_docstring = []
+                        for doc_line in docstring_lines:
+                            # Skip lines that only contain quotes
+                            if doc_line.strip() in ('"""', "'''"):
+                                continue
+                            # Remove starting/ending quotes from lines that have content
+                            doc_line = doc_line.strip()
+                            if doc_line.startswith('"""') or doc_line.startswith("'''"):
+                                doc_line = doc_line[3:]
+                            if doc_line.endswith('"""') or doc_line.endswith("'''"):
+                                doc_line = doc_line[:-3]
+                            clean_docstring.append(doc_line.strip())
+                        
+                        # Only add non-empty lines
+                        if clean_docstring:
+                            processed_lines.append("")
+                            processed_lines.extend(clean_docstring)
+                            processed_lines.append("")
+                        docstring_lines = []
+                    else:
+                        # Start a new docstring
+                        in_docstring = True
+                        # If we're in a code block, end it
+                        if in_code_block:
+                            processed_lines.append("```python")
+                            processed_lines.extend(code_block)
+                            processed_lines.append("```")
+                            code_block = []
+                            in_code_block = False
+                    continue
+                
+                # If we're in a docstring, add the line to docstring_lines
+                if in_docstring:
+                    docstring_lines.append(line)
+                    continue
+                
+                # For regular code lines (including # comments)
+                if not in_code_block and line.strip():
+                    in_code_block = True
+                    code_block.append(line)
+                elif in_code_block:
+                    code_block.append(line)
+                else:
+                    # Empty line outside of a code block
+                    processed_lines.append(line)
+            
+            # End any remaining code block
+            if in_code_block:
+                processed_lines.append("```python")
+                processed_lines.extend(code_block)
+                processed_lines.append("```")
+            
+            # End any remaining docstring
+            if in_docstring:
+                processed_lines.append("")
+                processed_lines.extend(docstring_lines)
+                processed_lines.append("")
+            
+            # Join the processed lines
+            pandoc_input_content = '\n'.join(processed_lines)
+            
+        except Exception as e:
+            print(f"  Error processing Python file {file_path}: {e}")
             return False
-        # Replace the specific marker literate-c uses with standard pandoc 'c'
-        pandoc_input_content = pandoc_input_content.replace('~~~literatec', '~~~c')
+    else:
+        # --- Call literate-c script for preprocessing (for C files) --- 
+        literate_c_cmd = [str(literate_c_script), str(file_path), '0'] # Use magic=0 for standard C files
+        try:
+            # Run literate-c, capture its output
+            preproc_proc = subprocess.Popen(literate_c_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8')
+            pandoc_input_content, preproc_stderr = preproc_proc.communicate()
 
-        # Handle case where preprocessing yields no output
-        if not pandoc_input_content.strip():
-             print(f"  Warning: Preprocessing yielded empty content for {file_path}. Skipping.")
-             # Optionally create an empty file or just skip
-             # output_html_path.touch() 
-             return True # Consider skipped as success
+            if preproc_proc.returncode != 0:
+                print(f"  Error during literate-c preprocessing for {file_path}:")
+                print(f"  literate-c stderr: {preproc_stderr}")
+                return False
+            # Replace the specific marker literate-c uses with standard pandoc 'c'
+            pandoc_input_content = pandoc_input_content.replace('~~~literatec', '~~~c')
 
-    except FileNotFoundError:
-         print(f"  Error: literate-c script not found at {literate_c_script} or is not executable.")
-         return False
-    except Exception as e:
-        print(f"  Error running literate-c preprocessing for {file_path}: {e}")
-        return False
+            # Handle case where preprocessing yields no output
+            if not pandoc_input_content.strip():
+                 print(f"  Warning: Preprocessing yielded empty content for {file_path}. Skipping.")
+                 # Optionally create an empty file or just skip
+                 # output_html_path.touch() 
+                 return True # Consider skipped as success
 
-    # --- Pandoc Command Definition (remains mostly the same) ---
-    # Note: Highlighting type (.c, .py etc) is now handled by literate-c outputting ~~~c
-    # Determine file type for highlighting (simplified: only C for .c/.h)
-    pandoc_lang_type = ".c" # Default to C
-    if file_path.suffix.lower() == '.py':
-        pandoc_lang_type = ".python"
-    elif file_path.suffix.lower() == '.m':
-         pandoc_lang_type = ".octave"
-    # Add more types if needed based on page2html logic
+        except FileNotFoundError:
+             print(f"  Error: literate-c script not found at {literate_c_script} or is not executable.")
+             return False
+        except Exception as e:
+            print(f"  Error running literate-c preprocessing for {file_path}: {e}")
+            return False
 
-    # --- Define Pandoc Command ---
+    # --- Pandoc Command Definition ---
     # Calculate relative URL path for the page
     # Ensure URL starts with / and uses forward slashes
     page_url = (base_url + output_html_path.relative_to(repo_root / 'docs').as_posix()).replace('//', '/')
@@ -120,22 +202,9 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
     # if CSS_PATH and CSS_PATH.is_file():
     #     pandoc_cmd.extend(['--css', CSS_PATH.name]) # Use relative name
 
-    # --- Define Postprocessing Command (cpostproc equivalent) ---
-    # awk -v tags="$1.tags" -f $BASILISK/darcsit/decl_anchors.awk
-    # Note: The .tags file generation is not included here, assuming decl_anchors handles its absence or it's not critical initially.
-    decl_anchors_script = darcsit_dir / 'decl_anchors.awk'
-    if not decl_anchors_script.is_file():
-        print(f"  Error: decl_anchors.awk script not found at {decl_anchors_script}")
-        return False
-    # Construct the expected tags file path relative to the repo root for awk
-    relative_tags_path = file_path.relative_to(repo_root).with_suffix(file_path.suffix + '.tags')
-    postproc_cmd = ['awk', '-v', f'tags={relative_tags_path}', '-f', str(decl_anchors_script)]
-
-
-    # --- Execute the pipeline: PANDOC | POSTPROC > output_file ---
-    # We feed the preprocessed content directly to pandoc's stdin
+    # --- Execute the pipeline ---
     try:
-        # Start pandoc process, pipe input from string, pipe output to postprocessor
+        # Start pandoc process, pipe input from string
         pandoc_proc = subprocess.Popen(pandoc_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8')
         pandoc_stdout, pandoc_stderr = pandoc_proc.communicate(input=pandoc_input_content)
 
@@ -147,101 +216,173 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
              print(f"  Warning: Pandoc generated empty output for {file_path}.")
              # return False # Decide if empty output is an error
 
-        # Start postprocessor process, pipe input from pandoc's output, pipe output to final file
-        with open(output_html_path, 'w', encoding='utf-8') as f_out:
-            postproc_proc = subprocess.Popen(postproc_cmd, stdin=subprocess.PIPE, stdout=f_out, stderr=subprocess.PIPE, text=True, encoding='utf-8')
-            postproc_stdout, postproc_stderr = postproc_proc.communicate(input=pandoc_stdout)
-
-            if postproc_proc.returncode != 0:
-                print(f"  Error during post-processing (awk) for {file_path}:")
-                print(f"  Postproc stderr: {postproc_stderr}")
-                # Attempt to remove the potentially corrupted output file
-                try:
-                    output_html_path.unlink()
-                except OSError:
-                    pass # Ignore error if file couldn't be removed
+        # For Python files, we still need to post-process for copy buttons
+        if is_python_file:
+            # First write the pandoc output to the file
+            with open(output_html_path, 'w', encoding='utf-8') as f_out:
+                f_out.write(pandoc_stdout)
+                
+            # Then process the file to add code block containers
+            try:
+                with open(output_html_path, 'r', encoding='utf-8') as f:
+                    html_content = f.read()
+                
+                # Fix any <pre><code> blocks by wrapping them in a container div
+                def wrap_pre_code_with_container(match):
+                    pre_content = match.group(0)
+                    return f'<div class="code-block-container">{pre_content}</div>'
+                
+                # Wrap <pre><code> blocks with a container div
+                processed_html = re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>', 
+                                         wrap_pre_code_with_container, 
+                                         html_content, 
+                                         flags=re.DOTALL | re.IGNORECASE)
+                
+                # Also handle code blocks created by pandoc (with sourceCode class)
+                def wrap_source_code_with_container(match):
+                    div_contents = match.group(1)
+                    return f'<div class="code-block-container">{div_contents}</div>'
+                
+                processed_html = re.sub(r'<div class="sourceCode" id="cb\d+"[^>]*>(.*?)</div>', 
+                                         wrap_source_code_with_container, 
+                                         processed_html, 
+                                         flags=re.DOTALL | re.IGNORECASE)
+                
+                # Write the processed HTML back to the file
+                with open(output_html_path, 'w', encoding='utf-8') as f_out:
+                    f_out.write(processed_html)
+                    
+            except Exception as e:
+                print(f"Error during HTML post-processing for Python file {file_path}: {e}")
+        else:
+            # For C files, use the post-processing step
+            # --- Define Postprocessing Command (cpostproc equivalent) ---
+            # awk -v tags="$1.tags" -f $BASILISK/darcsit/decl_anchors.awk
+            decl_anchors_script = darcsit_dir / 'decl_anchors.awk'
+            if not decl_anchors_script.is_file():
+                print(f"  Error: decl_anchors.awk script not found at {decl_anchors_script}")
                 return False
+            # Construct the expected tags file path relative to the repo root for awk
+            relative_tags_path = file_path.relative_to(repo_root).with_suffix(file_path.suffix + '.tags')
+            postproc_cmd = ['awk', '-v', f'tags={relative_tags_path}', '-f', str(decl_anchors_script)]
 
-        # --- Post-process HTML to remove trailing line numbers added by literate-c ---
-        try:
-            with open(output_html_path, 'r', encoding='utf-8') as f:
-                html_content = f.read()
-            
-            # Regex to find space(s) + digit(s) + optional space(s) right before </span>
-            # cleaned_html_content = re.sub(r'\s+\d+\s*</span>', '</span>', html_content)
-            # Updated regex: accounts for optional inner span around the number (e.g., <span class="dv">35</span>)
-            # cleaned_html_content = re.sub(r'\s*(?:<span class="[^"]*">\s*)?\d+\s*(?:</span>)?\s*</span>', '</span>', html_content)
-            # Third attempt: Capture the closing span and replace the whole match (number part + closing span) with just the captured closing span.
-            # cleaned_html_content = re.sub(r'(?:\s*<span class="[^"]*">\s*\d+\s*</span>|\s+\d+)(\s*</span>)', r'\1', html_content)
-            # Fourth attempt: Match one or more number segments (group 1), capture final closing span (group 2), replace with group 2.
-            cleaned_html_content = re.sub(r'(\s*(?:<span class="[^"]*">\s*\d+\s*</span>|\s+\d+)\s*)+(\s*</span>)', r'\2', html_content)
+            # Start postprocessor process, pipe input from pandoc's output, pipe output to final file
+            with open(output_html_path, 'w', encoding='utf-8') as f_out:
+                postproc_proc = subprocess.Popen(postproc_cmd, stdin=subprocess.PIPE, stdout=f_out, stderr=subprocess.PIPE, text=True, encoding='utf-8')
+                postproc_stdout, postproc_stderr = postproc_proc.communicate(input=pandoc_stdout)
 
-            # Remove the outer div.sourceCode wrapper generated by Pandoc
-            # This keeps the <pre> tag and its contents intact.
-            # Using re.DOTALL to ensure matching across potential newlines within the div.
-            cleaned_html_content = re.sub(r'<div class="sourceCode" id="cb\d+"[^>]*>(.*?)</div>', r'\1', cleaned_html_content, flags=re.DOTALL | re.IGNORECASE)
-
-            # --- Add links to #include statements ---
-            def create_include_link(match):
-                prefix = match.group(1) # e.g., <span class="pp">#include </span>
-                span_tag_open = match.group(2) # e.g., <span class="im">
-                filename = match.group(3) # e.g., filename.h or path/filename.h
-                span_tag_close = match.group(4) # </span>
-
-                # Reconstruct original full span tag assuming literal quotes
-                # (Based on previous debug output, Pandoc uses literal quotes here)
-                original_span_tag = f'{span_tag_open}\"{filename}\"{span_tag_close}'
-
-                # Correctly handle potential paths in included filename for local check
-                # Split filename by '/' and take the last part for checking in src-local root
-                # Note: This assumes local includes are directly in src-local, not subdirs.
-                # If includes can be in src-local/subdir/, adjust this logic.
-                check_filename = filename.split('/')[-1]
-                local_file_path = repo_root / 'src-local' / check_filename
-                
-                if local_file_path.is_file():
-                    # Link to local generated HTML file
-                    # Use the *original* filename (with path) for the link target
-                    target_html_path = (docs_dir / 'src-local' / check_filename).with_suffix('.html')
-                    # Calculate relative path from the *current* HTML file's directory
+                if postproc_proc.returncode != 0:
+                    print(f"  Error during post-processing (awk) for {file_path}:")
+                    print(f"  Postproc stderr: {postproc_stderr}")
+                    # Attempt to remove the potentially corrupted output file
                     try:
-                        relative_link = os.path.relpath(target_html_path, start=output_html_path.parent)
-                        link_url = relative_link.replace('\\', '/') # Ensure forward slashes
-                    except ValueError:
-                        # Handle cases where paths are on different drives (should not happen here)
-                        link_url = target_html_path.as_uri() # Fallback to absolute URI
-                    link_title = f"Link to local documentation for {filename}"
-                else:
-                    # Link to basilisk.fr, preserving original path if present
-                    link_url = f"http://basilisk.fr/src/{filename}"
-                    link_title = f"Link to Basilisk source for {filename}"
+                        output_html_path.unlink()
+                    except OSError:
+                        pass # Ignore error if file couldn't be removed
+                    return False
+
+            # --- Post-process HTML to remove trailing line numbers added by literate-c ---
+            try:
+                with open(output_html_path, 'r', encoding='utf-8') as f:
+                    html_content = f.read()
                 
-                # Return the prefix span, followed by the link wrapping the filename span
-                return f'{prefix}<a href="{link_url}" title="{link_title}">{original_span_tag}</a>'
+                # Regex to find space(s) + digit(s) + optional space(s) right before </span>
+                # cleaned_html_content = re.sub(r'\s+\d+\s*</span>', '</span>', html_content)
+                # Updated regex: accounts for optional inner span around the number (e.g., <span class="dv">35</span>)
+                # cleaned_html_content = re.sub(r'\s*(?:<span class="[^"]*">\s*)?\d+\s*(?:</span>)?\s*</span>', '</span>', html_content)
+                # Third attempt: Capture the closing span and replace the whole match (number part + closing span) with just the captured closing span.
+                # cleaned_html_content = re.sub(r'(?:\s*<span class="[^"]*">\s*\d+\s*</span>|\s+\d+)(\s*</span>)', r'\1', html_content)
+                # Fourth attempt: Match one or more number segments (group 1), capture final closing span (group 2), replace with group 2.
+                cleaned_html_content = re.sub(r'(\s*(?:<span class="[^"]*">\s*\d+\s*</span>|\s+\d+)\s*)+(\s*</span>)', r'\2', html_content)
 
-            # Corrected regex: Find pp span followed by im span, allowing flexible space
-            # and handle potential HTML entity quotes (&quot;)
-            include_pattern = r'(<span class="pp">#include\s*</span>)(<span class=\"im\">)(?:\"|&quot;)(.*?)(?:\"|&quot;)(</span>)'
-            cleaned_html_content = re.sub(include_pattern, create_include_link, cleaned_html_content, flags=re.DOTALL)
+                # First, fix any <pre><code> blocks by wrapping them in a container div
+                def wrap_pre_code_with_container(match):
+                    pre_content = match.group(0)
+                    return f'<div class="code-block-container">{pre_content}</div>'
+                
+                # Wrap <pre><code> blocks with a container div
+                cleaned_html_content = re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>', 
+                                          wrap_pre_code_with_container, 
+                                          cleaned_html_content, 
+                                          flags=re.DOTALL | re.IGNORECASE)
 
-            with open(output_html_path, 'w', encoding='utf-8') as f:
-                f.write(cleaned_html_content)
-            
-        except Exception as e:
-            print(f"Error during HTML cleanup for {output_html_path}: {e}")
-            return False
-        # --- End post-processing --- 
+                # Then process the sourceCode divs
+                def wrap_source_code_with_container(match):
+                    # Get the div's contents (which includes the pre/code)
+                    div_contents = match.group(1)
+                    # Return the pre/code wrapped in our container div
+                    return f'<div class="code-block-container">{div_contents}</div>'
+
+                # Replace the standard sourceCode div with our container div
+                cleaned_html_content = re.sub(r'<div class="sourceCode" id="cb\d+"[^>]*>(.*?)</div>', 
+                                          wrap_source_code_with_container, 
+                                          cleaned_html_content, 
+                                          flags=re.DOTALL | re.IGNORECASE)
+
+                # --- Add links to #include statements ---
+                def create_include_link(match):
+                    prefix = match.group(1) # e.g., <span class="pp">#include </span>
+                    span_tag_open = match.group(2) # e.g., <span class="im">
+                    filename = match.group(3) # e.g., filename.h or path/filename.h
+                    span_tag_close = match.group(4) # </span>
+
+                    # Reconstruct original full span tag assuming literal quotes
+                    # (Based on previous debug output, Pandoc uses literal quotes here)
+                    original_span_tag = f'{span_tag_open}\"{filename}\"{span_tag_close}'
+
+                    # Correctly handle potential paths in included filename for local check
+                    # Split filename by '/' and take the last part for checking in src-local root
+                    # Note: This assumes local includes are directly in src-local, not subdirs.
+                    # If includes can be in src-local/subdir/, adjust this logic.
+                    check_filename = filename.split('/')[-1]
+                    local_file_path = repo_root / 'src-local' / check_filename
+                    
+                    if local_file_path.is_file():
+                        # Link to local generated HTML file
+                        # Use the *original* filename (with path) for the link target
+                        target_html_path = (docs_dir / 'src-local' / check_filename).with_suffix('.html')
+                        # Calculate relative path from the *current* HTML file's directory
+                        try:
+                            relative_link = os.path.relpath(target_html_path, start=output_html_path.parent)
+                            link_url = relative_link.replace('\\', '/') # Ensure forward slashes
+                        except ValueError:
+                            # Handle cases where paths are on different drives (should not happen here)
+                            link_url = target_html_path.as_uri() # Fallback to absolute URI
+                        link_title = f"Link to local documentation for {filename}"
+                    else:
+                        # Link to basilisk.fr, preserving original path if present
+                        link_url = f"http://basilisk.fr/src/{filename}"
+                        link_title = f"Link to Basilisk source for {filename}"
+                    
+                    # Return the prefix span, followed by the link wrapping the filename span
+                    return f'{prefix}<a href="{link_url}" title="{link_title}">{original_span_tag}</a>'
+
+                # Corrected regex: Find pp span followed by im span, allowing flexible space
+                # and handle potential HTML entity quotes (&quot;)
+                include_pattern = r'(<span class="pp">#include\s*</span>)(<span class=\"im\">)(?:\"|&quot;)(.*?)(?:\"|&quot;)(</span>)'
+                cleaned_html_content = re.sub(include_pattern, create_include_link, cleaned_html_content, flags=re.DOTALL)
+
+                with open(output_html_path, 'w', encoding='utf-8') as f:
+                    f.write(cleaned_html_content)
+                
+            except Exception as e:
+                print(f"Error during HTML cleanup for {output_html_path}: {e}")
+                return False
+            # --- End post-processing --- 
 
         # --- Insert CSS link directly into the HTML file ---
         is_root = output_html_path.parent == DOCS_DIR
         insert_css_link_in_html(output_html_path, CSS_PATH, is_root)
+        
+        # --- Insert JavaScript for code copy functionality ---
+        insert_javascript_in_html(output_html_path)
 
         # print(f"  Successfully generated {output_html_path.relative_to(repo_root / 'docs')}")
         return True
 
     except FileNotFoundError as e:
         print(f"  Error: Command not found during processing of {file_path}. Is '{e.filename}' installed and in PATH?")
-        print(f"  Failed command (or part of pipeline): {' '.join(pandoc_cmd)} | {' '.join(postproc_cmd)}")
+        print(f"  Failed command (or part of pipeline): {' '.join(pandoc_cmd)} | {' '.join(postproc_cmd) if not is_python_file else ''}")
         return False
     except Exception as e:
         print(f"  An unexpected error occurred processing {file_path}: {e}")
@@ -320,28 +461,134 @@ def generate_index(readme_path, index_path, generated_files, docs_dir, repo_root
         # print(process.stderr) # Already printed in debug block
         return False
     
-    # --- Post-process index.html to remove div.sourceCode wrapper ---
+    # --- Post-process index.html to add code block containers for copy buttons ---
     try:
         with open(index_path, 'r', encoding='utf-8') as f_in:
             index_html_content = f_in.read()
         
-        # Use the same regex as in process_file_with_page2html_logic
-        cleaned_index_html = re.sub(r'<div class="sourceCode" id="cb\d+"[^>]*>(.*?)</div>', r'\1', index_html_content, flags=re.DOTALL | re.IGNORECASE)
-
+        # First, handle regular <pre><code> blocks
+        def wrap_pre_code_with_container(match):
+            pre_content = match.group(0)
+            return f'<div class="code-block-container">{pre_content}</div>'
+        
+        # Wrap <pre><code> blocks with a container div
+        processed_html = re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>', 
+                               wrap_pre_code_with_container, 
+                               index_html_content, 
+                               flags=re.DOTALL | re.IGNORECASE)
+        
+        # Then handle sourceCode divs (from Pandoc code blocks in Markdown)
+        def wrap_source_code_with_container(match):
+            div_contents = match.group(1)
+            return f'<div class="code-block-container">{div_contents}</div>'
+        
+        # Replace the sourceCode div with our container div
+        processed_html = re.sub(r'<div class="sourceCode" id="cb\d+"[^>]*>(.*?)</div>', 
+                               wrap_source_code_with_container, 
+                               processed_html, 
+                               flags=re.DOTALL | re.IGNORECASE)
+        
+        # Write the processed HTML back to the file
         with open(index_path, 'w', encoding='utf-8') as f_out:
-            f_out.write(cleaned_index_html)
+            f_out.write(processed_html)
             
     except Exception as e:
-        print(f"Warning: Failed to clean div.sourceCode from {index_path}: {e}")
-        # Continue even if cleanup fails, the base file was generated
+        print(f"Warning: Failed to process code blocks in {index_path}: {e}")
+        # Continue even if processing fails, the base file was generated
 
     # --- Insert CSS link directly into the index.html file ---
     insert_css_link_in_html(index_path, CSS_PATH, True)
+    
+    # --- Insert JavaScript for code copy functionality into index.html ---
+    insert_javascript_in_html(index_path)
     
     return True
 
 
 # --- Define a custom function to add CSS link to each HTML file ---
+def insert_javascript_in_html(html_file_path):
+    """Insert JavaScript for copy functionality in the HTML file."""
+    try:
+        with open(html_file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # JavaScript for copy functionality
+        copy_js = '''
+    <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add copy button to each code block container
+        const codeBlocks = document.querySelectorAll('.code-block-container pre');
+        codeBlocks.forEach(function(codeBlock, index) {
+            // Create button element
+            const button = document.createElement('button');
+            button.className = 'copy-button';
+            button.textContent = 'Copy';
+            button.setAttribute('aria-label', 'Copy code to clipboard');
+            button.setAttribute('data-copy-state', 'copy');
+            
+            // Get the code block container (parent of the pre)
+            const container = codeBlock.parentNode;
+            
+            // Add the button to the container
+            container.appendChild(button);
+            
+            // Set up click event
+            button.addEventListener('click', function() {
+                // Create a textarea element to copy from
+                const textarea = document.createElement('textarea');
+                // Get the text content from the pre element (the actual code)
+                textarea.value = codeBlock.textContent;
+                document.body.appendChild(textarea);
+                textarea.select();
+                
+                try {
+                    // Execute copy command
+                    document.execCommand('copy');
+                    // Update button state
+                    button.textContent = 'Copied!';
+                    button.classList.add('copied');
+                    
+                    // Reset button state after 2 seconds
+                    setTimeout(function() {
+                        button.textContent = 'Copy';
+                        button.classList.remove('copied');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Copy failed:', err);
+                    button.textContent = 'Error!';
+                }
+                
+                // Clean up
+                document.body.removeChild(textarea);
+            });
+        });
+    });
+    </script>
+        '''
+        
+        # Find the body end to insert the JavaScript
+        body_end_idx = content.find('</body>')
+        if body_end_idx == -1:
+            print(f"Warning: Could not find </body> tag in {html_file_path}")
+            return False
+        
+        # Check if the JavaScript is already included
+        if 'class="copy-button"' in content:
+            # JavaScript is already included, no need to add it
+            return True
+        
+        # Insert the JavaScript code just before the closing body tag
+        modified_content = content[:body_end_idx] + copy_js + content[body_end_idx:]
+        
+        # Write back the modified content
+        with open(html_file_path, 'w', encoding='utf-8') as f:
+            f.write(modified_content)
+        
+        return True
+    except Exception as e:
+        print(f"Error inserting JavaScript in {html_file_path}: {e}")
+        return False
+
 def insert_css_link_in_html(html_file_path, css_path, is_root=True):
     """Insert the CSS link tag in the HTML file's head section."""
     try:
