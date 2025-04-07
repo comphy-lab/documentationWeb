@@ -137,31 +137,31 @@ etc.)</li>
 <h3 id="installation">Installation</h3>
 <ol type="1">
 <li><p>Clone this repository:</p>
-<div class="sourceCode" id="cb1"><pre
+<pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/username/comphy-lab.git</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> comphy-lab</span></code></pre></div></li>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> comphy-lab</span></code></pre></li>
 <li><p>Make sure Basilisk is properly installed and the BASILISK
 environment variable is set.</p></li>
 <li><p>Compile a test case to verify the setup:</p>
-<div class="sourceCode" id="cb2"><pre
+<pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> testCases</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> test_name.tst</span></code></pre></div></li>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> test_name.tst</span></code></pre></li>
 </ol>
 <h2 id="usage">Usage</h2>
 <h3 id="compiling-simulation-files">Compiling Simulation Files</h3>
 <p>Basic compilation:</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qcc</span> <span class="at">-autolink</span> file.c <span class="at">-o</span> executable <span class="at">-lm</span></span></code></pre></div>
+<pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qcc</span> <span class="at">-autolink</span> file.c <span class="at">-o</span> executable <span class="at">-lm</span></span></code></pre>
 <p>Compilation with custom headers:</p>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qcc</span> <span class="at">-I</span><span class="va">$PWD</span>/src-local <span class="at">-autolink</span> file.c <span class="at">-o</span> executable <span class="at">-lm</span></span></code></pre></div>
+<pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qcc</span> <span class="at">-I</span><span class="va">$PWD</span>/src-local <span class="at">-autolink</span> file.c <span class="at">-o</span> executable <span class="at">-lm</span></span></code></pre>
 <h3 id="running-simulations">Running Simulations</h3>
 <p>Run a compiled executable:</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./executable</span></span></code></pre></div>
+<pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./executable</span></span></code></pre>
 <p>Execute a specific test case:</p>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> testCases <span class="kw">&amp;&amp;</span> <span class="fu">make</span> test_name.tst</span></code></pre></div>
+<pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> testCases <span class="kw">&amp;&amp;</span> <span class="fu">make</span> test_name.tst</span></code></pre>
 <h3 id="post-processing">Post-Processing</h3>
 <p>The <code>postProcess/</code> directory contains tools for
 post-processing simulation results:</p>
@@ -198,7 +198,7 @@ messages</li>
 <h2 id="example">Example</h2>
 <p>Here’s the actual lid-driven cavity flow with dye injection
 implementation:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&quot;navier-stokes/centered.h&quot;</span></span>
+<pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&quot;navier-stokes/centered.h&quot;</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&quot;dye-injection.h&quot;</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Constants</span></span>
@@ -278,7 +278,7 @@ implementation:</p>
 <span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Run simulation</span></span>
 <span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a>  run<span class="op">();</span></span>
-<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre>
 <h2 id="contributing">Contributing</h2>
 <ol type="1">
 <li>Fork the repository</li>
