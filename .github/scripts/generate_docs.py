@@ -370,7 +370,8 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
                     if local_file_path.is_file():
                         # Link to local generated HTML file
                         # Use the *original* filename (with path) for the link target
-                        target_html_path = (docs_dir / 'src-local' / check_filename).with_suffix('.html')
+                        # Make sure to preserve the original file extension in the HTML filename
+                        target_html_path = (docs_dir / 'src-local' / check_filename).with_suffix(local_file_path.suffix + '.html')
                         # Calculate relative path from the *current* HTML file's directory
                         try:
                             relative_link = os.path.relpath(target_html_path, start=output_html_path.parent)
@@ -439,12 +440,12 @@ def convert_directory_tree_to_html(readme_content):
     <div class="repository-structure">
     * **basilisk/src/** - Core Basilisk CFD library (reference only, do not modify)
     * **[testCases/](testCases)** - Test cases for simulation
-      * **[LidDrivenCavity-Newtonian-dyeInjection.c](testCases/LidDrivenCavity-Newtonian-dyeInjection.html)** - Lid-driven cavity with dye injection
+      * **[LidDrivenCavity-Newtonian-dyeInjection.c](testCases/LidDrivenCavity-Newtonian-dyeInjection.c.html)** - Lid-driven cavity with dye injection
     * **[src-local/](src-local)** - Custom header files extending Basilisk functionality
-      * **[dye-injection.h](src-local/dye-injection.html)** - Dye injection for flow visualization
+      * **[dye-injection.h](src-local/dye-injection.h.html)** - Dye injection for flow visualization
     * **[postProcess/](postProcess)** - Project-specific post-processing tools
-      * **[2-LidDrivenCavity-Newtonian-dyeInjection.py](postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.html)** - Visualization script for post-processing
-      * **[getData-LidDriven.c](postProcess/getData-LidDriven.html)** - Data extraction utility
+      * **[2-LidDrivenCavity-Newtonian-dyeInjection.py](postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py.html)** - Visualization script for post-processing
+      * **[getData-LidDriven.c](postProcess/getData-LidDriven.c.html)** - Data extraction utility
     </div>
     """
     # Find the directory tree section
@@ -526,10 +527,11 @@ def convert_directory_tree_to_html(readme_content):
             # Determine the parent directory path
             parent_path = path_stack[indent_level-1] if indent_level > 0 and path_stack else ""
             
-            # Create HTML link with correct extension
+            # Create HTML link with extension preserved in the filename
             file_path = f"{parent_path}/{path}" if parent_path else path
             file_path = file_path.lstrip('/')
             
+            # Preserve the original file extension in the link
             item_html += f"**[{path}]({file_path}.html)** - {description}"
         
         html_structure.append(item_html)
@@ -573,6 +575,8 @@ def generate_index(readme_path, index_path, generated_files, docs_dir, repo_root
             
         if top_dir not in grouped_links:
             grouped_links[top_dir] = []
+        
+        # Make sure the html_path has the correct format with preserved extension
         grouped_links[top_dir].append(f"- [{relative_original_path}]({relative_html_path})")
 
     # Add a section for files in the root directory
@@ -823,7 +827,8 @@ def main():
         # print(f"Processing: {file_path.relative_to(REPO_ROOT)}") # Moved inside helper
         relative_path = file_path.relative_to(REPO_ROOT)
         # Create a parallel structure in docs/
-        output_html_path = DOCS_DIR / relative_path.with_suffix('.html')
+        # Keep the original extension and append .html instead of replacing it
+        output_html_path = DOCS_DIR / relative_path.with_suffix(file_path.suffix + '.html')
         output_html_path.parent.mkdir(parents=True, exist_ok=True)
 
         # --- Use the new processing function ---
