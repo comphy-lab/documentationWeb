@@ -1,0 +1,409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <title>CoMPhy-Lab Documentation - postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py</title>
+        <!-- <link href="css/custom.css" rel="stylesheet" media="screen, projection" type="text/css" /> -->
+    <!-- <link href="css/print.css" rel="stylesheet" media="print" type= "text/css" /> -->
+        <!--[if IE]><!-- <link href="css/ie.css" rel="stylesheet" media="screen, projection" type="text/css" /> --><![endif]-->
+    <!-- <link rel="stylesheet" href="css/basilisk.css"/> -->
+    <!-- Link to our custom styles is added by Pandoc via --css flag -->
+    <script src="//js/jquery.min.js" type="text/javascript"></script>
+    <script src="//js/jquery-ui.packed.js" type="text/javascript"></script>
+    <script src="//js/plots.js" type="text/javascript"></script>
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css"
+      integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j"
+      crossorigin="anonymous"/>
+<script defer
+	src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js"
+	integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ"
+	crossorigin="anonymous">
+</script>
+      <link href="../custom_styles.css" rel="stylesheet" type="text/css" />
+    </head>
+  <body>
+    <div id="doc3" class="yui-t1">
+        <div id="yui-main">
+          <div id="maincol" class="yui-b">
+<!-- Removed userbox div 
+<div id="userbox">
+  <noscript>
+    <a href="//_login">Login</a>
+    <a href="//_logout">Logout</a>
+  </noscript>
+  &nbsp;
+  <a id="loginlink" class="login" href="//_login">Login / Get an account</a>
+  <a id="logoutlink" class="login" href="//_logout">Logout <span id="logged_in_user"></span></a>
+</div>
+-->
+<div id="content">
+    <!-- Removed page title h1 
+    <h1 class="pageTitle"><a href="/postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py.html">postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py</a></h1>
+-->
+  <ul class="messages" id="messages"></ul>
+  <div id="status"></div>
+    <div class="code-block-container"><div class="code-block-container"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> subprocess <span class="im">as</span> sp</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.collections <span class="im">import</span> LineCollection</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.ticker <span class="im">import</span> StrMethodFormatter</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mpl_toolkits.axes_grid1 <span class="im">import</span> make_axes_locatable</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> argparse  <span class="co"># Add at top with other imports</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> multiprocessing <span class="im">as</span> mp</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> functools <span class="im">import</span> partial</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>matplotlib.rcParams[<span class="st">&#39;font.family&#39;</span>] <span class="op">=</span> <span class="st">&#39;serif&#39;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>matplotlib.rcParams[<span class="st">&#39;text.usetex&#39;</span>] <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>matplotlib.rcParams[<span class="st">&#39;text.latex.preamble&#39;</span>] <span class="op">=</span> <span class="vs">r&#39;</span><span class="er">\</span><span class="vs">usepackage{amsmath}&#39;</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gettingfield(filename, zmin, zmax, rmin, rmax, nr):</span></code></pre></div></div>
+<p>Extract simulation field data from a simulation file.</p>
+<p>This function executes the external program “getData-LidDriven” with
+the given simulation file and boundary parameters to extract numerical
+data for axial and radial coordinates, temperature, velocity, and stream
+function. The output is parsed into NumPy arrays, reshaped to a (nz, nr)
+grid based on the number of radial grid points (nr), rotated 90°
+counterclockwise, and flipped vertically to ensure the correct
+orientation for further processing. It returns the processed field
+arrays along with the total number of axial grid points (nz).</p>
+<p>Args: filename: Path to the simulation data file. zmin: Minimum axial
+coordinate. zmax: Maximum axial coordinate. rmin: Minimum radial
+coordinate. rmax: Maximum radial coordinate. nr: Number of grid points
+in the radial direction.</p>
+<p>Returns: tuple: A tuple containing: - R (numpy.ndarray): 2D array of
+radial coordinate values. - Z (numpy.ndarray): 2D array of axial
+coordinate values. - T (numpy.ndarray): 2D array of temperature values.
+- vel (numpy.ndarray): 2D array of velocity values. - psi
+(numpy.ndarray): 2D array of stream function values. - nz (int): Number
+of grid points in the axial direction.</p>
+<div class="code-block-container"><div class="code-block-container"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>    exe <span class="op">=</span> [<span class="st">&quot;./getData-LidDriven&quot;</span>, filename, <span class="bu">str</span>(zmin), <span class="bu">str</span>(rmin), <span class="bu">str</span>(zmax), <span class="bu">str</span>(rmax), <span class="bu">str</span>(nr)]</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> sp.Popen(exe, stdout<span class="op">=</span>sp.PIPE, stderr<span class="op">=</span>sp.PIPE)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    stdout, stderr <span class="op">=</span> p.communicate()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    temp1 <span class="op">=</span> stderr.decode(<span class="st">&quot;utf-8&quot;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    temp2 <span class="op">=</span> temp1.split(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># print(temp2) #debugging</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    Rtemp, Ztemp, Ttemp, veltemp, Psitemp  <span class="op">=</span> [],[],[],[], []</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> n1 <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(temp2)):</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        temp3 <span class="op">=</span> temp2[n1].split(<span class="st">&quot; &quot;</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> temp3 <span class="op">==</span> [<span class="st">&#39;&#39;</span>]:</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">pass</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>            Ztemp.append(<span class="bu">float</span>(temp3[<span class="dv">0</span>]))</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>            Rtemp.append(<span class="bu">float</span>(temp3[<span class="dv">1</span>]))</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>            Ttemp.append(<span class="bu">float</span>(temp3[<span class="dv">2</span>]))</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>            veltemp.append(<span class="bu">float</span>(temp3[<span class="dv">3</span>]))</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>            Psitemp.append(<span class="bu">float</span>(temp3[<span class="dv">4</span>]))</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    R <span class="op">=</span> np.asarray(Rtemp)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    Z <span class="op">=</span> np.asarray(Ztemp)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    T <span class="op">=</span> np.asarray(Ttemp)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    vel <span class="op">=</span> np.asarray(veltemp)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    psi <span class="op">=</span> np.asarray(Psitemp)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    nz <span class="op">=</span> <span class="bu">int</span>(<span class="bu">len</span>(Z)<span class="op">/</span>nr)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># print(&quot;nr is %d %d&quot; % (nr, len(R))) # debugging</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;nz is </span><span class="sc">%d</span><span class="st">&quot;</span> <span class="op">%</span> nz)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    R.resize((nz, nr))</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    Z.resize((nz, nr))</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    T.resize((nz, nr))</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    vel.resize((nz, nr))</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    psi.resize((nz, nr))</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    <span class="co"># rotate the arrays by 90 degrees</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    R <span class="op">=</span> np.rot90(R, k<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    Z <span class="op">=</span> np.rot90(Z, k<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    T <span class="op">=</span> np.rot90(T, k<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    vel <span class="op">=</span> np.rot90(vel, k<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    psi <span class="op">=</span> np.rot90(psi, k<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># flip the array</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    R <span class="op">=</span> np.flip(R, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    Z <span class="op">=</span> np.flip(Z, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    T <span class="op">=</span> np.flip(T, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    vel <span class="op">=</span> np.flip(vel, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    psi <span class="op">=</span> np.flip(psi, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> R, Z, T, vel, psi, nz</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------------------------------------------------------------------------------------------------</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> process_timestep(ti, caseToProcess, folder, tsnap, GridsPerR, rmin, rmax, zmin, zmax, lw):</span></code></pre></div></div>
+<p>Generates and saves a two-panel plot for a simulation timestep.</p>
+<p>Calculates the simulation time using the timestep index and a time
+increment, then retrieves field data from an intermediate snapshot file.
+Creates a figure with two subplots—one displaying the dye color (with a
+coolwarm heat map) and the other showing velocity magnitude (with a
+viridis heat map). Both panels include domain boundaries and streamlines
+for the stream function. If the snapshot file is missing or the output
+image already exists, the function prints a warning and exits.</p>
+<div class="code-block-container"><div class="code-block-container"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> tsnap <span class="op">*</span> ti</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    place <span class="op">=</span> <span class="ss">f&quot;</span><span class="sc">{</span>caseToProcess<span class="sc">}</span><span class="ss">/intermediate/snapshot-</span><span class="sc">{</span>t<span class="sc">:.4f}</span><span class="ss">&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> <span class="ss">f&quot;</span><span class="sc">{</span>folder<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span><span class="bu">int</span>(t<span class="op">*</span><span class="dv">1000</span>)<span class="sc">:08d}</span><span class="ss">.png&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check if the file exists</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> os.path.exists(place):</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>place<span class="sc">}</span><span class="ss"> File not found!&quot;</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># if name exits, return </span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> os.path.exists(name):</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss"> already exists!&quot;</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># if folder does not exist, create it</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> os.path.exists(folder):</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        os.makedirs(folder)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate number of grid points in r-direction based on domain size</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    nr <span class="op">=</span> <span class="bu">int</span>(GridsPerR <span class="op">*</span> rmax)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract field data from the simulation file</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    R, Z, T, vel, psi, nz <span class="op">=</span> gettingfield(place, zmin, zmax, rmin, rmax, nr)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get actual domain bounds from the data</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    zminp, zmaxp, rminp, rmaxp <span class="op">=</span> Z.<span class="bu">min</span>(), Z.<span class="bu">max</span>(), R.<span class="bu">min</span>(), R.<span class="bu">max</span>()</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Set up the figure with two subplots</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    AxesLabel, TickLabel <span class="op">=</span> <span class="dv">50</span>, <span class="dv">20</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">24</span>, <span class="dv">11</span>), constrained_layout<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># First subplot - Rate of Strain Tensor (D2)</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Draw domain boundaries</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    ax1.plot([rmin, rmin], [zmin, zmax], <span class="st">&#39;-&#39;</span>, color<span class="op">=</span><span class="st">&#39;black&#39;</span>, linewidth<span class="op">=</span>lw)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    ax1.plot([rmin, rmax], [zmin, zmin], <span class="st">&#39;-&#39;</span>, color<span class="op">=</span><span class="st">&#39;black&#39;</span>, linewidth<span class="op">=</span>lw)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    ax1.plot([rmin, rmax], [zmax, zmax], <span class="st">&#39;-&#39;</span>, color<span class="op">=</span><span class="st">&#39;black&#39;</span>, linewidth<span class="op">=</span>lw)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    ax1.plot([rmax, rmax], [zmin, zmax], <span class="st">&#39;-&#39;</span>, color<span class="op">=</span><span class="st">&#39;black&#39;</span>, linewidth<span class="op">=</span>lw)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Plot the dye with a heat map</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    cntrl1 <span class="op">=</span> ax1.pcolormesh(Z, R, T, cmap<span class="op">=</span><span class="st">&quot;coolwarm&quot;</span>, edgecolor<span class="op">=</span><span class="st">&#39;face&#39;</span>, vmax<span class="op">=</span><span class="dv">1</span>, vmin<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add streamlines using the stream function</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    ax1.contour(Z, R, psi, <span class="dv">20</span>, colors<span class="op">=</span><span class="st">&#39;black&#39;</span>, linewidths<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Configure the first subplot</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    ax1.set_aspect(<span class="st">&#39;equal&#39;</span>)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    ax1.set_xlim(rmin, rmax)</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>    ax1.set_ylim(zmin, zmax)</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    ax1.set_title(<span class="vs">r&#39;Rate of Strain Tensor&#39;</span>, fontsize<span class="op">=</span>TickLabel)</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add colorbar to the first subplot</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    divider1 <span class="op">=</span> make_axes_locatable(ax1)</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    cax1 <span class="op">=</span> divider1.append_axes(<span class="st">&quot;right&quot;</span>, size<span class="op">=</span><span class="st">&quot;5%&quot;</span>, pad<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    c1 <span class="op">=</span> plt.colorbar(cntrl1, cax<span class="op">=</span>cax1)</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    c1.set_label(<span class="vs">r&#39;</span><span class="dv">$</span><span class="vs">log_</span><span class="op">{10}</span><span class="kw">(</span><span class="ch">\|</span><span class="dv">\m</span><span class="vs">athcal{D}_{ij}</span><span class="ch">\|</span><span class="kw">)</span><span class="dv">$</span><span class="vs">&#39;</span>, fontsize<span class="op">=</span>TickLabel, labelpad<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    c1.ax.tick_params(labelsize<span class="op">=</span>TickLabel)</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Second subplot - Velocity Magnitude</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Draw domain boundaries</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>    ax2.plot([rmin, rmin], [zmin, zmax], <span class="st">&#39;-&#39;</span>, color<span class="op">=</span><span class="st">&#39;black&#39;</span>, linewidth<span class="op">=</span>lw)</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>    ax2.plot([rmin, rmax], [zmin, zmin], <span class="st">&#39;-&#39;</span>, color<span class="op">=</span><span class="st">&#39;black&#39;</span>, linewidth<span class="op">=</span>lw)</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    ax2.plot([rmin, rmax], [zmax, zmax], <span class="st">&#39;-&#39;</span>, color<span class="op">=</span><span class="st">&#39;black&#39;</span>, linewidth<span class="op">=</span>lw)</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    ax2.plot([rmax, rmax], [zmin, zmax], <span class="st">&#39;-&#39;</span>, color<span class="op">=</span><span class="st">&#39;black&#39;</span>, linewidth<span class="op">=</span>lw)</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Plot velocity magnitude with viridis colormap</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>    cntrl2 <span class="op">=</span> ax2.pcolormesh(Z, R, vel, cmap<span class="op">=</span><span class="st">&quot;viridis&quot;</span>, edgecolor<span class="op">=</span><span class="st">&#39;face&#39;</span>, vmax <span class="op">=</span> <span class="dv">1</span>, vmin <span class="op">=</span> <span class="dv">0</span>)</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add streamlines using the stream function</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>    ax2.contour(Z, R, psi, <span class="dv">20</span>, colors<span class="op">=</span><span class="st">&#39;black&#39;</span>, linewidths<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Configure the second subplot</span></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>    ax2.set_aspect(<span class="st">&#39;equal&#39;</span>)</span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>    ax2.set_xlim(rmin, rmax)</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>    ax2.set_ylim(zmin, zmax)</span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>    ax2.set_title(<span class="vs">r&#39;Velocity Magnitude&#39;</span>, fontsize<span class="op">=</span>TickLabel)</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add colorbar to the second subplot</span></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>    divider2 <span class="op">=</span> make_axes_locatable(ax2)</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>    cax2 <span class="op">=</span> divider2.append_axes(<span class="st">&quot;right&quot;</span>, size<span class="op">=</span><span class="st">&quot;5%&quot;</span>, pad<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>    c2 <span class="op">=</span> plt.colorbar(cntrl2, cax<span class="op">=</span>cax2)</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>    c2.set_label(<span class="vs">r&#39;Velocity&#39;</span>, fontsize<span class="op">=</span>TickLabel, labelpad<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>    c2.ax.tick_params(labelsize<span class="op">=</span>TickLabel)</span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Turn off axes for cleaner visualization</span></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>    ax1.axis(<span class="st">&#39;off&#39;</span>)</span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>    ax2.axis(<span class="st">&#39;off&#39;</span>)</span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>    plt.savefig(name, bbox_inches<span class="op">=</span><span class="st">&#39;tight&#39;</span>)</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Display the figure</span></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>    plt.close()</span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get number of CPUs from command line argument, or use all available</span></span></code></pre></div></div>
+<p>Parses command-line arguments and initiates parallel processing of
+simulation timesteps.</p>
+<p>This function reads simulation configuration and processing
+parameters from the command line, including grid settings, simulation
+bounds, and performance options. It ensures that the output directory
+exists and then sets up a multiprocessing pool to concurrently process
+simulation data timesteps by mapping a worker function that generates
+visualizations.</p>
+<div class="code-block-container"><div class="code-block-container"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>    parser <span class="op">=</span> argparse.ArgumentParser()</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    parser.add_argument(<span class="st">&#39;--CPUs&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>, default<span class="op">=</span>mp.cpu_count(), <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Number of CPUs to use&#39;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    parser.add_argument(<span class="st">&#39;--nGFS&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>, default<span class="op">=</span><span class="dv">150</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Number of restart files to process&#39;</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    parser.add_argument(<span class="st">&#39;--GridsPerR&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>, default<span class="op">=</span><span class="dv">512</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Number of grids per R&#39;</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    parser.add_argument(<span class="st">&#39;--ZMAX&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">float</span>, default<span class="op">=</span><span class="fl">0.5</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Maximum Z value&#39;</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    parser.add_argument(<span class="st">&#39;--RMAX&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">float</span>, default<span class="op">=</span><span class="fl">0.5</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Maximum R value&#39;</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    parser.add_argument(<span class="st">&#39;--ZMIN&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">float</span>, default<span class="op">=-</span><span class="fl">0.5</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Minimum Z value&#39;</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    parser.add_argument(<span class="st">&#39;--RMIN&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">float</span>, default<span class="op">=-</span><span class="fl">0.5</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Minimum R value&#39;</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    parser.add_argument(<span class="st">&#39;--tsnap&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">float</span>, default<span class="op">=</span><span class="fl">0.01</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Time snap&#39;</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    parser.add_argument(<span class="st">&#39;--caseToProcess&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">str</span>, default<span class="op">=</span><span class="st">&#39;../testCases/2-LidDrivenCavity-Newtonian-dyeInjection&#39;</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Case to process&#39;</span>)  </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    parser.add_argument(<span class="st">&#39;--folderToSave&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">str</span>, default<span class="op">=</span><span class="st">&#39;2-LidDrivenCavity-Newtonian-dyeInjection&#39;</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Folder to save&#39;</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    args <span class="op">=</span> parser.parse_args()</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    num_processes <span class="op">=</span> args.CPUs</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    nGFS <span class="op">=</span> args.nGFS</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    tsnap <span class="op">=</span> args.tsnap</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    ZMAX <span class="op">=</span> args.ZMAX</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    RMAX <span class="op">=</span> args.RMAX</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    ZMIN <span class="op">=</span> args.ZMIN</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    RMIN <span class="op">=</span> args.RMIN</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    rmin, rmax, zmin, zmax <span class="op">=</span> [RMIN, RMAX, ZMIN, ZMAX]</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    GridsPerR <span class="op">=</span> args.GridsPerR</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    lw <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    folder <span class="op">=</span> args.folderToSave</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    caseToProcess <span class="op">=</span> args.caseToProcess</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> os.path.isdir(folder):</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>        os.makedirs(folder)</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create a pool of worker processes</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> mp.Pool(processes<span class="op">=</span>num_processes) <span class="im">as</span> pool:</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Create partial function with fixed arguments</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>        process_func <span class="op">=</span> partial(process_timestep, caseToProcess<span class="op">=</span>caseToProcess,</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>                             folder<span class="op">=</span>folder, tsnap<span class="op">=</span>tsnap,</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>                             GridsPerR<span class="op">=</span>GridsPerR, rmin<span class="op">=</span>rmin, rmax<span class="op">=</span>rmax, </span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>                             zmin<span class="op">=</span>zmin, zmax<span class="op">=</span>zmax, lw<span class="op">=</span>lw)</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Map the process_func to all timesteps</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>        pool.<span class="bu">map</span>(process_func, <span class="bu">range</span>(nGFS))</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>    main()</span></code></pre></div></div>
+</div>
+          </div>
+        </div>
+        <div id="sidebar" class="yui-b first">
+<!-- Removed logo div 
+<div id="logo">
+  <a href="//" alt="site logo" title="Go to top page"><img src="//img/logo.png" /></a>
+</div>
+-->
+          <!-- Removed fieldsets 
+<div class="sitenav">
+  <fieldset>
+    <legend>Site</legend>
+    <ul>
+      <li><a href="//Front Page">Front page</a></li>
+      <li><a href="//_index">All pages</a></li>
+      <li><a href="//_activity">Recent activity</a></li>
+            <li><a href="//Help">Help</a></li>
+    </ul>
+    <form action="/_search" method="get" id="searchform">
+      <input type="text" name="patterns" id="patterns"/>
+      <input type="submit" value="Search"/>
+    </form>
+  </fieldset>
+  <fieldset>
+    <legend>Documentation</legend>
+    <ul>
+      <li><a href="//Tutorial">Tutorial</a></li>
+      <li><a href="//src/INSTALL">Installation</a></li>
+      <li><a href="//Basilisk C">Basilisk C</a></li>
+      <li><a href="//src/README">Solvers and functions</a></li>
+      <li><a href="//src/examples/README">Examples</a></li>
+      <li><a href="http://groups.google.com/d/forum/basilisk-fr">User forum</a></li>
+      <li><a href="//sandbox/documentation">More documentation</a></li>
+    </ul>
+  </fieldset>
+  <fieldset>
+    <legend>Development</legend>
+    <ul>
+      <li><a href="//src/?history">Recent activity</a></li>
+      <li><a href="//src/">Source code</a></li>
+      <li><a href="https://hub.darcs.net/basilisk/basilisk/browse/src">Darcs Hub</a></li>
+      <li><a href="//src/test/README">Test cases</a></li>
+      <li><a href="//sandbox/bugs/README">Bug reports</a></li>
+      <li><a href="//src/Contributing">How to contribute</a></li>
+      <li><a href="//sandbox/">Play in the sandbox</a></li>
+    </ul>
+  </fieldset>
+</div>
+-->
+                    <!-- Removed this page fieldset 
+<div class="pageTools">
+  <fieldset>
+    <legend>This page</legend>
+    <ul>
+      <li><a href="/postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py.html?raw">Raw page source</a></li>
+      <li><a href="/postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py.html?delete">Delete this page</a></li>
+    </ul>
+  </fieldset>
+</div>
+-->
+                            </div>
+    </div>
+    
+      
+    <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add copy button to each code block container
+        const codeBlocks = document.querySelectorAll('.code-block-container pre');
+        codeBlocks.forEach(function(codeBlock, index) {
+            // Create button element
+            const button = document.createElement('button');
+            button.className = 'copy-button';
+            button.textContent = 'Copy';
+            button.setAttribute('aria-label', 'Copy code to clipboard');
+            button.setAttribute('data-copy-state', 'copy');
+            
+            // Get the code block container (parent of the pre)
+            const container = codeBlock.parentNode;
+            
+            // Add the button to the container
+            container.appendChild(button);
+            
+            // Set up click event
+            button.addEventListener('click', function() {
+                // Create a textarea element to copy from
+                const textarea = document.createElement('textarea');
+                // Get the text content from the pre element (the actual code)
+                textarea.value = codeBlock.textContent;
+                document.body.appendChild(textarea);
+                textarea.select();
+                
+                try {
+                    // Execute copy command
+                    document.execCommand('copy');
+                    // Update button state
+                    button.textContent = 'Copied!';
+                    button.classList.add('copied');
+                    
+                    // Reset button state after 2 seconds
+                    setTimeout(function() {
+                        button.textContent = 'Copy';
+                        button.classList.remove('copied');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Copy failed:', err);
+                    button.textContent = 'Error!';
+                }
+                
+                // Clean up
+                document.body.removeChild(textarea);
+            });
+        });
+    });
+    </script>
+        </body>
+<!-- Removed footer div 
+  <div id="footer">
+    inspired by <a href="http://github.com/jgm/gitit/tree/master/">gitit</a>,
+    powered by <a href="/src/darcsit/README">darcsit</a>
+  </div>
+-->
+</html>
