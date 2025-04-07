@@ -8,14 +8,16 @@ The codebase implements a classical lid driven cavity flow problem with dye inje
 
 ## Repository Structure
 
-*   `basilisk/src/` - Core Basilisk CFD library (reference only, do not modify)
-*   `postProcess/` - Project-specific post-processing tools
-    *   [`2-LidDrivenCavity-Newtonian-dyeInjection.py`](postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.html) - Visualization script for post-processing
-    *   [`getData-LidDriven.c`](postProcess/getData-LidDriven.html) - Data extraction utility
-*   `src-local/` - Custom header files extending Basilisk functionality
-    *   [`dye-injection.h`](src-local/dye-injection.html) - Dye injection for flow visualization
-*   `testCases/` - Test cases for simulation
-    *   [`LidDrivenCavity-Newtonian-dyeInjection.c`](testCases/LidDrivenCavity-Newtonian-dyeInjection.html) - Lid-driven cavity with dye injection
+```
+├── basilisk/src/               Core Basilisk CFD library (reference only, do not modify)
+├── testCases/                  Test cases for simulation
+│   └── LidDrivenCavity-Newtonian-dyeInjection.c    Lid-driven cavity with dye injection
+├── src-local/                  Custom header files extending Basilisk functionality
+│   └── dye-injection.h         Dye injection for flow visualization
+└── postProcess/                Project-specific post-processing tools
+    ├── 2-LidDrivenCavity-Newtonian-dyeInjection.py Visualization script for post-processing
+    └── getData-LidDriven.c     Data extraction utility
+```
 
 ### src-local/ Directory
 

@@ -72,3 +72,110 @@ code, pre {
 .sourceCode .op { color: #005cc5 !important; } /* Operator - blue */
 .sourceCode .cf { color: #d73a49 !important; } /* ControlFlow - red */
 .sourceCode .pp { color: #d73a49 !important; } /* Preprocessor - red */
+
+/* Repository Structure Sitemap Styling */
+.repository-structure {
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  line-height: 1.5;
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #f8f8f8;
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+}
+
+/* Style the markdown lists inside the repository structure */
+.repository-structure ul,
+.repository-structure ol {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.repository-structure li {
+  position: relative;
+  padding: 2px 0 2px 24px;
+  margin: 4px 0;
+}
+
+.repository-structure li::before {
+  content: "├── ";
+  color: #6a737d;
+  position: absolute;
+  left: 0;
+}
+
+.repository-structure li:last-child::before {
+  content: "└── ";
+}
+
+/* Style the nested lists */
+.repository-structure li li {
+  padding-left: 40px;
+}
+
+.repository-structure li li::before {
+  left: 16px;
+}
+
+/* Style folder and file links */
+.repository-structure strong {
+  font-weight: bold;
+}
+
+/* Style folder names with a different color */
+.repository-structure li > strong {
+  color: #0366d6; /* Blue color for folders */
+}
+
+/* Style file names */
+.repository-structure li li > strong {
+  color: #24292e; /* Dark color for files */
+}
+
+.repository-structure a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.repository-structure a:hover {
+  text-decoration: underline;
+}
+
+/* Style the description part */
+.repository-structure li {
+  color: #24292e;
+}
+
+.repository-structure li::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+/* Copy button container for code blocks */
+.code-block-container {
+  position: relative;
+}
+
+.copy-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  padding: 3px 8px;
+  background-color: #f8f8f8;
+  border: 1px solid #e1e4e8;
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.copy-button:hover {
+  background-color: #e6e6e6;
+}
+
+.copy-button.copied {
+  background-color: #28a745;
+  color: white;
+}

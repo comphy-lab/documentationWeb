@@ -63,8 +63,21 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
     # Check if this is a Python or Shell file
     is_python_file = file_path.suffix.lower() == '.py'
     is_shell_file = file_path.suffix.lower() == '.sh'
+    is_markdown_file = file_path.suffix.lower() == '.md'
     
-    if is_python_file or is_shell_file:
+    if is_markdown_file:
+        # For Markdown files, process to preserve HTML
+        try:
+            # Read the file content
+            with open(file_path, 'r', encoding='utf-8') as f:
+                file_content = f.read()
+            
+            # Use the content directly
+            pandoc_input_content = file_content
+        except Exception as e:
+            print(f"  Error processing Markdown file {file_path}: {e}")
+            return False
+    elif is_python_file or is_shell_file:
         # For Python or Shell files, process accordingly
         try:
             # Read the file content
@@ -196,7 +209,7 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
 
     pandoc_cmd = [
         'pandoc',
-        '-f', 'markdown+smart', # Use markdown input with smart typography extension
+        '-f', 'markdown+smart+raw_html', # Use markdown input with smart typography extension and raw HTML
         '-t', 'html5',
         '--katex',          # Enable KaTeX for math
         '--toc',            # Generate Table of Contents
@@ -406,6 +419,130 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
         return False
 
 
+def convert_directory_tree_to_html(readme_content):
+    """
+    Converts a plain text directory tree in the README.md to an HTML site map.
+    
+    Looks for a pattern like:
+    ```
+    ├── basilisk/src/               Core Basilisk CFD library (reference only, do not modify)
+    ├── testCases/                  Test cases for simulation
+    │   └── LidDrivenCavity-Newtonian-dyeInjection.c    Lid-driven cavity with dye injection
+    ├── src-local/                  Custom header files extending Basilisk functionality
+    │   └── dye-injection.h         Dye injection for flow visualization
+    └── postProcess/                Project-specific post-processing tools
+        ├── 2-LidDrivenCavity-Newtonian-dyeInjection.py Visualization script for post-processing
+        └── getData-LidDriven.c     Data extraction utility
+    ```
+    
+    And converts it to an HTML structure like:
+    <div class="repository-structure">
+    * **basilisk/src/** - Core Basilisk CFD library (reference only, do not modify)
+    * **[testCases/](testCases)** - Test cases for simulation
+      * **[LidDrivenCavity-Newtonian-dyeInjection.c](testCases/LidDrivenCavity-Newtonian-dyeInjection.html)** - Lid-driven cavity with dye injection
+    * **[src-local/](src-local)** - Custom header files extending Basilisk functionality
+      * **[dye-injection.h](src-local/dye-injection.html)** - Dye injection for flow visualization
+    * **[postProcess/](postProcess)** - Project-specific post-processing tools
+      * **[2-LidDrivenCavity-Newtonian-dyeInjection.py](postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.html)** - Visualization script for post-processing
+      * **[getData-LidDriven.c](postProcess/getData-LidDriven.html)** - Data extraction utility
+    </div>
+    """
+    # Find the directory tree section
+    tree_pattern = r'```\s*\n(├.*?\n.*?└.*?)\n```'
+    tree_match = re.search(tree_pattern, readme_content, re.DOTALL)
+    
+    if not tree_match:
+        return readme_content  # No tree found, return original content
+        
+    tree_text = tree_match.group(1)
+    
+    # Parse the directory tree
+    html_structure = ['<div class="repository-structure">']
+    
+    # Track parent directories and their indentation levels for proper nesting
+    path_stack = []
+    prev_indent = -1
+    
+    for line in tree_text.split('\n'):
+        # Skip empty lines
+        if not line.strip():
+            continue
+            
+        # Determine indentation level based on the structure symbols
+        indent_level = 0
+        
+        if '│   ' in line:
+            indent_level = line.count('│   ')
+        elif '    ' in line and ('├── ' in line or '└── ' in line):
+            # Handle case where │ might be missing but spacing is present
+            spaces_before_item = len(line) - len(line.lstrip(' '))
+            indent_level = spaces_before_item // 4
+        
+        # Clean up the line by removing directory tree symbols
+        clean_line = line.replace('├── ', '').replace('└── ', '').replace('│   ', '')
+        
+        # Get the path and description
+        parts = clean_line.strip().split(None, 1)
+        path = parts[0]
+        description = parts[1] if len(parts) > 1 else ''
+        
+        # Determine if it's a directory or file based on path ending with /
+        is_dir = path.endswith('/')
+        
+        # Update the path stack based on indentation changes
+        if indent_level > prev_indent:
+            # Going deeper, add the previous item to the stack
+            if path_stack and prev_indent >= 0:
+                path_stack.append(path_stack[-1])
+        elif indent_level < prev_indent:
+            # Going up, remove items from stack
+            for _ in range(prev_indent - indent_level):
+                if path_stack:
+                    path_stack.pop()
+        
+        # Generate proper indentation for HTML output
+        indent = '  ' * indent_level
+        
+        # Generate the HTML list item
+        item_html = f"{indent}* "
+        
+        if is_dir:
+            # For directories
+            dir_name = path.rstrip('/')
+            # Special case for basilisk/src/ which should not be linked
+            if dir_name == "basilisk/src":
+                item_html += f"**{path}** - {description}"
+            else:
+                # For other directories, create links
+                item_html += f"**[{path}]({dir_name})** - {description}"
+            
+            # Update the path stack for children
+            if len(path_stack) <= indent_level:
+                path_stack.append(dir_name)
+            else:
+                path_stack[indent_level] = dir_name
+        else:
+            # For files
+            # Determine the parent directory path
+            parent_path = path_stack[indent_level-1] if indent_level > 0 and path_stack else ""
+            
+            # Create HTML link with correct extension
+            file_path = f"{parent_path}/{path}" if parent_path else path
+            file_path = file_path.lstrip('/')
+            
+            item_html += f"**[{path}]({file_path}.html)** - {description}"
+        
+        html_structure.append(item_html)
+        prev_indent = indent_level
+    
+    html_structure.append('</div>')
+    
+    # Replace the tree section with the HTML structure
+    html_tree = '\n'.join(html_structure)
+    modified_content = readme_content.replace(tree_match.group(0), html_tree)
+    
+    return modified_content
+
 def generate_index(readme_path, index_path, generated_files, docs_dir, repo_root):
     """Generates index.html from README.md and adds links to generated files."""
     if not readme_path.exists():
@@ -413,6 +550,9 @@ def generate_index(readme_path, index_path, generated_files, docs_dir, repo_root
         readme_content = "# Project Documentation\n"
     else:
         readme_content = readme_path.read_text(encoding='utf-8')
+        
+    # Convert the directory tree to HTML before generating index
+    readme_content = convert_directory_tree_to_html(readme_content)
 
     # Simple placeholder replacement or append links
     # You might want a specific marker like <!-- DOC_LINKS_START -->
@@ -454,7 +594,7 @@ def generate_index(readme_path, index_path, generated_files, docs_dir, repo_root
     # Convert the combined README + links to HTML for index.html
     cmd = [
         'pandoc',
-        '-f', 'markdown+tex_math_dollars',
+        '-f', 'markdown+tex_math_dollars+raw_html', # Add raw_html to preserve HTML
         '-t', 'html5',
         '--standalone',
         '--mathjax',

@@ -55,32 +55,36 @@ cavity flow with dye injection.</p>
 with dye injection using the Basilisk CFD library with custom
 implementations for specific dye injection including.</p>
 <h2 id="repository-structure">Repository Structure</h2>
+<div class="repository-structure">
 <ul>
-<li><code>basilisk/src/</code> - Core Basilisk CFD library (reference
-only, do not modify)</li>
-<li><code>postProcess/</code> - Project-specific post-processing tools
+<li><strong>basilisk/src/</strong> - Core Basilisk CFD library
+(reference only, do not modify)</li>
+<li><strong><a href="testCases">testCases/</a></strong> - Test cases for
+simulation
 <ul>
-<li><a
-href="postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.html"><code>2-LidDrivenCavity-Newtonian-dyeInjection.py</code></a>
-- Visualization script for post-processing</li>
-<li><a
-href="postProcess/getData-LidDriven.html"><code>getData-LidDriven.c</code></a>
-- Data extraction utility</li>
-</ul></li>
-<li><code>src-local/</code> - Custom header files extending Basilisk
-functionality
-<ul>
-<li><a
-href="src-local/dye-injection.html"><code>dye-injection.h</code></a> -
-Dye injection for flow visualization</li>
-</ul></li>
-<li><code>testCases/</code> - Test cases for simulation
-<ul>
-<li><a
-href="testCases/LidDrivenCavity-Newtonian-dyeInjection.html"><code>LidDrivenCavity-Newtonian-dyeInjection.c</code></a>
+<li><strong><a
+href="testCases/LidDrivenCavity-Newtonian-dyeInjection.c.html">LidDrivenCavity-Newtonian-dyeInjection.c</a></strong>
 - Lid-driven cavity with dye injection</li>
 </ul></li>
+<li><strong><a href="src-local">src-local/</a></strong> - Custom header
+files extending Basilisk functionality
+<ul>
+<li><strong><a
+href="src-local/dye-injection.h.html">dye-injection.h</a></strong> - Dye
+injection for flow visualization</li>
+</ul></li>
+<li><strong><a href="postProcess">postProcess/</a></strong> -
+Project-specific post-processing tools
+<ul>
+<li><strong><a
+href="postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py.html">2-LidDrivenCavity-Newtonian-dyeInjection.py</a></strong>
+- Visualization script for post-processing</li>
+<li><strong><a
+href="postProcess/getData-LidDriven.c.html">getData-LidDriven.c</a></strong>
+- Data extraction utility</li>
+</ul></li>
 </ul>
+</div>
 <h3 id="src-local-directory">src-local/ Directory</h3>
 <p>The <a href="src-local"><code>src-local/</code></a> directory
 contains custom header files that extend the base Basilisk
