@@ -1,6 +1,10 @@
-# Lid driven cavity using dye injection
+# Test documentation: Lid driven cavity using dye injection
 
 This repository contains the computational framework and tools for multiphase fluid dynamics simulations based on the Basilisk C framework. The codebase specializes in the simulation and analysis of lid driven cavity flow with dye injection.
+
+## Documentation
+
+The full documentation for this project is available at [test.comphy-lab.org](https://test.comphy-lab.org). This website contains detailed explanations of the code, examples, and usage instructions.
 
 ## Overview
 
