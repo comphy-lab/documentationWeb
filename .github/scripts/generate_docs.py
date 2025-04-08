@@ -23,13 +23,11 @@ CSS_PATH = REPO_ROOT / '.github' / 'assets' / 'custom_styles.css'  # Path to cus
 
 def extract_h1_from_readme(readme_path: Path) -> str:
     """
-    Extracts the first h1 heading from README.md
+    Extract the first H1 heading from a README file.
     
-    Args:
-        readme_path: Path to the README.md file
-        
-    Returns:
-        The extracted h1 text or default text if not found
+    This function reads the content of the README file specified by readme_path using UTF-8 encoding
+    and searches for the first markdown H1 header (a line beginning with "# "). If such a header is
+    found, its trimmed text is returned; otherwise, the function returns a default title "Documentation".
     """
     try:
         with open(readme_path, 'r', encoding='utf-8') as f:
@@ -52,10 +50,10 @@ WIKI_TITLE = extract_h1_from_readme(README_PATH)
 
 def validate_config() -> bool:
     """
-    Validates the essential configuration paths exist.
+    Validates that all required configuration paths exist.
     
-    Returns:
-        True if all required paths exist, False otherwise
+    Checks if the necessary directories (BASILISK_DIR and DARCSIT_DIR) and files (TEMPLATE_PATH and the literate-c script)
+    are present. If any path is missing, an error is printed and the function returns False; otherwise, it returns True.
     """
     essential_paths = [
         (BASILISK_DIR, "BASILISK_DIR"),
@@ -73,15 +71,18 @@ def validate_config() -> bool:
 
 def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
     """
-    Finds all .c, .h, .py, and .sh files in the specified source directories.
-    Also finds .sh files in the root directory.
+    Recursively searches for C, header, Python, and shell script files in specified directories.
+    
+    This function scans each directory listed in `source_dirs` (relative to `root_dir`)
+    using a recursive search for files with extensions .c, .h, .py, and .sh. It also
+    identifies .sh files that are directly located in the `root_dir`.
     
     Args:
-        root_dir: Root directory of the project
-        source_dirs: List of directory names to search within
-        
+        root_dir: The root directory to begin the search.
+        source_dirs: List of directory names (relative to `root_dir`) to search recursively.
+    
     Returns:
-        List of Path objects for found source files
+        A list of Path objects for all discovered source files.
     """
     files = []
     # Search in source directories
@@ -120,17 +121,17 @@ def process_markdown_file(file_path: Path) -> str:
 
 def process_shell_file(file_path: Path) -> str:
     """
-    Process shell file content for HTML conversion.
-    Wraps the content in a bash code block.
+    Reads the specified shell script and wraps its content in a bash code block.
+    
+    This function opens the given shell file with UTF-8 encoding, reads its complete 
+    content, and encloses it within markdown fenced code block delimiters labeled 
+    with "bash" to facilitate HTML conversion.
     
     Args:
-        file_path: Path to the shell file
-        
-    Returns:
-        Content wrapped in bash code block
+        file_path: Path to the shell script file.
     
-    Raises:
-        Exception: If file reading fails
+    Returns:
+        A string containing the shell script content formatted as a bash code block.
     """
     with open(file_path, 'r', encoding='utf-8') as f:
         file_content = f.read()
@@ -139,17 +140,18 @@ def process_shell_file(file_path: Path) -> str:
 
 def process_python_file(file_path: Path) -> str:
     """
-    Process Python file content for HTML conversion.
-    Separates docstrings, comments and code for better documentation.
+    Process a Python file for Markdown conversion.
+    
+    Reads a Python source file and separates its triple-quoted docstrings from its code. Docstrings
+    are cleaned of enclosing quotes and inserted as plain text, while code blocks are wrapped in
+    Markdown fences with a Python specifier. This formatting produces a Markdown string suitable for
+    HTML conversion via pandoc.
     
     Args:
-        file_path: Path to the Python file
-        
-    Returns:
-        Processed content ready for pandoc conversion
+        file_path: The path to the Python file to process.
     
-    Raises:
-        Exception: If file reading fails
+    Returns:
+        A Markdown-formatted string containing the processed content.
     """
     with open(file_path, 'r', encoding='utf-8') as f:
         file_content = f.read()
@@ -232,17 +234,22 @@ def process_python_file(file_path: Path) -> str:
 
 def process_c_file(file_path: Path, literate_c_script: Path) -> str:
     """
-    Process C/C++ file content for HTML conversion using literate-c.
+    Process a C/C++ file for HTML conversion using a literate C preprocessor.
+    
+    This function runs the specified literate-c script on the given file to generate
+    preprocessed content for Pandoc conversion. It replaces literate-c markers with
+    standard code block indicators and validates the output.
     
     Args:
-        file_path: Path to the C/C++ file
-        literate_c_script: Path to the literate-c script
-        
+        file_path: Path to the C/C++ source file.
+        literate_c_script: Path to the literate-c script.
+    
     Returns:
-        Processed content ready for pandoc conversion
+        Processed file content ready for Pandoc conversion.
     
     Raises:
-        Exception: If literate-c processing fails
+        RuntimeError: If the literate-c script returns a non-zero exit status.
+        ValueError: If the preprocessing output is empty.
     """
     literate_c_cmd = [str(literate_c_script), str(file_path), '0']  # Use magic=0 for standard C files
     
@@ -271,17 +278,22 @@ def process_c_file(file_path: Path, literate_c_script: Path) -> str:
 
 def prepare_pandoc_input(file_path: Path, literate_c_script: Path) -> str:
     """
-    Prepare content for pandoc conversion based on file type.
+    Prepare file content for pandoc conversion.
+    
+    Determines the source file type based on its extension and processes it
+    accordingly. Markdown (.md), Python (.py), and shell (.sh) files are handled using
+    their respective processing functions, while C/C++ files are processed with the
+    provided literate-c script.
     
     Args:
-        file_path: Path to the source file
-        literate_c_script: Path to the literate-c script
-        
+        file_path: Path of the source file to process.
+        literate_c_script: Path to the script used for processing C/C++ files via literate programming.
+    
     Returns:
-        Content ready for pandoc conversion
+        A string containing the processed content, ready for pandoc conversion.
     
     Raises:
-        Exception: If processing fails
+        Exception: If an error occurs during file processing.
     """
     file_suffix = file_path.suffix.lower()
     
@@ -298,23 +310,30 @@ def prepare_pandoc_input(file_path: Path, literate_c_script: Path) -> str:
 def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path, 
                base_url: str, wiki_title: str, page_url: str, page_title: str) -> str:
     """
-    Run pandoc to convert input content to HTML.
-    
-    Args:
-        pandoc_input: Content to convert
-        output_html_path: Target HTML output path
-        template_path: Path to the HTML template
-        base_url: Base URL for links
-        wiki_title: Title for the wiki
-        page_url: URL for the current page
-        page_title: Title for the current page
-        
-    Returns:
-        Generated HTML content
-    
-    Raises:
-        Exception: If pandoc fails
-    """
+               Convert markdown content to a complete HTML document using Pandoc.
+               
+               This function runs Pandoc as a subprocess to transform the provided markdown input into HTML.
+               It applies the specified HTML template and passes template variables—such as the wiki title,
+               base URL, page URL, and page title—to generate a fully formatted document. Although an output
+               HTML path is accepted, the function returns the HTML content as a string rather than writing
+               directly to a file.
+               
+               Args:
+                   pandoc_input (str): Markdown content to be converted.
+                   output_html_path (Path): Target output path for HTML (reserved for future use).
+                   template_path (Path): Path to the HTML template file.
+                   base_url (str): Base URL used for resolving relative links.
+                   wiki_title (str): Title for the wiki, provided to the template.
+                   page_url (str): URL for the current page.
+                   page_title (str): Title for the current page.
+               
+               Returns:
+                   str: The generated HTML content.
+               
+               Raises:
+                   RuntimeError: If Pandoc execution fails with a non-zero exit code.
+                   ValueError: If Pandoc produces an empty output.
+               """
     pandoc_cmd = [
         'pandoc',
         '-f', 'markdown+smart+raw_html',  # Use markdown input with smart typography extension and raw HTML
@@ -365,6 +384,18 @@ def post_process_python_shell_html(html_content: str) -> str:
     """
     # Fix any <pre><code> blocks by wrapping them in a container div
     def wrap_pre_code_with_container(match):
+        """
+        Wraps a matched code block in a container div.
+        
+        Extracts the full text from a regex match object and encloses it in a <div> element
+        with the "code-block-container" class, enabling additional HTML styling.
+        
+        Args:
+            match: A regex match object containing the code block text.
+        
+        Returns:
+            A string with the matched content wrapped in a container div.
+        """
         pre_content = match.group(0)
         return f'<div class="code-block-container">{pre_content}</div>'
     
@@ -378,6 +409,18 @@ def post_process_python_shell_html(html_content: str) -> str:
     
     # Also handle code blocks created by pandoc (with sourceCode class)
     def wrap_source_code_with_container(match):
+        """
+        Wraps matched source code in an HTML container.
+        
+        Extracts the content from the first capturing group of the regex match object
+        and returns it enclosed within a <div> tag having the "code-block-container" class.
+        
+        Args:
+            match: A regex match object with the source code in its first capturing group.
+        
+        Returns:
+            A string with the source code wrapped in a <div class="code-block-container"> tag.
+        """
         div_contents = match.group(1)
         return f'<div class="code-block-container">{div_contents}</div>'
     
@@ -394,20 +437,26 @@ def post_process_python_shell_html(html_content: str) -> str:
 def run_awk_post_processing(html_content: str, file_path: Path, 
                             repo_root: Path, darcsit_dir: Path) -> str:
     """
-    Run awk post-processing for C files using decl_anchors.awk.
-    
-    Args:
-        html_content: HTML content to process
-        file_path: Original source file path
-        repo_root: Root directory of the repository
-        darcsit_dir: Directory containing darcsit scripts
-        
-    Returns:
-        Processed HTML content
-    
-    Raises:
-        Exception: If awk processing fails
-    """
+                            Apply awk post-processing to HTML content from C files.
+                            
+                            This function runs the 'decl_anchors.awk' script from the darcsit directory on the
+                            given HTML content. It determines a tags file path relative to the repository root
+                            based on the source file, executes the awk script using a temporary file for output,
+                            and returns the processed HTML. The temporary file is removed after processing.
+                            
+                            Args:
+                                html_content: HTML content to process.
+                                file_path: Path of the original C source file.
+                                repo_root: Root directory of the repository for relative path computation.
+                                darcsit_dir: Directory containing the 'decl_anchors.awk' script.
+                            
+                            Returns:
+                                Processed HTML content.
+                            
+                            Raises:
+                                FileNotFoundError: If the 'decl_anchors.awk' script is not found.
+                                RuntimeError: If the awk processing fails.
+                            """
     decl_anchors_script = darcsit_dir / 'decl_anchors.awk'
     if not decl_anchors_script.is_file():
         raise FileNotFoundError(f"decl_anchors.awk script not found at {decl_anchors_script}")
@@ -448,19 +497,24 @@ def run_awk_post_processing(html_content: str, file_path: Path,
 def post_process_c_html(html_content: str, file_path: Path, 
                        repo_root: Path, darcsit_dir: Path, docs_dir: Path) -> str:
     """
-    Post-process HTML generated from C/C++ files.
-    Adds code block containers and fixes include links.
-    
-    Args:
-        html_content: Original HTML content
-        file_path: Original source file path
-        repo_root: Root directory of the repository
-        darcsit_dir: Directory containing darcsit scripts
-        docs_dir: Output documentation directory
-        
-    Returns:
-        Processed HTML content
-    """
+                       Enhance C/C++ HTML content with code block containers and include-link corrections.
+                       
+                       This function post-processes HTML generated from C/C++ source files to improve its
+                       presentation in documentation. It removes extraneous trailing line numbers from the
+                       literate-c output, wraps <pre><code> blocks and sourceCode divs in container divs for
+                       consistent styling, and converts #include statements into hyperlinks that reference either
+                       locally generated documentation or external sources.
+                       
+                       Args:
+                           html_content: The original HTML output from processing a C/C++ file.
+                           file_path: Path to the source file corresponding to the HTML content.
+                           repo_root: Root directory of the repository.
+                           darcsit_dir: Directory containing darcsit scripts.
+                           docs_dir: Output directory for the generated HTML documentation.
+                       
+                       Returns:
+                           The modified HTML content with enhanced styling and linked #include statements.
+                       """
     # Remove trailing line numbers added by literate-c
     cleaned_html = re.sub(
         r'(\s*(?:<span class="[^"]*">\s*\d+\s*</span>|\s+\d+)\s*)+(\s*</span>)', 
@@ -470,6 +524,19 @@ def post_process_c_html(html_content: str, file_path: Path,
     
     # Wrap <pre><code> blocks with a container div
     def wrap_pre_code_with_container(match):
+        """
+        Wrap the matched content in a container div.
+        
+        This function retrieves the entire match from a regex match object and wraps it
+        inside a <div> element with the CSS class "code-block-container". It is used to
+        enclose code block elements within an HTML container for consistent styling.
+        
+        Args:
+            match (Match): A regex match object containing the code block to be wrapped.
+        
+        Returns:
+            str: An HTML string with the wrapped code block.
+        """
         pre_content = match.group(0)
         return f'<div class="code-block-container">{pre_content}</div>'
     
@@ -483,6 +550,18 @@ def post_process_c_html(html_content: str, file_path: Path,
     # Process the sourceCode divs
     def wrap_source_code_with_container(match):
         # Get the div's contents (which includes the pre/code)
+        """
+        Wraps a matched code block in a container div.
+        
+        Extracts the content captured by the first group of the provided regex match and
+        returns it enclosed in a <div> element with the "code-block-container" class.
+        
+        Args:
+            match (re.Match): A regex match object with the source code block in its first group.
+        
+        Returns:
+            str: An HTML string with the code block wrapped in a container div.
+        """
         div_contents = match.group(1)
         # Return the pre/code wrapped in our container div
         return f'<div class="code-block-container">{div_contents}</div>'
@@ -497,6 +576,29 @@ def post_process_c_html(html_content: str, file_path: Path,
     
     # Add links to #include statements
     def create_include_link(match):
+        """
+        Transforms an include directive match into an HTML hyperlink.
+        
+        This function converts a regex match object that captures parts of an include directive
+        into an HTML anchor element. It extracts the filename and checks if the file exists in the
+        local 'src-local' directory. If so, it creates a relative link to the generated local documentation;
+        otherwise, it falls back to a link pointing to the Basilisk source repository. The original span
+        formatting is preserved within the hyperlink.
+        
+        Parameters:
+            match: A regex match object with four capture groups:
+                   1. The prefix span for the include statement.
+                   2. The opening tag for the filename.
+                   3. The filename (possibly including a path).
+                   4. The closing tag for the filename.
+        
+        Returns:
+            A string containing the HTML link that wraps the original include directive span.
+        
+        Note:
+            This function relies on the global variables `repo_root`, `docs_dir`, and `file_path` for file
+            path resolution.
+        """
         prefix = match.group(1)  # e.g., <span class="pp">#include </span>
         span_tag_open = match.group(2)  # e.g., <span class="im">
         filename = match.group(3)  # e.g., filename.h or path/filename.h
@@ -538,15 +640,20 @@ def post_process_c_html(html_content: str, file_path: Path,
 
 def insert_css_link_in_html(html_file_path: Path, css_path: Path, is_root: bool = True) -> bool:
     """
-    Insert a CSS link tag in the HTML file's head section.
+    Insert a CSS link tag into an HTML file's <head> section.
     
-    Args:
-        html_file_path: Path to the HTML file
-        css_path: Path to the CSS file
-        is_root: Whether the HTML file is in the root directory or a subdirectory
+    Reads the specified HTML file and checks whether a <link> tag for the given CSS
+    file already exists. If not, it inserts the tag just before the closing </head> tag.
+    When the HTML file is in a subdirectory (is_root is False), the CSS file name is 
+    prefixed with "../" to ensure the link is correct.
+    
+    Parameters:
+        html_file_path: The path to the target HTML file.
+        css_path: The path to the CSS file to be linked.
+        is_root: True if the HTML file is in the root directory; otherwise, False.
     
     Returns:
-        True if successful, False otherwise
+        True if the CSS link was inserted or already exists; otherwise, False.
     """
     try:
         with open(html_file_path, 'r', encoding='utf-8') as f:
@@ -584,13 +691,17 @@ def insert_css_link_in_html(html_file_path: Path, css_path: Path, is_root: bool 
 
 def insert_javascript_in_html(html_file_path: Path) -> bool:
     """
-    Insert JavaScript for copy functionality in the HTML file.
+    Inserts inline JavaScript to enable copy-to-clipboard functionality in an HTML file.
     
+    This function reads the specified HTML file and checks for an existing copy button script.
+    If absent and the closing </body> tag is found, it appends a JavaScript snippet before the tag to add copy buttons to code blocks.
+    It returns True if the script is successfully inserted or already present, and False if the insertion fails.
+      
     Args:
-        html_file_path: Path to the HTML file
+        html_file_path: The path to the HTML file to update.
     
     Returns:
-        True if successful, False otherwise
+        True if the operation is successful or the script is already included; False otherwise.
     """
     try:
         with open(html_file_path, 'r', encoding='utf-8') as f:
@@ -678,23 +789,30 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
                                      basilisk_dir: Path, darcsit_dir: Path, template_path: Path, 
                                      base_url: str, wiki_title: str, literate_c_script: Path, docs_dir: Path) -> bool:
     """
-    Process a source file using logic similar to page2html, calling literate-c directly.
-    
-    Args:
-        file_path: Path to the source file
-        output_html_path: Path where the HTML output should be saved
-        repo_root: Root directory of the repository
-        basilisk_dir: Directory containing Basilisk
-        darcsit_dir: Directory containing darcsit scripts
-        template_path: Path to the HTML template
-        base_url: Base URL for links
-        wiki_title: Title for the wiki
-        literate_c_script: Path to the literate-c script
-        docs_dir: Output documentation directory
-        
-    Returns:
-        True if processing succeeded, False otherwise
-    """
+                                     Converts a source file to HTML and applies file-type-specific post processing.
+                                     
+                                     The function prepares input for Pandoc conversion based on the file type and then
+                                     applies additional steps tailored to the source file. For Python, shell, and Markdown
+                                     files, it post-processes the output HTML to enhance code block presentation. For C/C++
+                                     files, it uses awk-based post processing followed by further cleanup. CSS and JavaScript
+                                     are then inserted to improve styling and interactive functionality. Any errors during
+                                     processing are caught, and the function returns a success flag.
+                                     
+                                     Args:
+                                         file_path: Path to the source file.
+                                         output_html_path: Path where the generated HTML will be saved.
+                                         repo_root: Repository root directory used for computing relative paths.
+                                         basilisk_dir: Directory containing resources for Basilisk.
+                                         darcsit_dir: Directory containing darcsit scripts.
+                                         template_path: Path to the HTML template for conversion.
+                                         base_url: Base URL for constructing links within the documentation.
+                                         wiki_title: Title for the documentation or wiki.
+                                         literate_c_script: Path to the literate-c script for processing C/C++ files.
+                                         docs_dir: Directory where documentation files are stored.
+                                     
+                                     Returns:
+                                         True if the HTML was generated and post-processed successfully, False otherwise.
+                                     """
     print(f"  Processing {file_path.relative_to(repo_root)} -> {output_html_path.relative_to(repo_root / 'docs')}")
 
     try:
@@ -760,13 +878,19 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
 
 def convert_directory_tree_to_html(readme_content: str) -> str:
     """
-    Converts a plain text directory tree in the README.md to an HTML site map.
+    Converts a plain text directory tree in README content into an HTML site map.
+    
+    This function scans the provided README content for a markdown code block that
+    contains a directory tree. If found, it parses the tree structure and transforms it
+    into a nested HTML format wrapped in a <div> element with the class "repository-structure".
+    Directories and files are converted into bullet list items with hyperlinks where appropriate.
+    If no directory tree block is detected, the original content is returned unchanged.
     
     Args:
-        readme_content: The content of README.md
-        
+        readme_content: The complete README file content as a string.
+    
     Returns:
-        Modified README content with HTML site map
+        A string with the directory tree section replaced by an HTML site map.
     """
     # Find the directory tree section
     tree_pattern = r'```\s*\n(├.*?\n.*?└.*?)\n```'
@@ -869,18 +993,24 @@ def convert_directory_tree_to_html(readme_content: str) -> str:
 def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Path, Path], 
                   docs_dir: Path, repo_root: Path) -> bool:
     """
-    Generates index.html from README.md and adds links to generated files.
-    
-    Args:
-        readme_path: Path to README.md
-        index_path: Path where index.html should be saved
-        generated_files: Dictionary mapping original file paths to generated HTML paths
-        docs_dir: Directory where documentation is generated
-        repo_root: Root directory of the repository
-        
-    Returns:
-        True if index.html was successfully generated, False otherwise
-    """
+                  Generates an index.html page from README.md by integrating documentation links.
+                  
+                  Reads the README file (using a default header if missing) and converts its content to HTML.
+                  The function appends a section that groups links to generated documentation files based on their
+                  top-level directory, then uses Pandoc with a specified template and configuration to create
+                  the final HTML. After conversion, it post-processes the file to adjust code blocks and injects
+                  CSS and JavaScript for enhanced presentation.
+                  
+                  Args:
+                      readme_path: Path to the README.md file.
+                      index_path: Destination path for the generated index.html.
+                      generated_files: Dictionary mapping source file paths to their corresponding generated HTML paths.
+                      docs_dir: Directory where documentation files are stored.
+                      repo_root: Root directory of the repository used for computing relative paths.
+                  
+                  Returns:
+                      True if index.html was generated and processed successfully, otherwise False.
+                  """
     if not readme_path.exists():
         print(f"Warning: README.md not found at {readme_path}")
         readme_content = "# Project Documentation\n"
