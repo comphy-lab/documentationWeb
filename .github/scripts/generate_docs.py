@@ -18,7 +18,26 @@ DARCSIT_DIR = BASILISK_DIR / 'src' / 'darcsit'
 TEMPLATE_PATH = REPO_ROOT / '.github' / 'assets' / 'custom_template.html' # Use the modified local template
 LITERATE_C_SCRIPT = DARCSIT_DIR / 'literate-c' # Path to the literate-c script
 BASE_URL = "/" # Relative base URL for links within the site
-WIKI_TITLE = "CoMPhy-Lab Documentation"
+
+# Function to extract h1 from README.md
+def extract_h1_from_readme(readme_path):
+    """Extracts the first h1 heading from README.md"""
+    try:
+        with open(readme_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+            # Look for # Heading pattern
+            h1_match = re.search(r'^# (.+)$', content, re.MULTILINE)
+            if h1_match:
+                return h1_match.group(1).strip()
+            else:
+                print("Warning: No h1 heading found in README.md")
+                return "Documentation"
+    except Exception as e:
+        print(f"Error reading README.md: {e}")
+        return "Documentation"
+
+# Dynamically get the wiki title from README.md
+WIKI_TITLE = extract_h1_from_readme(README_PATH)
 # Check if essential directories/files exist
 if not BASILISK_DIR.is_dir():
     print(f"Error: BASILISK_DIR not found at {BASILISK_DIR}")
