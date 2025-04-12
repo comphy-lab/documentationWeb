@@ -531,6 +531,44 @@ def post_process_python_shell_html(html_content: str) -> str:
         flags=re.DOTALL | re.IGNORECASE
     )
     
+    # Fix links to documentation files by appending .html
+    def fix_doc_links(match):
+        """
+        Fixes links to documentation files by appending .html to the href.
+        
+        This function identifies links that point to other documentation files
+        and appends .html to the href attribute if it doesn't already have it.
+        
+        Args:
+            match: A regex match object containing the link tag.
+        
+        Returns:
+            A string with the fixed link.
+        """
+        link_tag = match.group(0)
+        href_match = re.search(r'href="([^"]+)"', link_tag)
+        
+        if href_match:
+            href = href_match.group(1)
+            # Skip external links, anchors, and links that already have .html
+            if (href.startswith('http') or href.startswith('https') or 
+                href.startswith('#') or href.endswith('.html')):
+                return link_tag
+                
+            # Check if the link points to a file in the repository
+            if re.search(r'\.(c|h|py|sh|md)$', href):
+                # Replace the href with the one that includes .html
+                return re.sub(r'href="([^"]+)"', f'href="{href}.html"', link_tag)
+        
+        return link_tag
+    
+    # Apply the link fix
+    processed_html = re.sub(
+        r'<a[^>]+href="[^"]+">[^<]+</a>',
+        fix_doc_links,
+        processed_html
+    )
+    
     return processed_html
 
 
