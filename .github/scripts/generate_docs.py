@@ -378,9 +378,9 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
     
     pandoc_cmd = [
         'pandoc',
-        '-f', 'markdown',
+        '-f', 'markdown+smart+raw_html',  # Use markdown input with smart typography extension and raw HTML
         '-t', 'html5',
-        '--standalone',
+        '--standalone',     # Create full HTML doc
         '--template', str(template_path),
         '-V', f'base={base_url}',
         '-V', f'wikititle={wiki_title}',
@@ -398,6 +398,30 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
     if process.returncode != 0:
         print(f"Error running pandoc: {process.stderr}")
         return ""
+    
+    # Verify that the output file has proper HTML structure
+    try:
+        with open(output_html_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+            
+        # Check if the file has proper HTML structure
+        if '<!DOCTYPE' not in content or '<html' not in content:
+            print(f"Warning: Generated HTML for {output_html_path} is missing DOCTYPE or html tag")
+            # Try to fix by adding proper HTML structure
+            fixed_content = f"""<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>{wiki_title} - {page_title}</title>
+</head>
+<body>
+{content}
+</body>
+</html>"""
+            with open(output_html_path, 'w', encoding='utf-8') as f:
+                f.write(fixed_content)
+    except Exception as e:
+        print(f"Error verifying HTML structure: {e}")
     
     return process.stdout
 
@@ -696,19 +720,35 @@ def insert_css_link_in_html(html_file_path: Path, css_path: Path, is_root: bool 
         else:
             css_link = f'<link href="../{Path(css_path).name}" rel="stylesheet" type="text/css" />'
         
-        # Find the head section to insert the CSS link
-        head_end_idx = content.find('</head>')
-        if head_end_idx == -1:
-            print(f"Warning: Could not find </head> tag in {html_file_path}")
-            return False
-        
         # Check if the CSS link is already included
         if 'link href="' + Path(css_path).name + '"' in content or 'link href="../' + Path(css_path).name + '"' in content:
             # CSS link is already included, no need to add it
             return True
         
-        # Insert the CSS link tag just before the closing head tag
-        modified_content = content[:head_end_idx] + '    ' + css_link + '\n    ' + content[head_end_idx:]
+        # Find the head section to insert the CSS link
+        head_end_idx = content.find('</head>')
+        if head_end_idx == -1:
+            # If no </head> tag found, check if there's a <head> tag
+            head_start_idx = content.find('<head>')
+            if head_start_idx != -1:
+                # Insert after the <head> tag
+                modified_content = content[:head_start_idx + 6] + '\n    ' + css_link + content[head_start_idx + 6:]
+            else:
+                # No head tag, create a complete HTML structure
+                print(f"Warning: No head tag found in {html_file_path}, creating complete HTML structure")
+                modified_content = f"""<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    {css_link}
+</head>
+<body>
+{content}
+</body>
+</html>"""
+        else:
+            # Insert the CSS link tag just before the closing head tag
+            modified_content = content[:head_end_idx] + '    ' + css_link + '\n    ' + content[head_end_idx:]
         
         # Write back the modified content
         with open(html_file_path, 'w', encoding='utf-8') as f:
@@ -792,19 +832,35 @@ def insert_javascript_in_html(html_file_path: Path) -> bool:
     </script>
         '''
         
-        # Find the body end to insert the JavaScript
-        body_end_idx = content.find('</body>')
-        if body_end_idx == -1:
-            print(f"Warning: Could not find </body> tag in {html_file_path}")
-            return False
-        
         # Check if the JavaScript is already included
         if 'class="copy-button"' in content:
             # JavaScript is already included, no need to add it
             return True
         
-        # Insert the JavaScript code just before the closing body tag
-        modified_content = content[:body_end_idx] + copy_js + content[body_end_idx:]
+        # Find the body end to insert the JavaScript
+        body_end_idx = content.find('</body>')
+        if body_end_idx == -1:
+            # If no </body> tag found, check if there's a <body> tag
+            body_start_idx = content.find('<body>')
+            if body_start_idx != -1:
+                # Insert at the end of the content
+                modified_content = content + copy_js
+            else:
+                # No body tag, create a complete HTML structure
+                print(f"Warning: No body tag found in {html_file_path}, creating complete HTML structure")
+                modified_content = f"""<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+{content}
+{copy_js}
+</body>
+</html>"""
+        else:
+            # Insert the JavaScript code just before the closing body tag
+            modified_content = content[:body_end_idx] + copy_js + content[body_end_idx:]
         
         # Write back the modified content
         with open(html_file_path, 'w', encoding='utf-8') as f:
