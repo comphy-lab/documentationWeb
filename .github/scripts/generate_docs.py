@@ -705,6 +705,11 @@ def post_process_c_html(html_content: str, file_path: Path,
             try:
                 relative_link = os.path.relpath(target_html_path, start=file_path.parent)
                 link_url = relative_link.replace('\\', '/')  # Ensure forward slashes
+                # remove /docs/ with / in link
+                link_url = link_url.replace('/docs/', '/')
+                # print(f"  [Debug Include] Relative link: {link_url}")
+                # print(f"  [Debug Include] Link URL: {file_path.parent}")
+                # exit(0)
             except ValueError:
                 # Handle cases where paths are on different drives (should not happen here)
                 link_url = target_html_path.as_uri()  # Fallback to absolute URI
