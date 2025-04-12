@@ -28,38 +28,14 @@ def extract_seo_metadata(file_path: Path, file_content: str) -> Dict[str, str]:
     metadata = {}
     
     # Extract first paragraph as description (up to 160 chars)
-    description_match = re.search(r'^\s*#(.*?)$(.*?)(?:^#|\Z)', file_content, re.MULTILINE | re.DOTALL)
+    # Try to find a documentation comment or a paragraph with actual text, not code
+    description_match = re.search(r'^\s*#\s*(.*?)\s*$\s*([a-zA-Z].*?)(?=^\s*#|\Z)', file_content, re.MULTILINE | re.DOTALL)
     if description_match:
+        # First try the paragraph after the heading
         description = description_match.group(2).strip()
-        # Clean up markdown and limit to ~160 chars for meta description
-        description = re.sub(r'[#*`_]', '', description)
-        description = ' '.join(description.split())[:160]
-        if description.endswith('.'):
-            metadata['description'] = description
-        else:
-            metadata['description'] = description + '...'
-    
-    # Extract keywords from content based on technical terms
-    keywords = set()
-    keyword_patterns = [
-        r'fluid dynamics', r'CFD', r'Basilisk', r'simulation', 
-        r'multiphase', r'cavity flow', r'dye injection', r'Reynolds',
-        r'computational', r'physics', r'navier-stokes', r'vof',
-        r'level set', r'surface tension', r'curvature'
-    ]
-    for pattern in keyword_patterns:
-        if re.search(pattern, file_content, re.IGNORECASE):
-            keywords.add(pattern.lower())
-    
-    # Add filename-based keywords
-    filename_keywords = file_path.stem.lower().replace('-', ' ').replace('_', ' ').split()
-    keywords.update(filename_keywords)
-    
-    # Filter and join keywords
-    filtered_keywords = [k for k in keywords if len(k) > 3][:10]  # Limit to 10 keywords
-    metadata['keywords'] = ', '.join(filtered_keywords)
-    
-    return metadata
+        
+        # If that's empty or just code, use the heading itself
+        if not description or description.startswith(('
 
 # Configuration
 # Assume the script is in .github/scripts, REPO_ROOT is the parent of .github
