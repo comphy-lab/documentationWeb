@@ -35,7 +35,12 @@ def extract_seo_metadata(file_path: Path, file_content: str) -> Dict[str, str]:
         description = description_match.group(2).strip()
         
         # If that's empty or just code, use the heading itself
-        if not description or description.startswith(('
+        if not description or description.startswith(('```', '`', '#', '//')):
+            description = description_match.group(1).strip()
+        
+        # If that's empty or just code, use the heading itself
+        if not description or description.startswith(('```', '`', '#', '//')):
+            description = description_match.group(1).strip()
 
 # Configuration
 # Assume the script is in .github/scripts, REPO_ROOT is the parent of .github
@@ -1467,3 +1472,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+        
