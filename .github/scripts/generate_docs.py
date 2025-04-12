@@ -55,7 +55,7 @@ DARCSIT_DIR = BASILISK_DIR / 'src' / 'darcsit'
 TEMPLATE_PATH = REPO_ROOT / '.github' / 'assets' / 'custom_template.html'  # Use the modified local template
 LITERATE_C_SCRIPT = DARCSIT_DIR / 'literate-c'  # Path to the literate-c script
 BASE_URL = "/"  # Relative base URL for links within the site
-CSS_PATH = REPO_ROOT / '.github' / 'assets' / 'custom_styles.css'  # Path to custom CSS
+CSS_PATH = REPO_ROOT / '.github' / 'assets' / 'css' / 'custom_styles.css'  # Path to custom CSS
 
 # Read domain from CNAME file or use default
 try:
