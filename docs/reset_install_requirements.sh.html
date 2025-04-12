@@ -3,6 +3,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <!-- Basic SEO Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Computational fluid dynamics simulations using Basilisk C framework.">
+    <meta name="author" content="Computational Multiphase Physics Laboratory">
+    <meta name="keywords" content="fluid dynamics, CFD, Basilisk, multiphase flow, computational physics">
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="Test documentation: Lid driven cavity using dye injection - reset_install_requirements.sh">
+    <meta property="og:description" content="Computational fluid dynamics simulations using Basilisk C framework.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://test.comphy-lab.org/reset_install_requirements.sh.html">
+    <meta property="og:image" content="https://test.comphy-lab.org/logo.png">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://test.comphy-lab.org/reset_install_requirements.sh.html">
+    
             <title>Test documentation: Lid driven cavity using dye injection - reset_install_requirements.sh</title>
         <!-- <link href="css/custom.css" rel="stylesheet" media="screen, projection" type="text/css" /> -->
     <!-- <link href="css/print.css" rel="stylesheet" media="print" type= "text/css" /> -->
@@ -45,64 +61,64 @@
   <ul class="messages" id="messages"></ul>
   <div id="status"></div>
     <div class="code-block-container"><div class="code-block-container"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/zsh</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># tested on MacOS only. Let us know if you find issues running with Linux by opening an issue. </span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># modify using http://basilisk.fr/src/INSTALL </span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ensures that we are always using the latest version of basilisk</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if --hard flag is passed</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="va">HARD_RESET</span><span class="op">=</span>false</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="st">&quot;</span><span class="va">$1</span><span class="st">&quot;</span> <span class="ot">==</span> <span class="st">&quot;--hard&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">HARD_RESET</span><span class="op">=</span>true</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to install basilisk</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">install_basilisk()</span> <span class="kw">{</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="ex">darcs</span> clone http://basilisk.fr/basilisk</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">cd</span> basilisk/src</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">[[</span> <span class="st">&quot;</span><span class="va">$OSTYPE</span><span class="st">&quot;</span> <span class="ot">==</span> <span class="st">&quot;darwin&quot;</span><span class="pp">*</span> <span class="kw">]];</span> <span class="cf">then</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="st">&quot;Using MacOS&quot;</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ln</span> <span class="at">-s</span> config.osx config</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="st">&quot;Using Linux&quot;</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ln</span> <span class="at">-s</span> config.gcc config</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">fi</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span> <span class="at">-k</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">make</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove project config always</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-rf</span> .project_config</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if basilisk needs to be installed</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="st">&quot;</span><span class="va">$HARD_RESET</span><span class="st">&quot;</span> <span class="ot">==</span> true <span class="kw">]]</span> <span class="kw">||</span> <span class="kw">[[</span> <span class="ot">!</span> <span class="ot">-d</span> <span class="st">&quot;basilisk&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Installing basilisk...&quot;</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rm</span> <span class="at">-rf</span> basilisk</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="ex">install_basilisk</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Using existing basilisk installation...&quot;</span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    <span class="bu">cd</span> basilisk/src</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Setup environment variables</span></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;export BASILISK=</span><span class="va">$PWD</span><span class="st">&quot;</span> <span class="op">&gt;&gt;</span> ../../.project_config</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;export PATH=</span><span class="dt">\$</span><span class="st">PATH:</span><span class="dt">\$</span><span class="st">BASILISK&quot;</span> <span class="op">&gt;&gt;</span> ../../.project_config</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> ../../.project_config</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if qcc is working properly</span></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;\nChecking qcc installation...&quot;</span></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="ot">! </span><span class="ex">qcc</span> <span class="at">--version</span> <span class="op">&gt;</span> /dev/null <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span><span class="kw">;</span> <span class="cf">then</span></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;\033[0;31mError: qcc is not working properly.\033[0m&quot;</span></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Please ensure you have Xcode Command Line Tools installed.&quot;</span></span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;You can install them by running: xcode-select --install&quot;</span></span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;For more details, visit: http://basilisk.fr/src/INSTALL&quot;</span></span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    <span class="bu">exit</span> 1</span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;\033[0;32mqcc is properly installed.\033[0m&quot;</span></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    <span class="ex">qcc</span> <span class="at">--version</span></span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code></pre></div></div>
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><span class="co">#!/bin/zsh</span></span>
+<span id="cb1-2"><span class="co"># tested on MacOS only. Let us know if you find issues running with Linux by opening an issue. </span></span>
+<span id="cb1-3"><span class="co"># modify using http://basilisk.fr/src/INSTALL </span></span>
+<span id="cb1-4"><span class="co"># ensures that we are always using the latest version of basilisk</span></span>
+<span id="cb1-5"></span>
+<span id="cb1-6"><span class="co"># Check if --hard flag is passed</span></span>
+<span id="cb1-7"><span class="va">HARD_RESET</span><span class="op">=</span>false</span>
+<span id="cb1-8"><span class="cf">if</span> <span class="kw">[[</span> <span class="st">&quot;</span><span class="va">$1</span><span class="st">&quot;</span> <span class="ot">==</span> <span class="st">&quot;--hard&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-9">    <span class="va">HARD_RESET</span><span class="op">=</span>true</span>
+<span id="cb1-10"><span class="cf">fi</span></span>
+<span id="cb1-11"></span>
+<span id="cb1-12"><span class="co"># Function to install basilisk</span></span>
+<span id="cb1-13"><span class="fu">install_basilisk()</span> <span class="kw">{</span></span>
+<span id="cb1-14">    <span class="ex">darcs</span> clone http://basilisk.fr/basilisk</span>
+<span id="cb1-15">    <span class="bu">cd</span> basilisk/src</span>
+<span id="cb1-16"></span>
+<span id="cb1-17">    <span class="cf">if</span> <span class="kw">[[</span> <span class="st">&quot;</span><span class="va">$OSTYPE</span><span class="st">&quot;</span> <span class="ot">==</span> <span class="st">&quot;darwin&quot;</span><span class="pp">*</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-18">        <span class="bu">echo</span> <span class="st">&quot;Using MacOS&quot;</span></span>
+<span id="cb1-19">        <span class="fu">ln</span> <span class="at">-s</span> config.osx config</span>
+<span id="cb1-20">    <span class="cf">else</span></span>
+<span id="cb1-21">        <span class="bu">echo</span> <span class="st">&quot;Using Linux&quot;</span></span>
+<span id="cb1-22">        <span class="fu">ln</span> <span class="at">-s</span> config.gcc config</span>
+<span id="cb1-23">    <span class="cf">fi</span></span>
+<span id="cb1-24">    <span class="fu">make</span> <span class="at">-k</span></span>
+<span id="cb1-25">    <span class="fu">make</span></span>
+<span id="cb1-26"><span class="kw">}</span></span>
+<span id="cb1-27"></span>
+<span id="cb1-28"><span class="co"># Remove project config always</span></span>
+<span id="cb1-29"><span class="fu">rm</span> <span class="at">-rf</span> .project_config</span>
+<span id="cb1-30"></span>
+<span id="cb1-31"><span class="co"># Check if basilisk needs to be installed</span></span>
+<span id="cb1-32"><span class="cf">if</span> <span class="kw">[[</span> <span class="st">&quot;</span><span class="va">$HARD_RESET</span><span class="st">&quot;</span> <span class="ot">==</span> true <span class="kw">]]</span> <span class="kw">||</span> <span class="kw">[[</span> <span class="ot">!</span> <span class="ot">-d</span> <span class="st">&quot;basilisk&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-33">    <span class="bu">echo</span> <span class="st">&quot;Installing basilisk...&quot;</span></span>
+<span id="cb1-34">    <span class="fu">rm</span> <span class="at">-rf</span> basilisk</span>
+<span id="cb1-35">    <span class="ex">install_basilisk</span></span>
+<span id="cb1-36"><span class="cf">else</span></span>
+<span id="cb1-37">    <span class="bu">echo</span> <span class="st">&quot;Using existing basilisk installation...&quot;</span></span>
+<span id="cb1-38">    <span class="bu">cd</span> basilisk/src</span>
+<span id="cb1-39"><span class="cf">fi</span></span>
+<span id="cb1-40"></span>
+<span id="cb1-41"><span class="co"># Setup environment variables</span></span>
+<span id="cb1-42"><span class="bu">echo</span> <span class="st">&quot;export BASILISK=</span><span class="va">$PWD</span><span class="st">&quot;</span> <span class="op">&gt;&gt;</span> ../../.project_config</span>
+<span id="cb1-43"><span class="bu">echo</span> <span class="st">&quot;export PATH=</span><span class="dt">\$</span><span class="st">PATH:</span><span class="dt">\$</span><span class="st">BASILISK&quot;</span> <span class="op">&gt;&gt;</span> ../../.project_config</span>
+<span id="cb1-44"></span>
+<span id="cb1-45"><span class="bu">source</span> ../../.project_config</span>
+<span id="cb1-46"></span>
+<span id="cb1-47"><span class="co"># Check if qcc is working properly</span></span>
+<span id="cb1-48"><span class="bu">echo</span> <span class="st">&quot;\nChecking qcc installation...&quot;</span></span>
+<span id="cb1-49"><span class="cf">if</span> <span class="ot">! </span><span class="ex">qcc</span> <span class="at">--version</span> <span class="op">&gt;</span> /dev/null <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb1-50">    <span class="bu">echo</span> <span class="st">&quot;\033[0;31mError: qcc is not working properly.\033[0m&quot;</span></span>
+<span id="cb1-51">    <span class="bu">echo</span> <span class="st">&quot;Please ensure you have Xcode Command Line Tools installed.&quot;</span></span>
+<span id="cb1-52">    <span class="bu">echo</span> <span class="st">&quot;You can install them by running: xcode-select --install&quot;</span></span>
+<span id="cb1-53">    <span class="bu">echo</span> <span class="st">&quot;For more details, visit: http://basilisk.fr/src/INSTALL&quot;</span></span>
+<span id="cb1-54">    <span class="bu">exit</span> 1</span>
+<span id="cb1-55"><span class="cf">else</span></span>
+<span id="cb1-56">    <span class="bu">echo</span> <span class="st">&quot;\033[0;32mqcc is properly installed.\033[0m&quot;</span></span>
+<span id="cb1-57">    <span class="ex">qcc</span> <span class="at">--version</span></span>
+<span id="cb1-58"><span class="cf">fi</span></span></code></pre></div></div>
 </div>
           </div>
         </div>
@@ -112,59 +128,7 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="
   <a href="//" alt="site logo" title="Go to top page"><img src="//img/logo.png" /></a>
 </div>
 -->
-          <!-- Removed fieldsets 
-<div class="sitenav">
-  <fieldset>
-    <legend>Site</legend>
-    <ul>
-      <li><a href="//Front Page">Front page</a></li>
-      <li><a href="//_index">All pages</a></li>
-      <li><a href="//_activity">Recent activity</a></li>
-            <li><a href="//Help">Help</a></li>
-    </ul>
-    <form action="/_search" method="get" id="searchform">
-      <input type="text" name="patterns" id="patterns"/>
-      <input type="submit" value="Search"/>
-    </form>
-  </fieldset>
-  <fieldset>
-    <legend>Documentation</legend>
-    <ul>
-      <li><a href="//Tutorial">Tutorial</a></li>
-      <li><a href="//src/INSTALL">Installation</a></li>
-      <li><a href="//Basilisk C">Basilisk C</a></li>
-      <li><a href="//src/README">Solvers and functions</a></li>
-      <li><a href="//src/examples/README">Examples</a></li>
-      <li><a href="http://groups.google.com/d/forum/basilisk-fr">User forum</a></li>
-      <li><a href="//sandbox/documentation">More documentation</a></li>
-    </ul>
-  </fieldset>
-  <fieldset>
-    <legend>Development</legend>
-    <ul>
-      <li><a href="//src/?history">Recent activity</a></li>
-      <li><a href="//src/">Source code</a></li>
-      <li><a href="https://hub.darcs.net/basilisk/basilisk/browse/src">Darcs Hub</a></li>
-      <li><a href="//src/test/README">Test cases</a></li>
-      <li><a href="//sandbox/bugs/README">Bug reports</a></li>
-      <li><a href="//src/Contributing">How to contribute</a></li>
-      <li><a href="//sandbox/">Play in the sandbox</a></li>
-    </ul>
-  </fieldset>
-</div>
--->
-                    <!-- Removed this page fieldset 
-<div class="pageTools">
-  <fieldset>
-    <legend>This page</legend>
-    <ul>
-      <li><a href="/reset_install_requirements.sh.html?raw">Raw page source</a></li>
-      <li><a href="/reset_install_requirements.sh.html?delete">Delete this page</a></li>
-    </ul>
-  </fieldset>
-</div>
--->
-                            </div>
+                                      </div>
     </div>
     
       

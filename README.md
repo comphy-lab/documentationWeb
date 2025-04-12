@@ -27,7 +27,7 @@ The codebase implements a classical lid driven cavity flow problem with dye inje
 
 The [`src-local/`](src-local) directory contains custom header files that extend the base Basilisk functionality:
 
-- **dye-injection.h**: Implements a circular tracer (dye) injection for flow visualization with:
+- [dye-injection.h](src-local/dye-injection.h): Implements a circular tracer (dye) injection for flow visualization with:
   - Configurable injection time and position
   - Circular dye region with adjustable radius
   - Integration with Basilisk's tracer module for advection
@@ -36,19 +36,19 @@ The [`src-local/`](src-local) directory contains custom header files that extend
 
 The [`postProcess/`](postProcess) directory provides tools for analyzing and visualizing simulation results:
 
-- **2-LidDrivenCavity-Newtonian-dyeInjection.py**: Python script for generating visualizations that:
+- [2-LidDrivenCavity-Newtonian-dyeInjection.py](postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py): Python script for generating visualizations that:
   - Processes simulation timesteps in parallel
   - Creates two-panel plots showing dye concentration and velocity magnitude
   - Adds streamlines to visualize flow patterns
   - Uses 'getData-LidDriven' utility to extract field data
 
-- **getData-LidDriven.c**: C utility that extracts and processes numerical data from simulation output files
+- [getData-LidDriven.c](postProcess/getData-LidDriven.c): C utility that extracts and processes numerical data from simulation output files
 
 ### testCases/ Directory
 
 The [`testCases/`](testCases) directory contains simulation configurations:
 
-- **LidDrivenCavity-Newtonian-dyeInjection.c**: Main simulation case that implements:
+- [LidDrivenCavity-Newtonian-dyeInjection.c](testCases/LidDrivenCavity-Newtonian-dyeInjection.c): Main simulation case that implements:
   - Classical lid-driven cavity flow for a Newtonian fluid
   - Configurable Reynolds number (default: Re = 1)
   - Dye injection in the upper center of the cavity at t=0.05
