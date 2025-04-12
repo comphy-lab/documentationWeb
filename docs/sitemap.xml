@@ -6,27 +6,27 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://test.comphy-lab.org/src-local/dye-injection.html</loc>
+    <loc>https://test.comphy-lab.org/src-local/dye-injection.h.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://test.comphy-lab.org/testCases/LidDrivenCavity-Newtonian-dyeInjection.html</loc>
+    <loc>https://test.comphy-lab.org/testCases/LidDrivenCavity-Newtonian-dyeInjection.c.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://test.comphy-lab.org/postProcess/getData-LidDriven.html</loc>
+    <loc>https://test.comphy-lab.org/postProcess/getData-LidDriven.c.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://test.comphy-lab.org/postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.html</loc>
+    <loc>https://test.comphy-lab.org/postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://test.comphy-lab.org/reset_install_requirements.html</loc>
+    <loc>https://test.comphy-lab.org/reset_install_requirements.sh.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

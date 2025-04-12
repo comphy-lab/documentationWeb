@@ -298,29 +298,45 @@ def process_c_file(file_path: Path, literate_c_script: Path) -> str:
         RuntimeError: If the literate-c script returns a non-zero exit status.
         ValueError: If the preprocessing output is empty.
     """
+    # First, read the file content directly
+    with open(file_path, 'r', encoding='utf-8') as f:
+        file_content = f.read()
+    
+    # Create a markdown representation of the C file
+    markdown_content = f"""# {file_path.name}
+
+```c
+{file_content}
+```
+"""
+    
+    # Run literate-c for additional processing if available
     literate_c_cmd = [str(literate_c_script), str(file_path), '0']  # Use magic=0 for standard C files
     
-    # Run literate-c, capture its output
-    preproc_proc = subprocess.Popen(
-        literate_c_cmd, 
-        stdout=subprocess.PIPE, 
-        stderr=subprocess.PIPE, 
-        text=True, 
-        encoding='utf-8'
-    )
-    content, stderr = preproc_proc.communicate()
+    try:
+        # Run literate-c, capture its output
+        preproc_proc = subprocess.Popen(
+            literate_c_cmd, 
+            stdout=subprocess.PIPE, 
+            stderr=subprocess.PIPE, 
+            text=True, 
+            encoding='utf-8'
+        )
+        content, stderr = preproc_proc.communicate()
 
-    if preproc_proc.returncode != 0:
-        raise RuntimeError(f"literate-c preprocessing failed: {stderr}")
-    
-    # Replace the specific marker literate-c uses with standard pandoc 'c'
-    content = content.replace('~~~literatec', '~~~c')
-
-    # Handle case where preprocessing yields no output
-    if not content.strip():
-        raise ValueError("Preprocessing yielded empty content")
-
-    return content
+        if preproc_proc.returncode == 0 and content.strip():
+            # Replace the specific marker literate-c uses with standard pandoc 'c'
+            content = content.replace('~~~literatec', '~~~c')
+            return content
+        else:
+            # If literate-c fails or produces no output, use our simple markdown version
+            print(f"  [Debug] Using simple markdown for {file_path} due to literate-c error: {stderr}")
+            return markdown_content
+            
+    except Exception as e:
+        # If there's any error running literate-c, fall back to simple markdown
+        print(f"  [Debug] Using simple markdown for {file_path} due to error: {e}")
+        return markdown_content
 
 
 def prepare_pandoc_input(file_path: Path, literate_c_script: Path) -> str:
@@ -393,7 +409,20 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
         '-o', str(output_html_path)
     ]
     
+    # Print pandoc command and input for debugging
+    print(f"  [Debug Pandoc] Command: {' '.join(pandoc_cmd)}")
+    print(f"  [Debug Pandoc] Input content length: {len(pandoc_input)} chars")
+    print(f"  [Debug Pandoc] First 200 chars of input: {pandoc_input[:200]}")
+    
+    # Run pandoc with input content
     process = subprocess.run(pandoc_cmd, input=pandoc_input, text=True, capture_output=True)
+    
+    # Print pandoc output for debugging
+    print(f"  [Debug Pandoc] Return Code: {process.returncode}")
+    if process.stdout:
+        print(f"  [Debug Pandoc] STDOUT:\n{process.stdout}")
+    if process.stderr:
+        print(f"  [Debug Pandoc] STDERR:\n{process.stderr}")
     
     if process.returncode != 0:
         print(f"Error running pandoc: {process.stderr}")
@@ -413,6 +442,8 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>{wiki_title} - {page_title}</title>
+    <meta name="description" content="{seo_metadata.get('description', '')}" />
+    <meta name="keywords" content="{seo_metadata.get('keywords', '')}" />
 </head>
 <body>
 {content}
@@ -668,6 +699,7 @@ def post_process_c_html(html_content: str, file_path: Path,
         
         if local_file_path.is_file():
             # Link to local generated HTML file
+            # Use the new file naming pattern: file.c -> file.c.html, file.h -> file.h.html
             target_html_path = (docs_dir / 'src-local' / check_filename).with_suffix(local_file_path.suffix + '.html')
             # Calculate relative path from the *current* HTML file's directory
             try:
@@ -931,24 +963,29 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
         # Apply appropriate post-processing based on file type
         if is_python_file or is_shell_file or is_markdown_file:
             # For Python, Shell, and Markdown files
-            with open(output_html_path, 'w', encoding='utf-8') as f_out:
-                f_out.write(pandoc_stdout)
-            
-            # Then post-process the HTML
+            # Read the generated HTML file
             with open(output_html_path, 'r', encoding='utf-8') as f:
                 html_content = f.read()
             
+            # Post-process the HTML
             processed_html = post_process_python_shell_html(html_content)
             
-            with open(output_html_path, 'w', encoding='utf-8') as f_out:
-                f_out.write(processed_html)
+            # Write back the processed HTML
+            with open(output_html_path, 'w', encoding='utf-8') as f:
+                f.write(processed_html)
         else:
-            # For C/C++ files, use awk for post-processing
-            processed_html = run_awk_post_processing(pandoc_stdout, file_path, repo_root, darcsit_dir)
+            # For C/C++ files
+            # Read the generated HTML file
+            with open(output_html_path, 'r', encoding='utf-8') as f:
+                html_content = f.read()
+            
+            # Use awk for post-processing
+            processed_html = run_awk_post_processing(html_content, file_path, repo_root, darcsit_dir)
             
             # Further post-process the HTML
             cleaned_html = post_process_c_html(processed_html, file_path, repo_root, darcsit_dir, docs_dir)
             
+            # Write back the processed HTML
             with open(output_html_path, 'w', encoding='utf-8') as f:
                 f.write(cleaned_html)
         
@@ -1064,6 +1101,7 @@ def convert_directory_tree_to_html(readme_content: str) -> str:
             file_path = file_path.lstrip('/')
             
             # Preserve the original file extension in the link
+            # Use the new file naming pattern: file.c -> file.c.html, file.h -> file.h.html
             item_html += f"**[{path}]({file_path}.html)** - {description}"
         
         html_structure.append(item_html)
@@ -1127,6 +1165,8 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
             grouped_links[top_dir] = []
         
         # Make sure the html_path has the correct format with preserved extension
+        # The html_path already has the correct format (file.c.html, file.h.html, etc.)
+        # because we modified the output path construction in the main function
         grouped_links[top_dir].append(f"- [{relative_original_path}]({relative_html_path})")
 
     # Add a section for files in the root directory
@@ -1297,7 +1337,10 @@ def main():
     for file_path in source_files:
         # Determine output path
         relative_path = file_path.relative_to(REPO_ROOT)
-        output_html_path = DOCS_DIR / relative_path.with_suffix('.html')
+        
+        # Create output path with file extension preserved in the HTML filename
+        # For example: file.c -> file.c.html, file.h -> file.h.html, file.py -> file.py.html
+        output_html_path = DOCS_DIR / relative_path.with_suffix(relative_path.suffix + '.html')
         
         # Create output directory if it doesn't exist
         output_html_path.parent.mkdir(parents=True, exist_ok=True)
