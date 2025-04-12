@@ -52,6 +52,13 @@ LITERATE_C_SCRIPT = DARCSIT_DIR / 'literate-c'  # Path to the literate-c script
 BASE_URL = "/"  # Relative base URL for links within the site
 CSS_PATH = REPO_ROOT / '.github' / 'assets' / 'custom_styles.css'  # Path to custom CSS
 
+# Read domain from CNAME file or use default
+try:
+    CNAME_PATH = REPO_ROOT / 'CNAME'
+    BASE_DOMAIN = f"https://{CNAME_PATH.read_text().strip()}" if CNAME_PATH.exists() else "https://test.comphy-lab.org"
+except Exception as e:
+    print(f"Warning: Could not read CNAME file: {e}")
+    BASE_DOMAIN = "https://test.comphy-lab.org"
 
 def extract_h1_from_readme(readme_path: Path) -> str:
     """
@@ -1290,7 +1297,7 @@ def generate_robots_txt(docs_dir: Path) -> bool:
         with open(robots_path, 'w', encoding='utf-8') as f:
             f.write('User-agent: *\n')
             f.write('Allow: /\n\n')
-            f.write('Sitemap: https://test.comphy-lab.org/sitemap.xml\n')
+            f.write(f'Sitemap: {BASE_DOMAIN}/sitemap.xml\n')
         
         debug_print(f"Generated robots.txt at {robots_path}")
         return True
@@ -1312,7 +1319,6 @@ def generate_sitemap(docs_dir: Path, generated_files: Dict[Path, Path]) -> bool:
         True if sitemap was generated successfully
     """
     sitemap_path = docs_dir / 'sitemap.xml'
-    base_url = "https://test.comphy-lab.org"  # Update with your actual domain
     
     try:
         with open(sitemap_path, 'w', encoding='utf-8') as f:
@@ -1321,7 +1327,7 @@ def generate_sitemap(docs_dir: Path, generated_files: Dict[Path, Path]) -> bool:
             
             # Add the homepage
             f.write('  <url>\n')
-            f.write(f'    <loc>{base_url}/</loc>\n')
+            f.write(f'    <loc>{BASE_DOMAIN}/</loc>\n')
             f.write('    <changefreq>weekly</changefreq>\n')
             f.write('    <priority>1.0</priority>\n')
             f.write('  </url>\n')
@@ -1332,7 +1338,7 @@ def generate_sitemap(docs_dir: Path, generated_files: Dict[Path, Path]) -> bool:
                 url_path = str(relative_path).replace('\\', '/')
                 
                 f.write('  <url>\n')
-                f.write(f'    <loc>{base_url}/{url_path}</loc>\n')
+                f.write(f'    <loc>{BASE_DOMAIN}/{url_path}</loc>\n')
                 f.write('    <changefreq>monthly</changefreq>\n')
                 
                 # Higher priority for important files
