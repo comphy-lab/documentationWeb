@@ -32,17 +32,38 @@ def extract_seo_metadata(file_path: Path, file_content: str) -> Dict[str, str]:
     """
     metadata = {}
     
-    # Extract first paragraph as description (up to 160 chars)
-    description_match = re.search(r'^\s*#(.*?)$(.*?)(?:^#|\Z)', file_content, re.MULTILINE | re.DOTALL)
-    if description_match:
-        description = description_match.group(2).strip()
-        # Clean up markdown and limit to ~160 chars for meta description
-        description = re.sub(r'[#*`_]', '', description)
-        description = ' '.join(description.split())[:160]
-        if description.endswith('.'):
-            metadata['description'] = description
-        else:
-            metadata['description'] = description + '...'
+    # For Python files, try to extract docstring first
+    if file_path.suffix.lower() == '.py':
+        # Look for module docstring or first function docstring
+        docstring_match = re.search(r'"""(.*?)"""', file_content, re.MULTILINE | re.DOTALL)
+        if docstring_match:
+            description = docstring_match.group(1).strip()
+            # Clean up and limit to ~160 chars for meta description
+            description = ' '.join(description.split())[:160]
+            if description.endswith('.'):
+                metadata['description'] = description
+            else:
+                metadata['description'] = description + '...'
+    else:
+        # For other files, extract first paragraph after heading
+        description_match = re.search(r'^\s*#(.*?)$(.*?)(?:^#|\Z)', file_content, re.MULTILINE | re.DOTALL)
+        if description_match:
+            description = description_match.group(2).strip()
+            # Clean up markdown and limit to ~160 chars for meta description
+            description = re.sub(r'[#*`_]', '', description)
+            description = ' '.join(description.split())[:160]
+            if description.endswith('.'):
+                metadata['description'] = description
+            else:
+                metadata['description'] = description + '...'
+    
+    # If no description found or if it looks like code (contains certain keywords),
+    # use a generic description based on the filename
+    code_indicators = ['import ', 'def ', 'class ', 'return ', '= ', '+= ', '-= ']
+    if ('description' not in metadata or 
+        any(indicator in metadata.get('description', '') for indicator in code_indicators)):
+        filename = file_path.stem.replace('-', ' ').replace('_', ' ')
+        metadata['description'] = f"Documentation for {filename}"
     
     # Extract keywords from content based on technical terms
     keywords = set()
@@ -420,6 +441,8 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
         '-V', f'description={seo_metadata.get("description", "")}',
         '-V', f'keywords={seo_metadata.get("keywords", "")}',
         '-V', f'image={seo_metadata.get("image", "")}',
+        '--strip-comments',  # Strip HTML comments
+        '--no-highlight',    # Disable syntax highlighting to prevent extra markup
         '-o', str(output_html_path)
     ]
     
@@ -442,10 +465,13 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
         print(f"Error running pandoc: {process.stderr}")
         return ""
     
-    # Verify that the output file has proper HTML structure
+    # Read the generated HTML and clean up any empty anchor tags
     try:
         with open(output_html_path, 'r', encoding='utf-8') as f:
             content = f.read()
+            
+        # Remove empty anchor tags
+        content = re.sub(r'<a[^>]*>\s*</a>', '', content)
             
         # Check if the file has proper HTML structure
         if '<!DOCTYPE' not in content or '<html' not in content:
@@ -463,8 +489,12 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
 {content}
 </body>
 </html>"""
-            with open(output_html_path, 'w', encoding='utf-8') as f:
-                f.write(fixed_content)
+            content = fixed_content
+            
+        # Write back the cleaned content
+        with open(output_html_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+            
     except Exception as e:
         print(f"Error verifying HTML structure: {e}")
     
