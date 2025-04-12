@@ -376,28 +376,28 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
                base_url: str, wiki_title: str, page_url: str, page_title: str,
                seo_metadata: Dict[str, str] = None) -> str:
     """
-               Converts Markdown content to a standalone HTML document using Pandoc.
-               
-               This function runs Pandoc to transform the provided Markdown input into HTML using a specified
-               template and SEO metadata. It assigns HTML variables for the base URL, wiki title, page URL, and
-               page title, and saves Pandoc’s output to the designated file. After conversion, the function checks
-               that the generated HTML contains the proper DOCTYPE and <html> tag, and wraps the content with a
-               complete HTML scaffold if necessary. Returns Pandoc’s standard output on success or an empty string
-               when an error occurs.
-                 
-               Args:
-                   pandoc_input: The Markdown content to convert.
-                   output_html_path: File path where the generated HTML is saved.
-                   template_path: Path to the HTML template file used by Pandoc.
-                   base_url: Base URL for constructing absolute links.
-                   wiki_title: Title of the documentation or wiki.
-                   page_url: URL of the current page.
-                   page_title: Title of the current page.
-                   seo_metadata: Optional dictionary with SEO metadata (e.g., description, keywords, image).
-               
-               Returns:
-                   The standard output from Pandoc if conversion succeeds; otherwise, an empty string.
-               """
+               """Converts Markdown content to a standalone HTML document using Pandoc.
+    
+    This function runs Pandoc to transform the provided Markdown input into HTML using a specified
+    template and SEO metadata. It assigns HTML variables for the base URL, wiki title, page URL, and
+    page title, and saves Pandoc's output to the designated file. After conversion, the function checks
+    that the generated HTML contains the proper DOCTYPE and <html> tag, and wraps the content with a
+    complete HTML scaffold if necessary. Returns Pandoc's standard output on success or an empty string
+    when an error occurs.
+      
+    Args:
+        pandoc_input: The Markdown content to convert.
+        output_html_path: File path where the generated HTML is saved.
+        template_path: Path to the HTML template file used by Pandoc.
+        base_url: Base URL for constructing absolute links.
+        wiki_title: Title of the documentation or wiki.
+        page_url: URL of the current page.
+        page_title: Title of the current page.
+        seo_metadata: Optional dictionary with SEO metadata (e.g., description, keywords, image).
+    
+    Returns:
+        The standard output from Pandoc if conversion succeeds; otherwise, an empty string.
+    """
     if seo_metadata is None:
         seo_metadata = {}
     
