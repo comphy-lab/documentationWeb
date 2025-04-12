@@ -1,10 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <!-- Basic SEO Meta Tags -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Basic SEO Meta Tags -->
     <meta name="description" content="Computational fluid dynamics simulations using Basilisk C framework.">
     <meta name="author" content="Computational Multiphase Physics Laboratory">
     <meta name="keywords" content="fluid dynamics, CFD, Basilisk, multiphase flow, computational physics">
@@ -14,222 +14,299 @@
     <meta property="og:description" content="Computational fluid dynamics simulations using Basilisk C framework.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://test.comphy-lab.org">
-    <meta property="og:image" content="https://test.comphy-lab.org/logo.png">
+    <meta property="og:image" content="https://test.comphy-lab.org/assets/logos/CoMPhy-Lab.svg">
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://test.comphy-lab.org">
     
-            <title>Test documentation: Lid driven cavity using dye injection - -</title>
-        <!-- <link href="css/custom.css" rel="stylesheet" media="screen, projection" type="text/css" /> -->
-    <!-- <link href="css/print.css" rel="stylesheet" media="print" type= "text/css" /> -->
-        <!--[if IE]><!-- <link href="css/ie.css" rel="stylesheet" media="screen, projection" type="text/css" /> --><![endif]-->
-    <!-- <link rel="stylesheet" href="css/basilisk.css"/> -->
-    <!-- Link to our custom styles is added by Pandoc via --css flag -->
-    <script src="//js/jquery.min.js" type="text/javascript"></script>
-    <script src="//js/jquery-ui.packed.js" type="text/javascript"></script>
-    <script src="//js/plots.js" type="text/javascript"></script>
-<link rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css"
-      integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j"
-      crossorigin="anonymous"/>
-<script defer
-	src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js"
-	integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ"
-	crossorigin="anonymous">
-</script>
-      <link href="custom_styles.css" rel="stylesheet" type="text/css" />
+    <title>Test documentation: Lid driven cavity using dye injection - -</title>
+
+    <!-- Critical CSS -->
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --text-color: #333;
+            --background-color: #fff;
+            --code-background: #f5f5f5;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        pre, code {
+            background: var(--code-background);
+            border-radius: 4px;
+            padding: 0.2em 0.4em;
+        }
+        
+        pre {
+            padding: 1em;
+            overflow-x: auto;
+        }
+    </style>
+
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="//assets/css/styles.css" as="style">
+    <link rel="preload" href="//assets/css/custom_styles.css" as="style">
+    <link rel="preload" href="//assets/js/main.js" as="script">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="//assets/logos/CoMPhy-Lab.svg">
+    <link rel="apple-touch-icon" href="//assets/logos/CoMPhy-Lab.svg">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="//assets/css/styles.css">
+    <link rel="stylesheet" href="//assets/css/custom_styles.css">
+    <link rel="stylesheet" href="//assets/css/command-palette.css">
+    <link rel="stylesheet" href="//assets/css/vendor.css">
+    
+    <!-- KaTeX for Math -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css">
+    
+    <!-- jQuery and UI -->
+    <script src="//js/jquery.min.js"></script>
+    <script src="//js/jquery-ui.packed.js"></script>
+    <script src="//js/plots.js"></script>
+    
+    <!-- KaTeX -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js"></script>
+    
+    <!-- Command Palette -->
+    <script src="//assets/js/command-palette.js"></script>
+    <script src="//assets/js/command-data.js"></script>
+    <script src="//assets/js/shortcut-key.js"></script>
+    <link href="custom_styles.css" rel="stylesheet" type="text/css" />
     </head>
-  <body>
-    <div id="doc3" class="yui-t1">
-        <div id="yui-main">
-          <div id="maincol" class="yui-b">
-<!-- Removed userbox div 
-<div id="userbox">
-  <noscript>
-    <a href="//_login">Login</a>
-    <a href="//_logout">Logout</a>
-  </noscript>
-  &nbsp;
-  <a id="loginlink" class="login" href="//_login">Login / Get an account</a>
-  <a id="logoutlink" class="login" href="//_logout">Logout <span id="logged_in_user"></span></a>
-</div>
--->
-<div id="content">
-    <!-- Removed page title h1 
-    <h1 class="pageTitle"><a href="">-</a></h1>
--->
-  <ul class="messages" id="messages"></ul>
-  <div id="status"></div>
-    <h1
-id="test-documentation-lid-driven-cavity-using-dye-injection">Test
-documentation: Lid driven cavity using dye injection</h1>
-<p>This repository contains the computational framework and tools for
-multiphase fluid dynamics simulations based on the Basilisk C framework.
-The codebase specializes in the simulation and analysis of lid driven
-cavity flow with dye injection.</p>
-<h2 id="documentation">Documentation</h2>
-<p>The full documentation for this project is available at <a
-href="https://test.comphy-lab.org">test.comphy-lab.org</a>. This website
-contains detailed explanations of the code, examples, and usage
-instructions.</p>
-<h2 id="overview">Overview</h2>
-<p>The codebase implements a classical lid driven cavity flow problem
-with dye injection using the Basilisk CFD library with custom
-implementations for specific dye injection including.</p>
-<h2 id="repository-structure">Repository Structure</h2>
-<div class="repository-structure">
-<ul>
-<li><strong>basilisk/src/</strong> - Core Basilisk CFD library
-(reference only, do not modify)</li>
-<li><strong><a href="testCases">testCases/</a></strong> - Test cases for
-simulation
-<ul>
-<li><strong><a
-href="testCases/LidDrivenCavity-Newtonian-dyeInjection.c.html">LidDrivenCavity-Newtonian-dyeInjection.c</a></strong>
-- Lid-driven cavity with dye injection</li>
-</ul></li>
-<li><strong><a href="src-local">src-local/</a></strong> - Custom header
-files extending Basilisk functionality
-<ul>
-<li><strong><a
-href="src-local/dye-injection.h.html">dye-injection.h</a></strong> - Dye
-injection for flow visualization</li>
-</ul></li>
-<li><strong><a href="postProcess">postProcess/</a></strong> -
-Project-specific post-processing tools
-<ul>
-<li><strong><a
-href="postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py.html">2-LidDrivenCavity-Newtonian-dyeInjection.py</a></strong>
-- Visualization script for post-processing</li>
-<li><strong><a
-href="postProcess/getData-LidDriven.c.html">getData-LidDriven.c</a></strong>
-- Data extraction utility</li>
-</ul></li>
-</ul>
-</div>
-<h3 id="src-local-directory">src-local/ Directory</h3>
-<p>The <a href="src-local"><code>src-local/</code></a> directory
-contains custom header files that extend the base Basilisk
-functionality:</p>
-<ul>
-<li><a href="src-local/dye-injection.h.html">dye-injection.h</a>: Implements
-a circular tracer (dye) injection for flow visualization with:
-<ul>
-<li>Configurable injection time and position</li>
-<li>Circular dye region with adjustable radius</li>
-<li>Integration with Basilisk’s tracer module for advection</li>
-</ul></li>
-</ul>
-<h3 id="postprocess-directory">postProcess/ Directory</h3>
-<p>The <a href="postProcess"><code>postProcess/</code></a> directory
-provides tools for analyzing and visualizing simulation results:</p>
-<ul>
-<li><a
-href="postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py.html">2-LidDrivenCavity-Newtonian-dyeInjection.py</a>:
-Python script for generating visualizations that:
-<ul>
-<li>Processes simulation timesteps in parallel</li>
-<li>Creates two-panel plots showing dye concentration and velocity
-magnitude</li>
-<li>Adds streamlines to visualize flow patterns</li>
-<li>Uses ‘getData-LidDriven’ utility to extract field data</li>
-</ul></li>
-<li><a href="postProcess/getData-LidDriven.c.html">getData-LidDriven.c</a>: C
-utility that extracts and processes numerical data from simulation
-output files</li>
-</ul>
-<h3 id="testcases-directory">testCases/ Directory</h3>
-<p>The <a href="testCases"><code>testCases/</code></a> directory
-contains simulation configurations:</p>
-<ul>
-<li><a
-href="testCases/LidDrivenCavity-Newtonian-dyeInjection.c.html">LidDrivenCavity-Newtonian-dyeInjection.c</a>:
-Main simulation case that implements:
-<ul>
-<li>Classical lid-driven cavity flow for a Newtonian fluid</li>
-<li>Configurable Reynolds number (default: Re = 1)</li>
-<li>Dye injection in the upper center of the cavity at t=0.05</li>
-<li>Adaptive grid with level 8 refinement</li>
-<li>Proper boundary conditions for the moving lid and no-slip walls</li>
-<li>Regular snapshot generation for visualization</li>
-</ul></li>
-</ul>
-<h2 id="getting-started">Getting Started</h2>
-<h3 id="prerequisites">Prerequisites</h3>
-<ul>
-<li>Basilisk C installed (<a
-href="http://basilisk.fr/src/INSTALL">Installation
-instructions</a>)</li>
-<li>C compiler (gcc recommended)</li>
-<li>Make build system</li>
-<li>Scientific visualization tools (optional: ParaView, Gnuplot,
-etc.)</li>
-</ul>
-<h3 id="installation">Installation</h3>
-<ol type="1">
-<li><p>Clone this repository:</p>
-<div class="code-block-container"><div class="code-block-container"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/username/comphy-lab.git</span>
+<body>
+    <div class="container">
+        <header class="site-header">
+            <nav class="main-nav">
+                <a href="//" class="logo">
+                    <img src="//assets/logos/CoMPhy-Lab.svg" alt="CoMPhy-Lab Logo" height="40">
+                </a>
+                <div class="nav-links">
+                    <a href="//Tutorial">Tutorial</a>
+                    <a href="//src/INSTALL">Installation</a>
+                    <a href="//Basilisk C">Basilisk C</a>
+                    <a href="//src/README">Solvers</a>
+                    <a href="//src/examples/README">Examples</a>
+                </div>
+            </nav>
+        </header>
+
+        <main class="content">
+            
+            <div class="page-content">
+                
+                                <h1 class="page-title">-</h1>
+                
+                
+                <h1
+                id="test-documentation-lid-driven-cavity-using-dye-injection">Test
+                documentation: Lid driven cavity using dye
+                injection</h1>
+                <p>This repository contains the computational framework
+                and tools for multiphase fluid dynamics simulations
+                based on the Basilisk C framework. The codebase
+                specializes in the simulation and analysis of lid driven
+                cavity flow with dye injection.</p>
+                <h2 id="documentation">Documentation</h2>
+                <p>The full documentation for this project is available
+                at <a
+                href="https://test.comphy-lab.org">test.comphy-lab.org</a>.
+                This website contains detailed explanations of the code,
+                examples, and usage instructions.</p>
+                <h2 id="overview">Overview</h2>
+                <p>The codebase implements a classical lid driven cavity
+                flow problem with dye injection using the Basilisk CFD
+                library with custom implementations for specific dye
+                injection including.</p>
+                <h2 id="repository-structure">Repository Structure</h2>
+                <div class="repository-structure">
+                <ul>
+                <li><strong>basilisk/src/</strong> - Core Basilisk CFD
+                library (reference only, do not modify)</li>
+                <li><strong><a href="testCases">testCases/</a></strong>
+                - Test cases for simulation
+                <ul>
+                <li><strong><a
+                href="testCases/LidDrivenCavity-Newtonian-dyeInjection.c.html">LidDrivenCavity-Newtonian-dyeInjection.c</a></strong>
+                - Lid-driven cavity with dye injection</li>
+                </ul></li>
+                <li><strong><a href="src-local">src-local/</a></strong>
+                - Custom header files extending Basilisk functionality
+                <ul>
+                <li><strong><a
+                href="src-local/dye-injection.h.html">dye-injection.h</a></strong>
+                - Dye injection for flow visualization</li>
+                </ul></li>
+                <li><strong><a
+                href="postProcess">postProcess/</a></strong> -
+                Project-specific post-processing tools
+                <ul>
+                <li><strong><a
+                href="postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py.html">2-LidDrivenCavity-Newtonian-dyeInjection.py</a></strong>
+                - Visualization script for post-processing</li>
+                <li><strong><a
+                href="postProcess/getData-LidDriven.c.html">getData-LidDriven.c</a></strong>
+                - Data extraction utility</li>
+                </ul></li>
+                </ul>
+                </div>
+                <h3 id="src-local-directory">src-local/ Directory</h3>
+                <p>The <a href="src-local"><code>src-local/</code></a>
+                directory contains custom header files that extend the
+                base Basilisk functionality:</p>
+                <ul>
+                <li><a
+                href="src-local/dye-injection.h.html">dye-injection.h</a>:
+                Implements a circular tracer (dye) injection for flow
+                visualization with:
+                <ul>
+                <li>Configurable injection time and position</li>
+                <li>Circular dye region with adjustable radius</li>
+                <li>Integration with Basilisk’s tracer module for
+                advection</li>
+                </ul></li>
+                </ul>
+                <h3 id="postprocess-directory">postProcess/
+                Directory</h3>
+                <p>The <a
+                href="postProcess"><code>postProcess/</code></a>
+                directory provides tools for analyzing and visualizing
+                simulation results:</p>
+                <ul>
+                <li><a
+                href="postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py.html">2-LidDrivenCavity-Newtonian-dyeInjection.py</a>:
+                Python script for generating visualizations that:
+                <ul>
+                <li>Processes simulation timesteps in parallel</li>
+                <li>Creates two-panel plots showing dye concentration
+                and velocity magnitude</li>
+                <li>Adds streamlines to visualize flow patterns</li>
+                <li>Uses ‘getData-LidDriven’ utility to extract field
+                data</li>
+                </ul></li>
+                <li><a
+                href="postProcess/getData-LidDriven.c.html">getData-LidDriven.c</a>:
+                C utility that extracts and processes numerical data
+                from simulation output files</li>
+                </ul>
+                <h3 id="testcases-directory">testCases/ Directory</h3>
+                <p>The <a href="testCases"><code>testCases/</code></a>
+                directory contains simulation configurations:</p>
+                <ul>
+                <li><a
+                href="testCases/LidDrivenCavity-Newtonian-dyeInjection.c.html">LidDrivenCavity-Newtonian-dyeInjection.c</a>:
+                Main simulation case that implements:
+                <ul>
+                <li>Classical lid-driven cavity flow for a Newtonian
+                fluid</li>
+                <li>Configurable Reynolds number (default: Re = 1)</li>
+                <li>Dye injection in the upper center of the cavity at
+                t=0.05</li>
+                <li>Adaptive grid with level 8 refinement</li>
+                <li>Proper boundary conditions for the moving lid and
+                no-slip walls</li>
+                <li>Regular snapshot generation for visualization</li>
+                </ul></li>
+                </ul>
+                <h2 id="getting-started">Getting Started</h2>
+                <h3 id="prerequisites">Prerequisites</h3>
+                <ul>
+                <li>Basilisk C installed (<a
+                href="http://basilisk.fr/src/INSTALL">Installation
+                instructions</a>)</li>
+                <li>C compiler (gcc recommended)</li>
+                <li>Make build system</li>
+                <li>Scientific visualization tools (optional: ParaView,
+                Gnuplot, etc.)</li>
+                </ul>
+                <h3 id="installation">Installation</h3>
+                <ol type="1">
+                <li><p>Clone this repository:</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/username/comphy-lab.git</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> comphy-lab</span></code></pre></div></div></li>
-<li><p>Make sure Basilisk is properly installed and the BASILISK
-environment variable is set.</p></li>
-<li><p>Compile a test case to verify the setup:</p>
-<div class="code-block-container"><div class="code-block-container"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> testCases</span>
+                <li><p>Make sure Basilisk is properly installed and the
+                BASILISK environment variable is set.</p></li>
+                <li><p>Compile a test case to verify the setup:</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> testCases</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> test_name.tst</span></code></pre></div></div></li>
-</ol>
-<h2 id="usage">Usage</h2>
-<h3 id="compiling-simulation-files">Compiling Simulation Files</h3>
-<p>Basic compilation:</p>
-<div class="code-block-container"><div class="code-block-container"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qcc</span> <span class="at">-autolink</span> file.c <span class="at">-o</span> executable <span class="at">-lm</span></span></code></pre></div></div>
-<p>Compilation with custom headers:</p>
-<div class="code-block-container"><div class="code-block-container"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qcc</span> <span class="at">-I</span><span class="va">$PWD</span>/src-local <span class="at">-autolink</span> file.c <span class="at">-o</span> executable <span class="at">-lm</span></span></code></pre></div></div>
-<h3 id="running-simulations">Running Simulations</h3>
-<p>Run a compiled executable:</p>
-<div class="code-block-container"><div class="code-block-container"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./executable</span></span></code></pre></div></div>
-<p>Execute a specific test case:</p>
-<div class="code-block-container"><div class="code-block-container"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> testCases <span class="kw">&amp;&amp;</span> <span class="fu">make</span> test_name.tst</span></code></pre></div></div>
-<h3 id="post-processing">Post-Processing</h3>
-<p>The <code>postProcess/</code> directory contains tools for
-post-processing simulation results:</p>
-<ul>
-<li><strong>Visualization Generation</strong>: Automated generation of
-two-panel plots showing:
-<ul>
-<li>Dye concentration with coolwarm colormap</li>
-<li>Velocity magnitude with viridis colormap</li>
-<li>Streamlines to visualize flow patterns</li>
-</ul></li>
-<li><strong>Data Extraction</strong>: Utility to extract numerical data
-from simulation output files</li>
-<li><strong>Parallel Processing</strong>: Multi-core processing of
-simulation timesteps for efficient visualization</li>
-<li><strong>LaTeX Integration</strong>: Formatted plots with
-mathematical notation using LaTeX</li>
-</ul>
-<h2 id="code-style-guidelines">Code Style Guidelines</h2>
-<ul>
-<li><strong>Indentation</strong>: 2 spaces (no tabs)</li>
-<li><strong>Line length</strong>: 80 characters maximum</li>
-<li><strong>Documentation</strong>: Use markdown in comments starting
-with <code>/**</code>. Do not use <code>*</code> in comments.</li>
-<li><strong>Spacing</strong>: Space after commas, spaces around
-operators (+, -)</li>
-<li><strong>Files</strong>: Core functionality in <code>.h</code>
-headers, tests in <code>.c</code> files</li>
-<li><strong>Naming</strong>: Snake_case for variables, camelCase for
-functions</li>
-<li><strong>Error handling</strong>: Return values with stderr
-messages</li>
-</ul>
-<h2 id="example">Example</h2>
-<p>Here’s the actual lid-driven cavity flow with dye injection
-implementation:</p>
-<div class="code-block-container"><div class="code-block-container"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&quot;navier-stokes/centered.h&quot;</span></span>
+                </ol>
+                <h2 id="usage">Usage</h2>
+                <h3 id="compiling-simulation-files">Compiling Simulation
+                Files</h3>
+                <p>Basic compilation:</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qcc</span> <span class="at">-autolink</span> file.c <span class="at">-o</span> executable <span class="at">-lm</span></span></code></pre></div></div>
+                <p>Compilation with custom headers:</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qcc</span> <span class="at">-I</span><span class="va">$PWD</span>/src-local <span class="at">-autolink</span> file.c <span class="at">-o</span> executable <span class="at">-lm</span></span></code></pre></div></div>
+                <h3 id="running-simulations">Running Simulations</h3>
+                <p>Run a compiled executable:</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./executable</span></span></code></pre></div></div>
+                <p>Execute a specific test case:</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> testCases <span class="kw">&amp;&amp;</span> <span class="fu">make</span> test_name.tst</span></code></pre></div></div>
+                <h3 id="post-processing">Post-Processing</h3>
+                <p>The <code>postProcess/</code> directory contains
+                tools for post-processing simulation results:</p>
+                <ul>
+                <li><strong>Visualization Generation</strong>: Automated
+                generation of two-panel plots showing:
+                <ul>
+                <li>Dye concentration with coolwarm colormap</li>
+                <li>Velocity magnitude with viridis colormap</li>
+                <li>Streamlines to visualize flow patterns</li>
+                </ul></li>
+                <li><strong>Data Extraction</strong>: Utility to extract
+                numerical data from simulation output files</li>
+                <li><strong>Parallel Processing</strong>: Multi-core
+                processing of simulation timesteps for efficient
+                visualization</li>
+                <li><strong>LaTeX Integration</strong>: Formatted plots
+                with mathematical notation using LaTeX</li>
+                </ul>
+                <h2 id="code-style-guidelines">Code Style
+                Guidelines</h2>
+                <ul>
+                <li><strong>Indentation</strong>: 2 spaces (no
+                tabs)</li>
+                <li><strong>Line length</strong>: 80 characters
+                maximum</li>
+                <li><strong>Documentation</strong>: Use markdown in
+                comments starting with <code>/**</code>. Do not use
+                <code>*</code> in comments.</li>
+                <li><strong>Spacing</strong>: Space after commas, spaces
+                around operators (+, -)</li>
+                <li><strong>Files</strong>: Core functionality in
+                <code>.h</code> headers, tests in <code>.c</code>
+                files</li>
+                <li><strong>Naming</strong>: Snake_case for variables,
+                camelCase for functions</li>
+                <li><strong>Error handling</strong>: Return values with
+                stderr messages</li>
+                </ul>
+                <h2 id="example">Example</h2>
+                <p>Here’s the actual lid-driven cavity flow with dye
+                injection implementation:</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&quot;navier-stokes/centered.h&quot;</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&quot;dye-injection.h&quot;</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Constants</span></span>
@@ -310,111 +387,136 @@ implementation:</p>
 <span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Run simulation</span></span>
 <span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a>  run<span class="op">();</span></span>
 <span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
-<h2 id="contributing">Contributing</h2>
-<ol type="1">
-<li>Fork the repository</li>
-<li>Create your feature branch
-(<code>git checkout -b feature/amazing-feature</code>)</li>
-<li>Commit your changes
-(<code>git commit -m 'Add some amazing feature'</code>)</li>
-<li>Push to the branch
-(<code>git push origin feature/amazing-feature</code>)</li>
-<li>Open a Pull Request</li>
-</ol>
-<h2 id="reporting-issues-and-feature-requests">Reporting Issues and
-Feature Requests</h2>
-<p>We use GitHub Issues to track bugs, feature requests, and example
-requests for this repository. When creating an issue, please select the
-appropriate template to help us address your needs efficiently.</p>
-<h3 id="issue-templates">Issue Templates</h3>
-<h4 id="bug-report">Bug Report:</h4>
-<p><a
-href="https://github.com/comphy-lab/documentationWeb/issues/new?template=bug_report.md">Report
-here</a></p>
-<ul>
-<li>For problems with installation, compilation, or running code. Please
-include:</li>
-<li>Detailed description of the issue</li>
-<li>Your environment (OS, compiler version)</li>
-<li>Steps to reproduce</li>
-<li>Expected vs. actual behavior</li>
-<li>Error messages and logs</li>
-<li>Code snippets or files that demonstrate the issue</li>
-</ul>
-<h4 id="featuretopic-request">Feature/Topic Request:</h4>
-<p><a
-href="https://github.com/comphy-lab/documentationWeb/issues/new?template=feature_request.md">Report
-here</a> - For requesting specific topics or functionality - New
-examples or tutorials - Additional functionality in the codebase -
-Improvements to existing materials</p>
-<h4 id="example-request">Example Request:</h4>
-<p><a
-href="https://github.com/comphy-lab/documentationWeb/issues/new?template=example_request.md">Report
-here</a> - For requesting specific examples that demonstrate: -
-Particular Basilisk features - Solutions to common problems -
-Implementation of specific physics or numerical methods</p>
-<h4 id="general-question">General Question:</h4>
-<p><a
-href="https://github.com/comphy-lab/documentationWeb/issues/new?template=general_question.md">Report
-here</a> - For any other questions</p>
-<h3 id="how-to-create-an-issue">How to Create an Issue</h3>
-<ol type="1">
-<li>Go to the <a
-href="https://github.com/comphy-lab/documentationWeb/issues">“Issues”
-tab</a> in the GitHub repository</li>
-<li>Click the <a
-href="https://github.com/comphy-lab/documentationWeb/issues/new/choose">“New
-Issue”</a> button</li>
-<li>Select the appropriate template from the options</li>
-<li>Fill in the required information according to the template</li>
-<li>Add relevant labels if available</li>
-<li>Submit the issue</li>
-</ol>
-<h2 id="license">License</h2>
-<p>This project is licensed under the <a href="LICENSE">GNU General
-Public License v3.0</a> - see the LICENSE file for details.</p>
-<h2 id="acknowledgments">Acknowledgments</h2>
-<ul>
-<li>S. Popinet &amp; collaborators, Basilisk C, <a
-href="http://basilisk.fr">http://basilisk.fr</a> (Last accessed: June
-2025) (2013-2025)</li>
-</ul>
-<h2 id="generated-documentation">Generated Documentation</h2>
-<h3 id="root-directory">Root Directory</h3>
-<ul>
-<li><a
-href="reset_install_requirements.sh.html">reset_install_requirements.sh</a></li>
-</ul>
-<h3 id="postprocess">postProcess</h3>
-<ul>
-<li><a
-href="postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py.html">postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py</a></li>
-<li><a
-href="postProcess/getData-LidDriven.c.html">postProcess/getData-LidDriven.c</a></li>
-</ul>
-<h3 id="src-local">src-local</h3>
-<ul>
-<li><a
-href="src-local/dye-injection.h.html">src-local/dye-injection.h</a></li>
-</ul>
-<h3 id="testcases">testCases</h3>
-<ul>
-<li><a
-href="testCases/LidDrivenCavity-Newtonian-dyeInjection.c.html">testCases/LidDrivenCavity-Newtonian-dyeInjection.c</a></li>
-</ul>
-</div>
-          </div>
-        </div>
-        <div id="sidebar" class="yui-b first">
-<!-- Removed logo div 
-<div id="logo">
-  <a href="//" alt="site logo" title="Go to top page"><img src="//img/logo.png" /></a>
-</div>
--->
-                                      </div>
+                <h2 id="contributing">Contributing</h2>
+                <ol type="1">
+                <li>Fork the repository</li>
+                <li>Create your feature branch
+                (<code>git checkout -b feature/amazing-feature</code>)</li>
+                <li>Commit your changes
+                (<code>git commit -m 'Add some amazing feature'</code>)</li>
+                <li>Push to the branch
+                (<code>git push origin feature/amazing-feature</code>)</li>
+                <li>Open a Pull Request</li>
+                </ol>
+                <h2 id="reporting-issues-and-feature-requests">Reporting
+                Issues and Feature Requests</h2>
+                <p>We use GitHub Issues to track bugs, feature requests,
+                and example requests for this repository. When creating
+                an issue, please select the appropriate template to help
+                us address your needs efficiently.</p>
+                <h3 id="issue-templates">Issue Templates</h3>
+                <h4 id="bug-report">Bug Report:</h4>
+                <p><a
+                href="https://github.com/comphy-lab/documentationWeb/issues/new?template=bug_report.md">Report
+                here</a></p>
+                <ul>
+                <li>For problems with installation, compilation, or
+                running code. Please include:</li>
+                <li>Detailed description of the issue</li>
+                <li>Your environment (OS, compiler version)</li>
+                <li>Steps to reproduce</li>
+                <li>Expected vs. actual behavior</li>
+                <li>Error messages and logs</li>
+                <li>Code snippets or files that demonstrate the
+                issue</li>
+                </ul>
+                <h4 id="featuretopic-request">Feature/Topic
+                Request:</h4>
+                <p><a
+                href="https://github.com/comphy-lab/documentationWeb/issues/new?template=feature_request.md">Report
+                here</a> - For requesting specific topics or
+                functionality - New examples or tutorials - Additional
+                functionality in the codebase - Improvements to existing
+                materials</p>
+                <h4 id="example-request">Example Request:</h4>
+                <p><a
+                href="https://github.com/comphy-lab/documentationWeb/issues/new?template=example_request.md">Report
+                here</a> - For requesting specific examples that
+                demonstrate: - Particular Basilisk features - Solutions
+                to common problems - Implementation of specific physics
+                or numerical methods</p>
+                <h4 id="general-question">General Question:</h4>
+                <p><a
+                href="https://github.com/comphy-lab/documentationWeb/issues/new?template=general_question.md">Report
+                here</a> - For any other questions</p>
+                <h3 id="how-to-create-an-issue">How to Create an
+                Issue</h3>
+                <ol type="1">
+                <li>Go to the <a
+                href="https://github.com/comphy-lab/documentationWeb/issues">“Issues”
+                tab</a> in the GitHub repository</li>
+                <li>Click the <a
+                href="https://github.com/comphy-lab/documentationWeb/issues/new/choose">“New
+                Issue”</a> button</li>
+                <li>Select the appropriate template from the
+                options</li>
+                <li>Fill in the required information according to the
+                template</li>
+                <li>Add relevant labels if available</li>
+                <li>Submit the issue</li>
+                </ol>
+                <h2 id="license">License</h2>
+                <p>This project is licensed under the <a
+                href="LICENSE">GNU General Public License v3.0</a> - see
+                the LICENSE file for details.</p>
+                <h2 id="acknowledgments">Acknowledgments</h2>
+                <ul>
+                <li>S. Popinet &amp; collaborators, Basilisk C, <a
+                href="http://basilisk.fr">http://basilisk.fr</a> (Last
+                accessed: June 2025) (2013-2025)</li>
+                </ul>
+                <h2 id="generated-documentation">Generated
+                Documentation</h2>
+                <h3 id="root-directory">Root Directory</h3>
+                <ul>
+                <li><a
+                href="reset_install_requirements.sh.html">reset_install_requirements.sh</a></li>
+                </ul>
+                <h3 id="postprocess">postProcess</h3>
+                <ul>
+                <li><a
+                href="postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py.html">postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py</a></li>
+                <li><a
+                href="postProcess/getData-LidDriven.c.html">postProcess/getData-LidDriven.c</a></li>
+                </ul>
+                <h3 id="src-local">src-local</h3>
+                <ul>
+                <li><a
+                href="src-local/dye-injection.h.html">src-local/dye-injection.h</a></li>
+                </ul>
+                <h3 id="testcases">testCases</h3>
+                <ul>
+                <li><a
+                href="testCases/LidDrivenCavity-Newtonian-dyeInjection.c.html">testCases/LidDrivenCavity-Newtonian-dyeInjection.c</a></li>
+                </ul>
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="//assets/logos/CoMPhy-Lab.svg" alt="CoMPhy-Lab Logo" height="30">
+                </div>
+                <div class="footer-links">
+                    <a href="//Help">Help</a>
+                    <a href="http://groups.google.com/d/forum/basilisk-fr">Forum</a>
+                    <a href="//src/Contributing">Contribute</a>
+                </div>
+            </div>
+        </footer>
     </div>
-    
-      
+
+    <!-- Command Palette Modal -->
+    <div id="command-palette" class="command-palette">
+        <div class="command-palette-content">
+            <input type="text" id="command-input" placeholder="Type a command or search...">
+            <div id="command-results"></div>
+        </div>
+    </div>
+
+    <!-- Main JavaScript -->
+    <script src="//assets/js/main.js"></script>
+
     <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function() {
         // Add copy button to each code block container
@@ -466,10 +568,4 @@ href="testCases/LidDrivenCavity-Newtonian-dyeInjection.c.html">testCases/LidDriv
     });
     </script>
         </body>
-<!-- Removed footer div 
-  <div id="footer">
-    inspired by <a href="http://github.com/jgm/gitit/tree/master/">gitit</a>,
-    powered by <a href="/src/darcsit/README">darcsit</a>
-  </div>
--->
 </html>

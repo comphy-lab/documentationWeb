@@ -1,10 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <!-- Basic SEO Meta Tags -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<a id="" href="#"></a>
+    <!-- Basic SEO Meta Tags -->
     <meta name="description" content="Computational fluid dynamics simulations using Basilisk C framework.">
     <meta name="author" content="Computational Multiphase Physics Laboratory">
     <meta name="keywords" content="fluid dynamics, CFD, Basilisk, multiphase flow, computational physics">
@@ -14,66 +14,124 @@
     <meta property="og:description" content="Computational fluid dynamics simulations using Basilisk C framework.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://test.comphy-lab.org/src-local/dye-injection.h.html">
-    <meta property="og:image" content="https://test.comphy-lab.org/logo.png">
+    <meta property="og:image" content="https://test.comphy-lab.org/assets/logos/CoMPhy-Lab.svg">
 <a id="" href="#"></a>
     <!-- Canonical URL -->
     <link rel="canonical" href="https://test.comphy-lab.org/src-local/dye-injection.h.html">
 <a id="" href="#"></a>
-            <title>Test documentation: Lid driven cavity using dye injection - src-local/dye-injection.h</title>
-        <!-- <link href="css/custom.css" rel="stylesheet" media="screen, projection" type="text/css" /> -->
-    <!-- <link href="css/print.css" rel="stylesheet" media="print" type= "text/css" /> -->
-        <!--[if IE]><!-- <link href="css/ie.css" rel="stylesheet" media="screen, projection" type="text/css" /> --><![endif]-->
-    <!-- <link rel="stylesheet" href="css/basilisk.css"/> -->
-    <!-- Link to our custom styles is added by Pandoc via --css flag -->
-    <script src="//js/jquery.min.js" type="text/javascript"></script>
-    <script src="//js/jquery-ui.packed.js" type="text/javascript"></script>
-    <script src="//js/plots.js" type="text/javascript"></script>
-<link rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css"
-      integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j"
-      crossorigin="anonymous"/>
-<script defer
-	src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js"
-	integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ"
-	crossorigin="anonymous">
-</script>
-      <link href="../custom_styles.css" rel="stylesheet" type="text/css" />
+    <title>Test documentation: Lid driven cavity using dye injection - src-local/dye-injection.h</title>
+<a id="" href="#"></a>
+    <!-- Critical CSS -->
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --text-color: #333;
+            --background-color: #fff;
+            --code-background: #f5f5f5;
+        }
+<a id="" href="#"></a>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+<a id="" href="#"></a>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+<a id="" href="#"></a>
+        pre, code {
+            background: var(--code-background);
+            border-radius: 4px;
+            padding: 0.2em 0.4em;
+        }
+<a id="" href="#"></a>
+        pre {
+            padding: 1em;
+            overflow-x: auto;
+        }
+    </style>
+<a id="" href="#"></a>
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="//assets/css/styles.css" as="style">
+    <link rel="preload" href="//assets/css/custom_styles.css" as="style">
+    <link rel="preload" href="//assets/js/main.js" as="script">
+<a id="" href="#"></a>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="//assets/logos/CoMPhy-Lab.svg">
+    <link rel="apple-touch-icon" href="//assets/logos/CoMPhy-Lab.svg">
+<a id="" href="#"></a>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="//assets/css/styles.css">
+    <link rel="stylesheet" href="//assets/css/custom_styles.css">
+    <link rel="stylesheet" href="//assets/css/command-palette.css">
+    <link rel="stylesheet" href="//assets/css/vendor.css">
+<a id="" href="#"></a>
+    <!-- KaTeX for Math -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css">
+<a id="" href="#"></a>
+    <!-- jQuery and UI -->
+    <script src="//js/jquery.min.js"></script>
+    <script src="//js/jquery-ui.packed.js"></script>
+    <script src="//js/plots.js"></script>
+<a id="" href="#"></a>
+    <!-- KaTeX -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js"></script>
+<a id="" href="#"></a>
+    <!-- Command Palette -->
+    <script src="//assets/js/command-palette.js"></script>
+    <script src="//assets/js/command-data.js"></script>
+    <script src="//assets/js/shortcut-key.js"></script>
+    <link href="../custom_styles.css" rel="stylesheet" type="text/css" />
     </head>
-  <body>
-    <div id="doc3" class="yui-t1">
-        <div id="yui-main">
-          <div id="maincol" class="yui-b">
-<!-- Removed userbox div 
-<div id="userbox">
-  <noscript>
-    <a href="//_login">Login</a>
-    <a href="//_logout">Logout</a>
-  </noscript>
-  &nbsp;
-  <a id="loginlink" class="login" href="//_login">Login / Get an account</a>
-  <a id="logoutlink" class="login" href="//_logout">Logout <span id="logged_in_user"></span></a>
-</div>
--->
-<div id="content">
-    <!-- Removed page title h1 
-    <h1 class="pageTitle"><a href="/src-local/dye-injection.h.html">src-local/dye-injection.h</a></h1>
--->
-  <ul class="messages" id="messages"></ul>
-  <div id="status"></div>
-    <h1 id="dye-injection-for-flow-visualization">dye Injection for Flow
-Visualization</h1>
-<p>This module introduces a circular tracer (dye) into the flow at a
-specified time and location. The dye then advects with the flow,
-allowing visualization of flow patterns. This is useful for visualizing
-complex flow structures in simulations like lid-driven cavity flow.</p>
-<h2 id="parameters">Parameters</h2>
-<ul>
-<li><code>tInjection</code>: time at which to inject the dye</li>
-<li><code>xInjection</code>, <code>yInjection</code>: position where the
-dye is injected</li>
-<li><code>dyeRadius</code>: radius of the circular dye</li>
-</ul>
-<div class="code-block-container"><div class="code-block-container"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><span class="pp">#include </span><a href="http://basilisk.fr/src/tracer.h" title="Link to Basilisk source for tracer.h"><span class="im">"tracer.h"</span></a></span>
+<body>
+    <div class="container">
+        <header class="site-header">
+            <nav class="main-nav">
+                <a href="//" class="logo">
+                    <img src="//assets/logos/CoMPhy-Lab.svg" alt="CoMPhy-Lab Logo" height="40">
+                </a>
+                <div class="nav-links">
+                    <a href="//Tutorial">Tutorial</a>
+                    <a href="//src/INSTALL">Installation</a>
+                    <a href="//Basilisk C">Basilisk C</a>
+                    <a href="//src/README">Solvers</a>
+                    <a href="//src/examples/README">Examples</a>
+                </div>
+            </nav>
+        </header>
+<a id="" href="#"></a>
+        <main class="content">
+<a id="" href="#"></a>
+            <div class="page-content">
+<a id="" href="#"></a>
+                                <h1 class="page-title">src-local/dye-injection.h</h1>
+<a id="" href="#"></a>
+<a id="" href="#"></a>
+                <h1 id="dye-injection-for-flow-visualization">dye
+                Injection for Flow Visualization</h1>
+                <p>This module introduces a circular tracer (dye) into
+                the flow at a specified time and location. The dye then
+                advects with the flow, allowing visualization of flow
+                patterns. This is useful for visualizing complex flow
+                structures in simulations like lid-driven cavity
+                flow.</p>
+                <h2 id="parameters">Parameters</h2>
+                <ul>
+                <li><code>tInjection</code>: time at which to inject the
+                dye</li>
+                <li><code>xInjection</code>, <code>yInjection</code>:
+                position where the dye is injected</li>
+                <li><code>dyeRadius</code>: radius of the circular
+                dye</li>
+                </ul>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><span class="pp">#include </span><a href="http://basilisk.fr/src/tracer.h" title="Link to Basilisk source for tracer.h"><span class="im">"tracer.h"</span></a></span>
 <span id="cb1-2"></span>
 <span id="cb1-3"><span class="co">// dye tracer parameters (can be overridden by the user)</span></span>
 <span id="cb1-4"><span class="dt">double</span> tInjection <span class="op">=</span> <span class="fl">0.1</span><span class="op">;</span>  <span class="co">// Default injection time</span></span>
@@ -103,19 +161,34 @@ dye is injected</li>
 <span id="cb1-28">      T<span class="op">[]</span> <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
 <span id="cb1-29">  <span class="op">}</span></span>
 <span id="cb1-30"><span class="op">}</span></span></code></pre></div></div>
-</div>
-          </div>
-        </div>
-        <div id="sidebar" class="yui-b first">
-<!-- Removed logo div 
-<div id="logo">
-  <a href="//" alt="site logo" title="Go to top page"><img src="//img/logo.png" /></a>
-</div>
--->
-                                      </div>
+            </div>
+        </main>
+<a id="" href="#"></a>
+        <footer class="site-footer">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="//assets/logos/CoMPhy-Lab.svg" alt="CoMPhy-Lab Logo" height="30">
+                </div>
+                <div class="footer-links">
+                    <a href="//Help">Help</a>
+                    <a href="http://groups.google.com/d/forum/basilisk-fr">Forum</a>
+                    <a href="//src/Contributing">Contribute</a>
+                </div>
+            </div>
+        </footer>
     </div>
 <a id="" href="#"></a>
-      
+    <!-- Command Palette Modal -->
+    <div id="command-palette" class="command-palette">
+        <div class="command-palette-content">
+            <input type="text" id="command-input" placeholder="Type a command or search...">
+            <div id="command-results"></div>
+        </div>
+    </div>
+<a id="" href="#"></a>
+    <!-- Main JavaScript -->
+    <script src="//assets/js/main.js"></script>
+
     <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function() {
         // Add copy button to each code block container
@@ -167,10 +240,4 @@ dye is injected</li>
     });
     </script>
         </body>
-<!-- Removed footer div 
-  <div id="footer">
-    inspired by <a href="http://github.com/jgm/gitit/tree/master/">gitit</a>,
-    powered by <a href="/src/darcsit/README">darcsit</a>
-  </div>
--->
 </html>
