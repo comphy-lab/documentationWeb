@@ -1314,6 +1314,27 @@ def generate_sitemap(docs_dir: Path, generated_files: Dict[Path, Path]) -> bool:
         return False
 
 
+def copy_css_file(css_path: Path, docs_dir: Path) -> bool:
+    """
+    Copy CSS file to docs directory.
+    
+    Args:
+        css_path: Path to the source CSS file
+        docs_dir: Directory where documentation files are stored
+        
+    Returns:
+        True if CSS file was copied successfully
+    """
+    try:
+        # Copy CSS file to docs directory
+        shutil.copy2(css_path, docs_dir / css_path.name)
+        print(f"Copied CSS file to {docs_dir / css_path.name}")
+        return True
+    except Exception as e:
+        print(f"Error copying CSS file: {e}")
+        return False
+
+
 def main():
     """
     Main function to generate documentation.
@@ -1323,6 +1344,12 @@ def main():
     
     # Create docs directory if it doesn't exist
     DOCS_DIR.mkdir(exist_ok=True)
+    
+    # Copy CSS file to docs directory
+    print("\nCopying CSS file...")
+    if not copy_css_file(CSS_PATH, DOCS_DIR):
+        print("Failed to copy CSS file.")
+        return
     
     # Find all source files
     source_files = find_source_files(REPO_ROOT, SOURCE_DIRS)
