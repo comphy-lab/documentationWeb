@@ -21,14 +21,9 @@ def debug_print(message):
 
 def extract_seo_metadata(file_path: Path, file_content: str) -> Dict[str, str]:
     """
-    Extract SEO metadata (description, keywords) from file content.
+    Extract SEO metadata from the given file content.
     
-    Args:
-        file_path: Path to the source file
-        file_content: Content of the file
-        
-    Returns:
-        Dictionary containing SEO metadata
+    This function scans the file content to obtain SEO metadata by extracting a meta description and a set of keywords. The description is derived from the first comment block in the file, cleaned of markdown formatting, and truncated to approximately 160 characters. Keywords are identified by matching predefined technical patterns in the content and by extracting meaningful tokens from the file name. The metadata is returned as a dictionary with keys "description" and "keywords".
     """
     metadata = {}
     
@@ -84,11 +79,11 @@ CSS_PATH = REPO_ROOT / '.github' / 'assets' / 'custom_styles.css'  # Path to cus
 
 def extract_h1_from_readme(readme_path: Path) -> str:
     """
-    Extract the first H1 heading from a README file.
+    Extract the first markdown H1 header from a README file.
     
-    This function reads the content of the README file specified by readme_path using UTF-8 encoding
-    and searches for the first markdown H1 header (a line beginning with "# "). If such a header is
-    found, its trimmed text is returned; otherwise, the function returns a default title "Documentation".
+    This function reads the file at the specified path using UTF-8 encoding and searches for the
+    first line that starts with "# ". If an H1 header is found, the function returns its trimmed text.
+    If no header is present or an error occurs during reading, it returns the default title "Documentation".
     """
     try:
         with open(readme_path, 'r', encoding='utf-8') as f:
@@ -295,22 +290,21 @@ def process_python_file(file_path: Path) -> str:
 
 def process_c_file(file_path: Path, literate_c_script: Path) -> str:
     """
-    Process a C/C++ file for HTML conversion using a literate C preprocessor.
+    Process a C/C++ source file for HTML conversion using literate-C preprocessing.
     
-    This function runs the specified literate-c script on the given file to generate
-    preprocessed content for Pandoc conversion. It replaces literate-c markers with
-    standard code block indicators and validates the output.
+    This function reads the content of a C/C++ file and creates a simple markdown
+    representation. It then attempts to run a provided literate-C script on the file to
+    generate a preprocessed output suitable for Pandoc conversion. If the literate-C
+    processing produces non-empty output, specific markers are replaced with standard
+    Pandoc code block markers. If the processing fails or returns empty output, a debug
+    message is logged and the fallback markdown version is returned.
     
     Args:
-        file_path: Path to the C/C++ source file.
-        literate_c_script: Path to the literate-c script.
+        file_path (Path): Path to the C/C++ source file.
+        literate_c_script (Path): Path to the literate-C preprocessing script.
     
     Returns:
-        Processed file content ready for Pandoc conversion.
-    
-    Raises:
-        RuntimeError: If the literate-c script returns a non-zero exit status.
-        ValueError: If the preprocessing output is empty.
+        str: Markdown-formatted content ready for Pandoc conversion.
     """
     # First, read the file content directly
     with open(file_path, 'r', encoding='utf-8') as f:
@@ -355,22 +349,16 @@ def process_c_file(file_path: Path, literate_c_script: Path) -> str:
 
 def prepare_pandoc_input(file_path: Path, literate_c_script: Path) -> str:
     """
-    Prepare file content for pandoc conversion.
+    Prepare file content for Pandoc conversion.
     
-    Determines the source file type based on its extension and processes it
-    accordingly. Markdown (.md), Python (.py), and shell (.sh) files are handled using
-    their respective processing functions, while C/C++ files are processed with the
-    provided literate-c script.
+    Determines the processing function to use based on the file extension. Markdown (.md), Python (.py), and shell (.sh) files are handled using their specialized functions, while C/C++ files are processed with a provided literate-C script to generate a Markdown representation.
     
     Args:
         file_path: Path of the source file to process.
-        literate_c_script: Path to the script used for processing C/C++ files via literate programming.
+        literate_c_script: Path to the script for processing C/C++ files via literate programming.
     
     Returns:
-        A string containing the processed content, ready for pandoc conversion.
-    
-    Raises:
-        Exception: If an error occurs during file processing.
+        The processed content as a string, ready for Pandoc conversion.
     """
     file_suffix = file_path.suffix.lower()
     
@@ -388,21 +376,28 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
                base_url: str, wiki_title: str, page_url: str, page_title: str,
                seo_metadata: Dict[str, str] = None) -> str:
     """
-    Convert markdown content to HTML using Pandoc with SEO metadata.
-    
-    Args:
-        pandoc_input: Input content for pandoc
-        output_html_path: Path where to save the generated HTML
-        template_path: Path to the HTML template
-        base_url: Base URL for links
-        wiki_title: Title of the wiki/documentation
-        page_url: URL of the current page
-        page_title: Title of the current page
-        seo_metadata: Dictionary containing SEO metadata (description, keywords)
-        
-    Returns:
-        Pandoc stdout output
-    """
+               Converts Markdown content to a standalone HTML document using Pandoc.
+               
+               This function runs Pandoc to transform the provided Markdown input into HTML using a specified
+               template and SEO metadata. It assigns HTML variables for the base URL, wiki title, page URL, and
+               page title, and saves Pandoc’s output to the designated file. After conversion, the function checks
+               that the generated HTML contains the proper DOCTYPE and <html> tag, and wraps the content with a
+               complete HTML scaffold if necessary. Returns Pandoc’s standard output on success or an empty string
+               when an error occurs.
+                 
+               Args:
+                   pandoc_input: The Markdown content to convert.
+                   output_html_path: File path where the generated HTML is saved.
+                   template_path: Path to the HTML template file used by Pandoc.
+                   base_url: Base URL for constructing absolute links.
+                   wiki_title: Title of the documentation or wiki.
+                   page_url: URL of the current page.
+                   page_title: Title of the current page.
+                   seo_metadata: Optional dictionary with SEO metadata (e.g., description, keywords, image).
+               
+               Returns:
+                   The standard output from Pandoc if conversion succeeds; otherwise, an empty string.
+               """
     if seo_metadata is None:
         seo_metadata = {}
     
@@ -473,14 +468,17 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
 
 def post_process_python_shell_html(html_content: str) -> str:
     """
-    Post-process HTML generated from Python or Shell files.
-    Adds code block containers for the copy button functionality.
+    Enhance HTML for improved code block display and documentation link accuracy.
+    
+    Processes raw HTML generated from Python or shell files by wrapping <pre><code> and Pandoc’s
+    source code blocks in a container div for copy button functionality. Additionally, appends ".html"
+    to local links pointing to documentation files to ensure correct navigation.
     
     Args:
-        html_content: Original HTML content
-        
+        html_content: Raw HTML content to be processed.
+    
     Returns:
-        Processed HTML content
+        Processed HTML content with enhanced code blocks and updated links.
     """
     # Fix any <pre><code> blocks by wrapping them in a container div
     def wrap_pre_code_with_container(match):
@@ -717,25 +715,24 @@ def post_process_c_html(html_content: str, file_path: Path,
         """
         Transforms an include directive match into an HTML hyperlink.
         
-        This function converts a regex match object that captures parts of an include directive
-        into an HTML anchor element. It extracts the filename and checks if the file exists in the
-        local 'src-local' directory. If so, it creates a relative link to the generated local documentation;
-        otherwise, it falls back to a link pointing to the Basilisk source repository. The original span
-        formatting is preserved within the hyperlink.
+        Converts a regex match object capturing parts of an include directive into an HTML anchor element.
+        The function extracts the filename and checks if a corresponding file exists in the local
+        'src-local' directory. If it does, a relative link to the generated local documentation is created;
+        otherwise, a link to the Basilisk source repository is returned. The original span formatting is preserved.
         
         Parameters:
             match: A regex match object with four capture groups:
                    1. The prefix span for the include statement.
                    2. The opening tag for the filename.
-                   3. The filename (possibly including a path).
+                   3. The filename (which may include a path).
                    4. The closing tag for the filename.
         
         Returns:
-            A string containing the HTML link that wraps the original include directive span.
+            A string containing the HTML hyperlink wrapping the original include directive span.
         
         Note:
-            This function relies on the global variables `repo_root`, `docs_dir`, and `file_path` for file
-            path resolution.
+            This function relies on the global variables `repo_root`, `docs_dir`, and `file_path` for
+            file path resolution.
         """
         prefix = match.group(1)  # e.g., <span class="pp">#include </span>
         span_tag_open = match.group(2)  # e.g., <span class="im">
@@ -851,17 +848,20 @@ def insert_css_link_in_html(html_file_path: Path, css_path: Path, is_root: bool 
 
 def insert_javascript_in_html(html_file_path: Path) -> bool:
     """
-    Inserts inline JavaScript to enable copy-to-clipboard functionality in an HTML file.
+    Inserts inline JavaScript for copy-to-clipboard on code blocks.
     
-    This function reads the specified HTML file and checks for an existing copy button script.
-    If absent and the closing </body> tag is found, it appends a JavaScript snippet before the tag to add copy buttons to code blocks.
-    It returns True if the script is successfully inserted or already present, and False if the insertion fails.
+    Reads the specified HTML file and checks for an existing copy button script by searching
+    for elements with the "copy-button" class. If absent, the function inserts an inline JavaScript
+    snippet that adds copy buttons to code block containers. The snippet is placed just before the
+    closing </body> tag; if no </body> tag is found, it is appended to the content (or wrapped in a
+    basic HTML structure if no <body> tag exists). Returns True if the snippet is inserted or
+    already present, and False if updating the file fails.
       
     Args:
         html_file_path: The path to the HTML file to update.
     
     Returns:
-        True if the operation is successful or the script is already included; False otherwise.
+        True if the JavaScript snippet is present or successfully inserted; False otherwise.
     """
     try:
         with open(html_file_path, 'r', encoding='utf-8') as f:
@@ -1373,14 +1373,18 @@ def generate_sitemap(docs_dir: Path, generated_files: Dict[Path, Path]) -> bool:
 
 def copy_css_file(css_path: Path, docs_dir: Path) -> bool:
     """
-    Copy CSS file to docs directory.
+    Copies a CSS file to the specified documentation directory.
+    
+    This function copies the CSS file using shutil.copy2 to preserve file metadata.
+    If an error occurs during the copy operation, an error message is printed and the
+    function returns False.
     
     Args:
-        css_path: Path to the source CSS file
-        docs_dir: Directory where documentation files are stored
-        
+        css_path: The path to the source CSS file.
+        docs_dir: The destination directory where the CSS file will be copied.
+    
     Returns:
-        True if CSS file was copied successfully
+        True if the CSS file was successfully copied; otherwise, False.
     """
     try:
         # Copy CSS file to docs directory
@@ -1394,7 +1398,14 @@ def copy_css_file(css_path: Path, docs_dir: Path) -> bool:
 
 def main():
     """
-    Main function to generate documentation.
+    Generate HTML documentation for the project.
+    
+    This function orchestrates the documentation generation process by validating
+    configuration, setting up the output directories, and copying required CSS files.
+    It finds source files in the repository, converts them to HTML using type-specific
+    processing logic, and collects the results into a generated files dictionary.
+    Finally, it creates an index page and produces SEO-compliant files such as robots.txt
+    and sitemap.xml, with all output written to the documentation directory.
     """
     if not validate_config():
         return
