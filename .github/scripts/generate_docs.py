@@ -2,8 +2,22 @@ import os
 import subprocess
 import re
 import shutil
+import argparse
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Set, Any, Union
+
+# Parse command line arguments
+parser = argparse.ArgumentParser(description='Generate documentation from source files.')
+parser.add_argument('--debug', action='store_true', help='Enable debug output')
+args = parser.parse_args()
+
+# Global debug flag
+DEBUG = args.debug
+
+def debug_print(message):
+    """Print debug messages only if debug mode is enabled."""
+    if DEBUG:
+        print(message)
 
 def extract_seo_metadata(file_path: Path, file_content: str) -> Dict[str, str]:
     """
@@ -84,7 +98,7 @@ def extract_h1_from_readme(readme_path: Path) -> str:
             if h1_match:
                 return h1_match.group(1).strip()
             else:
-                print("Warning: No h1 heading found in README.md")
+                debug_print("Warning: No h1 heading found in README.md")
                 return "Documentation"
     except Exception as e:
         print(f"Error reading README.md: {e}")
@@ -330,12 +344,12 @@ def process_c_file(file_path: Path, literate_c_script: Path) -> str:
             return content
         else:
             # If literate-c fails or produces no output, use our simple markdown version
-            print(f"  [Debug] Using simple markdown for {file_path} due to literate-c error: {stderr}")
+            debug_print(f"  [Debug] Using simple markdown for {file_path} due to literate-c error: {stderr}")
             return markdown_content
             
     except Exception as e:
         # If there's any error running literate-c, fall back to simple markdown
-        print(f"  [Debug] Using simple markdown for {file_path} due to error: {e}")
+        debug_print(f"  [Debug] Using simple markdown for {file_path} due to error: {e}")
         return markdown_content
 
 
@@ -410,19 +424,19 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
     ]
     
     # Print pandoc command and input for debugging
-    print(f"  [Debug Pandoc] Command: {' '.join(pandoc_cmd)}")
-    print(f"  [Debug Pandoc] Input content length: {len(pandoc_input)} chars")
-    print(f"  [Debug Pandoc] First 200 chars of input: {pandoc_input[:200]}")
+    debug_print(f"  [Debug Pandoc] Command: {' '.join(pandoc_cmd)}")
+    debug_print(f"  [Debug Pandoc] Input content length: {len(pandoc_input)} chars")
+    debug_print(f"  [Debug Pandoc] First 200 chars of input: {pandoc_input[:200]}")
     
     # Run pandoc with input content
     process = subprocess.run(pandoc_cmd, input=pandoc_input, text=True, capture_output=True)
     
     # Print pandoc output for debugging
-    print(f"  [Debug Pandoc] Return Code: {process.returncode}")
+    debug_print(f"  [Debug Pandoc] Return Code: {process.returncode}")
     if process.stdout:
-        print(f"  [Debug Pandoc] STDOUT:\n{process.stdout}")
+        debug_print(f"  [Debug Pandoc] STDOUT:\n{process.stdout}")
     if process.stderr:
-        print(f"  [Debug Pandoc] STDERR:\n{process.stderr}")
+        debug_print(f"  [Debug Pandoc] STDERR:\n{process.stderr}")
     
     if process.returncode != 0:
         print(f"Error running pandoc: {process.stderr}")
@@ -707,8 +721,8 @@ def post_process_c_html(html_content: str, file_path: Path,
                 link_url = relative_link.replace('\\', '/')  # Ensure forward slashes
                 # remove /docs/ with / in link
                 link_url = link_url.replace('/docs/', '/')
-                # print(f"  [Debug Include] Relative link: {link_url}")
-                # print(f"  [Debug Include] Link URL: {file_path.parent}")
+                # debug_print(f"  [Debug Include] Relative link: {link_url}")
+                # debug_print(f"  [Debug Include] Link URL: {file_path.parent}")
                 # exit(0)
             except ValueError:
                 # Handle cases where paths are on different drives (should not happen here)
@@ -772,7 +786,7 @@ def insert_css_link_in_html(html_file_path: Path, css_path: Path, is_root: bool 
                 modified_content = content[:head_start_idx + 6] + '\n    ' + css_link + content[head_start_idx + 6:]
             else:
                 # No head tag, create a complete HTML structure
-                print(f"Warning: No head tag found in {html_file_path}, creating complete HTML structure")
+                debug_print(f"Warning: No head tag found in {html_file_path}, creating complete HTML structure")
                 modified_content = f"""<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -884,7 +898,7 @@ def insert_javascript_in_html(html_file_path: Path) -> bool:
                 modified_content = content + copy_js
             else:
                 # No body tag, create a complete HTML structure
-                print(f"Warning: No body tag found in {html_file_path}, creating complete HTML structure")
+                debug_print(f"Warning: No body tag found in {html_file_path}, creating complete HTML structure")
                 modified_content = f"""<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -1203,17 +1217,17 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
         '-o', str(index_path)
     ]
 
-    print(f"  [Debug Index] Target path: {index_path}")
-    print(f"  [Debug Index] Command: {' '.join(cmd)}")
+    debug_print(f"  [Debug Index] Target path: {index_path}")
+    debug_print(f"  [Debug Index] Command: {' '.join(cmd)}")
 
     process = subprocess.run(cmd, input=final_readme_content, text=True, capture_output=True, check=False)
 
     # Print results unconditionally for debugging
-    print(f"  [Debug Index] Pandoc Return Code: {process.returncode}")
+    debug_print(f"  [Debug Index] Pandoc Return Code: {process.returncode}")
     if process.stdout:
-        print(f"  [Debug Index] Pandoc STDOUT:\n{process.stdout}")
+        debug_print(f"  [Debug Index] Pandoc STDOUT:\n{process.stdout}")
     if process.stderr:
-        print(f"  [Debug Index] Pandoc STDERR:\n{process.stderr}")
+        debug_print(f"  [Debug Index] Pandoc STDERR:\n{process.stderr}")
 
     if process.returncode != 0:
         print("Error generating index.html:")
@@ -1258,7 +1272,7 @@ def generate_robots_txt(docs_dir: Path) -> bool:
             f.write('Allow: /\n\n')
             f.write('Sitemap: https://test.comphy-lab.org/sitemap.xml\n')
         
-        print(f"Generated robots.txt at {robots_path}")
+        debug_print(f"Generated robots.txt at {robots_path}")
         return True
         
     except Exception as e:
@@ -1311,7 +1325,7 @@ def generate_sitemap(docs_dir: Path, generated_files: Dict[Path, Path]) -> bool:
             
             f.write('</urlset>\n')
         
-        print(f"Generated sitemap at {sitemap_path}")
+        debug_print(f"Generated sitemap at {sitemap_path}")
         return True
         
     except Exception as e:
@@ -1333,7 +1347,7 @@ def copy_css_file(css_path: Path, docs_dir: Path) -> bool:
     try:
         # Copy CSS file to docs directory
         shutil.copy2(css_path, docs_dir / css_path.name)
-        print(f"Copied CSS file to {docs_dir / css_path.name}")
+        debug_print(f"Copied CSS file to {docs_dir / css_path.name}")
         return True
     except Exception as e:
         print(f"Error copying CSS file: {e}")

@@ -112,8 +112,8 @@ href="postProcess/getData-LidDriven.c.html">getData-LidDriven.c</a></strong>
 contains custom header files that extend the base Basilisk
 functionality:</p>
 <ul>
-<li><strong>dye-injection.h</strong>: Implements a circular tracer (dye)
-injection for flow visualization with:
+<li><a href="src-local/dye-injection.h">dye-injection.h</a>: Implements
+a circular tracer (dye) injection for flow visualization with:
 <ul>
 <li>Configurable injection time and position</li>
 <li>Circular dye region with adjustable radius</li>
@@ -124,8 +124,9 @@ injection for flow visualization with:
 <p>The <a href="postProcess"><code>postProcess/</code></a> directory
 provides tools for analyzing and visualizing simulation results:</p>
 <ul>
-<li><strong>2-LidDrivenCavity-Newtonian-dyeInjection.py</strong>: Python
-script for generating visualizations that:
+<li><a
+href="postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py">2-LidDrivenCavity-Newtonian-dyeInjection.py</a>:
+Python script for generating visualizations that:
 <ul>
 <li>Processes simulation timesteps in parallel</li>
 <li>Creates two-panel plots showing dye concentration and velocity
@@ -133,15 +134,17 @@ magnitude</li>
 <li>Adds streamlines to visualize flow patterns</li>
 <li>Uses ‘getData-LidDriven’ utility to extract field data</li>
 </ul></li>
-<li><strong>getData-LidDriven.c</strong>: C utility that extracts and
-processes numerical data from simulation output files</li>
+<li><a href="postProcess/getData-LidDriven.c">getData-LidDriven.c</a>: C
+utility that extracts and processes numerical data from simulation
+output files</li>
 </ul>
 <h3 id="testcases-directory">testCases/ Directory</h3>
 <p>The <a href="testCases"><code>testCases/</code></a> directory
 contains simulation configurations:</p>
 <ul>
-<li><strong>LidDrivenCavity-Newtonian-dyeInjection.c</strong>: Main
-simulation case that implements:
+<li><a
+href="testCases/LidDrivenCavity-Newtonian-dyeInjection.c">LidDrivenCavity-Newtonian-dyeInjection.c</a>:
+Main simulation case that implements:
 <ul>
 <li>Classical lid-driven cavity flow for a Newtonian fluid</li>
 <li>Configurable Reynolds number (default: Re = 1)</li>
