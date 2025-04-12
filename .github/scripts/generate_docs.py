@@ -5,6 +5,53 @@ import shutil
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Set, Any, Union
 
+def extract_seo_metadata(file_path: Path, file_content: str) -> Dict[str, str]:
+    """
+    Extract SEO metadata (description, keywords) from file content.
+    
+    Args:
+        file_path: Path to the source file
+        file_content: Content of the file
+        
+    Returns:
+        Dictionary containing SEO metadata
+    """
+    metadata = {}
+    
+    # Extract first paragraph as description (up to 160 chars)
+    description_match = re.search(r'^\s*#(.*?)$(.*?)(?:^#|\Z)', file_content, re.MULTILINE | re.DOTALL)
+    if description_match:
+        description = description_match.group(2).strip()
+        # Clean up markdown and limit to ~160 chars for meta description
+        description = re.sub(r'[#*`_]', '', description)
+        description = ' '.join(description.split())[:160]
+        if description.endswith('.'):
+            metadata['description'] = description
+        else:
+            metadata['description'] = description + '...'
+    
+    # Extract keywords from content based on technical terms
+    keywords = set()
+    keyword_patterns = [
+        r'fluid dynamics', r'CFD', r'Basilisk', r'simulation', 
+        r'multiphase', r'cavity flow', r'dye injection', r'Reynolds',
+        r'computational', r'physics', r'navier-stokes', r'vof',
+        r'level set', r'surface tension', r'curvature'
+    ]
+    for pattern in keyword_patterns:
+        if re.search(pattern, file_content, re.IGNORECASE):
+            keywords.add(pattern.lower())
+    
+    # Add filename-based keywords
+    filename_keywords = file_path.stem.lower().replace('-', ' ').replace('_', ' ').split()
+    keywords.update(filename_keywords)
+    
+    # Filter and join keywords
+    filtered_keywords = [k for k in keywords if len(k) > 3][:10]  # Limit to 10 keywords
+    metadata['keywords'] = ', '.join(filtered_keywords)
+    
+    return metadata
+
 # Configuration
 # Assume the script is in .github/scripts, REPO_ROOT is the parent of .github
 REPO_ROOT = Path(__file__).parent.parent.parent
@@ -308,67 +355,51 @@ def prepare_pandoc_input(file_path: Path, literate_c_script: Path) -> str:
 
 
 def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path, 
-               base_url: str, wiki_title: str, page_url: str, page_title: str) -> str:
+               base_url: str, wiki_title: str, page_url: str, page_title: str,
+               seo_metadata: Dict[str, str] = None) -> str:
     """
-               Convert markdown content to a complete HTML document using Pandoc.
-               
-               This function runs Pandoc as a subprocess to transform the provided markdown input into HTML.
-               It applies the specified HTML template and passes template variables—such as the wiki title,
-               base URL, page URL, and page title—to generate a fully formatted document. Although an output
-               HTML path is accepted, the function returns the HTML content as a string rather than writing
-               directly to a file.
-               
-               Args:
-                   pandoc_input (str): Markdown content to be converted.
-                   output_html_path (Path): Target output path for HTML (reserved for future use).
-                   template_path (Path): Path to the HTML template file.
-                   base_url (str): Base URL used for resolving relative links.
-                   wiki_title (str): Title for the wiki, provided to the template.
-                   page_url (str): URL for the current page.
-                   page_title (str): Title for the current page.
-               
-               Returns:
-                   str: The generated HTML content.
-               
-               Raises:
-                   RuntimeError: If Pandoc execution fails with a non-zero exit code.
-                   ValueError: If Pandoc produces an empty output.
-               """
+    Convert markdown content to HTML using Pandoc with SEO metadata.
+    
+    Args:
+        pandoc_input: Input content for pandoc
+        output_html_path: Path where to save the generated HTML
+        template_path: Path to the HTML template
+        base_url: Base URL for links
+        wiki_title: Title of the wiki/documentation
+        page_url: URL of the current page
+        page_title: Title of the current page
+        seo_metadata: Dictionary containing SEO metadata (description, keywords)
+        
+    Returns:
+        Pandoc stdout output
+    """
+    if seo_metadata is None:
+        seo_metadata = {}
+    
     pandoc_cmd = [
         'pandoc',
-        '-f', 'markdown+smart+raw_html',  # Use markdown input with smart typography extension and raw HTML
+        '-f', 'markdown',
         '-t', 'html5',
-        '--katex',          # Enable KaTeX for math
-        '--toc',            # Generate Table of Contents
-        '--preserve-tabs',
-        '--standalone',     # Create full HTML doc
+        '--standalone',
         '--template', str(template_path),
-        # Variables passed to the template (-V key=value)
-        '-V', f'wikititle={wiki_title}',
         '-V', f'base={base_url}',
+        '-V', f'wikititle={wiki_title}',
         '-V', f'pageUrl={page_url}',
         '-V', f'pagetitle={page_title}',
-        '-V', 'sitenav=true',
-        '-V', 'pagetools=true',
+        # Add SEO metadata variables
+        '-V', f'description={seo_metadata.get("description", "")}',
+        '-V', f'keywords={seo_metadata.get("keywords", "")}',
+        '-V', f'image={seo_metadata.get("image", "")}',
+        '-o', str(output_html_path)
     ]
-
-    pandoc_proc = subprocess.Popen(
-        pandoc_cmd, 
-        stdin=subprocess.PIPE, 
-        stdout=subprocess.PIPE, 
-        stderr=subprocess.PIPE, 
-        text=True, 
-        encoding='utf-8'
-    )
-    stdout, stderr = pandoc_proc.communicate(input=pandoc_input)
-
-    if pandoc_proc.returncode != 0:
-        raise RuntimeError(f"Pandoc processing failed: {stderr}")
     
-    if not stdout:
-        raise ValueError("Pandoc generated empty output")
+    process = subprocess.run(pandoc_cmd, input=pandoc_input, text=True, capture_output=True)
     
-    return stdout
+    if process.returncode != 0:
+        print(f"Error running pandoc: {process.stderr}")
+        return ""
+    
+    return process.stdout
 
 
 def post_process_python_shell_html(html_content: str) -> str:
@@ -832,7 +863,8 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
             base_url, 
             wiki_title, 
             page_url, 
-            page_title
+            page_title,
+            extract_seo_metadata(file_path, pandoc_input_content)
         )
         
         # Determine file type for post-processing
@@ -1107,72 +1139,146 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
     return True
 
 
+def generate_robots_txt(docs_dir: Path) -> bool:
+    """
+    Generate a robots.txt file to guide search engine crawlers.
+    
+    Args:
+        docs_dir: Directory where documentation files are stored
+        
+    Returns:
+        True if robots.txt was generated successfully
+    """
+    robots_path = docs_dir / 'robots.txt'
+    
+    try:
+        with open(robots_path, 'w', encoding='utf-8') as f:
+            f.write('User-agent: *\n')
+            f.write('Allow: /\n\n')
+            f.write('Sitemap: https://test.comphy-lab.org/sitemap.xml\n')
+        
+        print(f"Generated robots.txt at {robots_path}")
+        return True
+        
+    except Exception as e:
+        print(f"Error generating robots.txt: {e}")
+        return False
+
+
+def generate_sitemap(docs_dir: Path, generated_files: Dict[Path, Path]) -> bool:
+    """
+    Generate a sitemap.xml file for search engines.
+    
+    Args:
+        docs_dir: Directory where documentation files are stored
+        generated_files: Dictionary mapping source files to generated HTML files
+        
+    Returns:
+        True if sitemap was generated successfully
+    """
+    sitemap_path = docs_dir / 'sitemap.xml'
+    base_url = "https://test.comphy-lab.org"  # Update with your actual domain
+    
+    try:
+        with open(sitemap_path, 'w', encoding='utf-8') as f:
+            f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+            f.write('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n')
+            
+            # Add the homepage
+            f.write('  <url>\n')
+            f.write(f'    <loc>{base_url}/</loc>\n')
+            f.write('    <changefreq>weekly</changefreq>\n')
+            f.write('    <priority>1.0</priority>\n')
+            f.write('  </url>\n')
+            
+            # Add all generated HTML files
+            for _, html_path in generated_files.items():
+                relative_path = html_path.relative_to(docs_dir)
+                url_path = str(relative_path).replace('\\', '/')
+                
+                f.write('  <url>\n')
+                f.write(f'    <loc>{base_url}/{url_path}</loc>\n')
+                f.write('    <changefreq>monthly</changefreq>\n')
+                
+                # Higher priority for important files
+                if 'index' in url_path or url_path.startswith('src-local/'):
+                    f.write('    <priority>0.8</priority>\n')
+                else:
+                    f.write('    <priority>0.6</priority>\n')
+                    
+                f.write('  </url>\n')
+            
+            f.write('</urlset>\n')
+        
+        print(f"Generated sitemap at {sitemap_path}")
+        return True
+        
+    except Exception as e:
+        print(f"Error generating sitemap: {e}")
+        return False
+
+
 def main():
     """
-    Main function to orchestrate documentation generation.
-    
-    This function:
-    1. Validates configuration
-    2. Prepares the output directory
-    3. Finds source files
-    4. Processes each source file to generate HTML
-    5. Generates the index.html file
+    Main function to generate documentation.
     """
-    print("Starting documentation generation...")
-    
-    # Validate configuration
     if not validate_config():
-        print("Configuration validation failed. Exiting.")
         return
     
-    # Prepare output directory
-    if DOCS_DIR.exists():
-        print(f"Cleaning existing docs directory: {DOCS_DIR}")
-        shutil.rmtree(DOCS_DIR)
-    DOCS_DIR.mkdir(parents=True)
-
-    # Find source files
+    # Create docs directory if it doesn't exist
+    DOCS_DIR.mkdir(exist_ok=True)
+    
+    # Find all source files
     source_files = find_source_files(REPO_ROOT, SOURCE_DIRS)
-    print(f"Found {len(source_files)} source files to document.")
-
-    # Track processed files and errors
+    if not source_files:
+        print("No source files found.")
+        return
+    
+    # Dictionary to store generated HTML files
     generated_files = {}
-    errors = 0
-
-    # Copy CSS file to docs directory
-    if CSS_PATH and CSS_PATH.is_file():
-        print(f"Copying CSS: {CSS_PATH} to {DOCS_DIR}")
-        shutil.copy(CSS_PATH, DOCS_DIR)
-    else:
-        print("Warning: Custom CSS file not found or not specified. Code blocks might not have custom styling.")
-
+    
     # Process each source file
     for file_path in source_files:
+        # Determine output path
         relative_path = file_path.relative_to(REPO_ROOT)
-        # Create a parallel structure in docs/ with original extension preserved
-        output_html_path = DOCS_DIR / relative_path.with_suffix(file_path.suffix + '.html')
+        output_html_path = DOCS_DIR / relative_path.with_suffix('.html')
+        
+        # Create output directory if it doesn't exist
         output_html_path.parent.mkdir(parents=True, exist_ok=True)
-
-        # Process the file
+        
+        # Process file and generate HTML
         if process_file_with_page2html_logic(
-            file_path, output_html_path,
-            REPO_ROOT, BASILISK_DIR, DARCSIT_DIR, TEMPLATE_PATH, BASE_URL, WIKI_TITLE, LITERATE_C_SCRIPT, DOCS_DIR
+            file_path, 
+            output_html_path, 
+            REPO_ROOT, 
+            BASILISK_DIR, 
+            DARCSIT_DIR, 
+            TEMPLATE_PATH, 
+            BASE_URL, 
+            WIKI_TITLE, 
+            LITERATE_C_SCRIPT,
+            DOCS_DIR
         ):
             generated_files[file_path] = output_html_path
-        else:
-            errors += 1
-            print(f"-> Failed processing {file_path.relative_to(REPO_ROOT)}")
-
-    # Report errors
-    if errors > 0:
-        print(f"\nEncountered {errors} errors during HTML generation.")
-
+    
     # Generate index.html
     print("\nGenerating index.html...")
     if not generate_index(README_PATH, INDEX_PATH, generated_files, DOCS_DIR, REPO_ROOT):
         print("Failed to generate index.html.")
         return
-
+    
+    # Generate robots.txt
+    print("\nGenerating robots.txt...")
+    if not generate_robots_txt(DOCS_DIR):
+        print("Failed to generate robots.txt.")
+        return
+    
+    # Generate sitemap
+    print("\nGenerating sitemap...")
+    if not generate_sitemap(DOCS_DIR, generated_files):
+        print("Failed to generate sitemap.")
+        return
+    
     print("\nDocumentation generation complete.")
     print(f"Output generated in: {DOCS_DIR}")
 

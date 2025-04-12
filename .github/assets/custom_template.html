@@ -3,6 +3,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <!-- Basic SEO Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="$if(description)$$description$$else$Computational fluid dynamics simulations using Basilisk C framework.$endif$">
+    <meta name="author" content="Computational Multiphase Physics Laboratory">
+    <meta name="keywords" content="$if(keywords)$$keywords$$else$fluid dynamics, CFD, Basilisk, multiphase flow, computational physics$endif$">
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="$if(pagetitle)$$pagetitle$ - $endif$$wikititle$">
+    <meta property="og:description" content="$if(description)$$description$$else$Computational fluid dynamics simulations using Basilisk C framework.$endif$">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://test.comphy-lab.org$pageUrl$">
+    <meta property="og:image" content="$if(image)$$image$$else$https://test.comphy-lab.org/logo.png$endif$">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://test.comphy-lab.org$pageUrl$">
+    
     $if(basepage)$
     <base href="$base$/$basepage$/"/>
     $endif$
