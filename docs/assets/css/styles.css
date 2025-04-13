@@ -2669,7 +2669,17 @@ img.youtube-stats-dark {
   height: 40px;
 }
 
-/* Explicitly set visited link color in dark mode */
+/* Explicitly set link and visited link colors for better browser compatibility */
+[data-theme="dark"] a {
+  color: var(--color-link) !important; /* Force color for all links in dark mode */
+}
+
 [data-theme="dark"] a:visited {
-  color: var(--color-link); /* Use the same variable for consistency */
+  color: var(--color-link) !important; /* Use the same variable for consistency */
+}
+
+/* Fix for external links that might be using #00E */
+[data-theme="dark"] a[href^="http"],
+[data-theme="dark"] a[href^="https"] {
+  color: var(--color-link) !important; /* Ensure external links use the correct color */
 }
