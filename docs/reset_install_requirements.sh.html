@@ -1,114 +1,187 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- Basic SEO Meta Tags -->
-    <meta name="description" content="Computational fluid dynamics simulations using Basilisk C framework.">
-    <meta name="author" content="Computational Multiphase Physics Laboratory">
-    <meta name="keywords" content="fluid dynamics, CFD, Basilisk, multiphase flow, computational physics">
-    
-    <!-- Open Graph / Social Media Meta Tags -->
-    <meta property="og:title" content="Test documentation: Lid driven cavity using dye injection - reset_install_requirements.sh">
-    <meta property="og:description" content="Computational fluid dynamics simulations using Basilisk C framework.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://test.comphy-lab.org/reset_install_requirements.sh.html">
-    <meta property="og:image" content="https://test.comphy-lab.org/assets/logos/CoMPhy-Lab.svg">
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://test.comphy-lab.org/reset_install_requirements.sh.html">
-    
-    <title>Test documentation: Lid driven cavity using dye injection - reset_install_requirements.sh</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="base-url" content="..">
+    <title>reset_install_requirements.sh - Test documentation: Lid driven cavity using dye injection</title>
 
-    <!-- Critical CSS -->
+    <!-- Critical CSS for fastest paint -->
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --text-color: #333;
-            --background-color: #fff;
-            --code-background: #f5f5f5;
+        .s-intro__title {
+            visibility: visible;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-        
-        pre, code {
-            background: var(--code-background);
-            border-radius: 4px;
-            padding: 0.2em 0.4em;
-        }
-        
-        pre {
-            padding: 1em;
-            overflow-x: auto;
+        .s-header {
+            visibility: visible;
         }
     </style>
 
-    <!-- Preload Critical Resources -->
-    <link rel="preload" href="//assets/css/styles.css" as="style">
-    <link rel="preload" href="//assets/css/custom_styles.css" as="style">
-    <link rel="preload" href="//assets/js/main.js" as="script">
-    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="../assets/js/main.js" as="script">
+    <link rel="preload" href="../assets/css/fontello/css/fontello.css" as="style">
+    <link rel="preload" href="../assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
+
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="//assets/logos/CoMPhy-Lab.svg">
-    <link rel="apple-touch-icon" href="//assets/logos/CoMPhy-Lab.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+    <link rel="apple-touch-icon-precomposed" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../assets/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon/favicon.svg">
+    <link rel="manifest" href="../assets/favicon/site.webmanifest">
+    <link rel="shortcut icon" href="../assets/favicon/favicon.ico">
+    <link rel="icon" href="../assets/favicon/favicon.ico">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
     
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="//assets/css/styles.css">
-    <link rel="stylesheet" href="//assets/css/custom_styles.css">
-    <link rel="stylesheet" href="//assets/css/command-palette.css">
-    <link rel="stylesheet" href="//assets/css/vendor.css">
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Computational fluid dynamics simulations using Basilisk C framework.">
+    <meta name="author" content="CoMPhy Lab">
+    <meta name="robots" content="index, follow">
+    <meta name="keywords" content="fluid dynamics, CFD, Basilisk, multiphase flow, computational physics">
+
+    <!-- Font dependencies with font-display: swap -->
+    <style>
+        @font-face {
+            font-display: swap;
+            font-family: 'System Font';
+            src: local('system-ui');
+        }
+    </style>
+    <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css">
+        <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css">
+    </noscript>
+
+    <!-- Site styles -->
+    <link rel="stylesheet" href="../assets/css/vendor.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/command-palette.css" media="print" onload="this.media='all'">
     
     <!-- KaTeX for Math -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css">
-    
-    <!-- jQuery and UI -->
-    <script src="//js/jquery.min.js"></script>
-    <script src="//js/jquery-ui.packed.js"></script>
-    <script src="//js/plots.js"></script>
-    
-    <!-- KaTeX -->
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js"></script>
     
-    <!-- Command Palette -->
-    <script src="//assets/js/command-palette.js"></script>
-    <script src="//assets/js/command-data.js"></script>
-    <script src="//assets/js/shortcut-key.js"></script>
-    <link href="custom_styles.css" rel="stylesheet" type="text/css" />
+    <!-- jQuery and UI -->
+    <script src="../js/jquery.min.js"></script>
+    <script src="../js/jquery-ui.packed.js"></script>
+    <script src="../js/plots.js"></script>
+    
+    <!-- Command palette -->
+    <script defer src="../assets/js/command-palette.js"></script>
+    <script defer src="../assets/js/command-data.js"></script>
+    <script defer src="../assets/js/main.js"></script>
+
+    <script>
+        document.documentElement.classList.remove('no-js');
+        document.documentElement.classList.add('js');
+        
+        // Theme toggle functionality
+        (function() {
+            // Check for saved theme preference or use OS preference
+            const getThemePreference = () => {
+                // Check if user has already selected a theme
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme) {
+                    return savedTheme;
+                }
+                // If not, check OS preference
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            };
+            
+            // Set theme on document
+            const setTheme = (theme) => {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+            };
+            
+            // Apply theme when page loads
+            document.addEventListener('DOMContentLoaded', () => {
+                setTheme(getThemePreference());
+                
+                // Add click event listener to theme toggle
+                const themeToggle = document.getElementById('theme-toggle');
+                if (themeToggle) {
+                    themeToggle.addEventListener('click', () => {
+                        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+                        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                        setTheme(newTheme);
+                    });
+                }
+            });
+        })();
+    </script>
+
+    <!-- FontAwesome loader script -->
+    <script defer src="//assets/js/fontawesome-loader.js"></script>    <link href="custom_styles.css" rel="stylesheet" type="text/css" />
     </head>
-<body>
-    <div class="container">
-        <header class="site-header">
-            <nav class="main-nav">
-                <a href="//" class="logo">
-                    <img src="//assets/logos/CoMPhy-Lab.svg" alt="CoMPhy-Lab Logo" height="40">
+<body id="top">
+
+    <div id="preloader">
+        <div id="loader"></div>
+    </div>
+
+    <div id="page" class="s-pagewrap">
+        <header class="s-header">
+            <div class="s-header__logo">
+                <a class="logo" href="../">
+                    <img src="../assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
                 </a>
-                <div class="nav-links">
-                    <a href="//Tutorial">Tutorial</a>
-                    <a href="//src/INSTALL">Installation</a>
-                    <a href="//Basilisk C">Basilisk C</a>
-                    <a href="//src/README">Solvers</a>
-                    <a href="//src/examples/README">Examples</a>
-                </div>
+            </div>
+            <a class="s-header__menu-toggle" href="#0">
+                <span class="s-header__menu-text">Menu</span>
+                <span class="s-header__menu-icon"></span>
+            </a>
+            <nav class="s-header__nav">
+                <a href="#0" class="s-header__nav-close-btn"><span>Close</span></a>
+                <ul class="s-header__nav-list">
+                    <li style="background: none;">
+                        <div class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light theme">
+                            <svg class="theme-toggle-icon moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                            <svg class="theme-toggle-icon sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                            </svg>
+                        </div>
+                    </li>
+                    <li style="background: none;"><a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" style="background: none; padding: 0;" aria-label="Google Scholar Profile"><i class="ai ai-google-scholar" style="font-size: 1.75em;"></i></a></li>
+                    <li style="background: none;"><a href="https://github.com/comphy-lab" style="background: none; padding: 0;" aria-label="GitHub Organization"><i class="fa-brands fa-github" style="font-size: 1.75em; color: #333;"></i></a></li>
+                    <li><a href="https://comphy-lab.org/#about" class="smoothscroll">About</a></li>
+                    <li><a href="https://comphy-lab.org/team/">Team</a></li>
+                    <li><a href="https://comphy-lab.org/research">Research</a></li>
+                    <li><a href="https://comphy-lab.org/teaching">Teaching</a></li>
+                    <li><a href="https://comphy-lab.org/join">Join Us</a></li>
+                    <li><a href="https://blogs.comphy-lab.org/">Blog</a></li>
+                    <li style="background: none;"><a href="https://bsky.app/profile/comphy-lab.org" style="background: none; padding: 0;" aria-label="Bluesky Profile"><i class="fa-brands fa-bluesky" style="font-size: 1.75em; color: #0085ff;"></i></a></li>
+                    <!-- Command Palette Button (Styled like search) -->
+                    <li class="command-palette-button">
+                        <div class="command-wrapper">
+                            <button class="command-k-style-btn" id="command-palette-btn" aria-label="Open command palette">
+                                <span class="default-theme-text">ctrl K</span>
+                                <span class="mac-theme-text">⌘ K</span>
+                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
             </nav>
         </header>
 
+        <!-- Main content -->
         <main class="content">
             
-            <div class="page-content">
+            <div class="page-content" style="padding: 0 1rem;">
                 
                                 <h1 class="page-title">reset_install_requirements.sh</h1>
                 
@@ -176,29 +249,68 @@
         </main>
 
         <footer class="site-footer">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <img src="//assets/logos/CoMPhy-Lab.svg" alt="CoMPhy-Lab Logo" height="30">
-                </div>
-                <div class="footer-links">
-                    <a href="//Help">Help</a>
-                    <a href="http://groups.google.com/d/forum/basilisk-fr">Forum</a>
-                    <a href="//src/Contributing">Contribute</a>
-                </div>
+            <div class="footer-left">
+                <a href="http://basilisk.fr/sandbox/vatsal/" target="_blank">
+                    <img src="../assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
+                </a>
+                <a href="https://pof.tnw.utwente.nl/" target="_blank">
+                    <img src="../assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
+                </a>
+                <a href="https://www.utwente.nl/" target="_blank">
+                    <img src="../assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
+                </a>
+                <a href="https://www.vatsalsanjay.com/" target="_blank">
+                    <img src="../assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
+                </a>
             </div>
+            <div class="footer-center">
+                <p class="copyright-text">
+                    &copy; Copyright<br>
+                    CoMPhy Lab 2025
+                </p>
+            </div>
+            <div class="footer-right">
+                <a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" target="_blank" aria-label="Google Scholar Profile">
+                    <i class="ai ai-google-scholar" style="font-size: 2.5em; color: white;"></i>
+                </a>
+                <a href="https://github.com/comphy-lab" target="_blank" aria-label="GitHub Organization">
+                    <i class="fa-brands fa-github" style="font-size: 2.5em; color: white;"></i>
+                </a>
+                <a href="https://www.youtube.com/@CoMPhyLab" target="_blank" aria-label="YouTube Channel">
+                    <i class="fa-brands fa-youtube" style="font-size: 2.5em; color: white;"></i>
+                </a>
+                <a href="https://x.com/VatsalSanjay" target="_blank" aria-label="X (Twitter) Profile">
+                    <i class="fa-brands fa-x-twitter" style="font-size: 2.5em; color: white;"></i>
+                </a>
+                <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" aria-label="Bluesky Profile">
+                    <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
+                </a>
+                <a href="https://github.com/comphy-lab/comphy-lab.github.io" class="edit-link" aria-label="Edit this page on GitHub">
+                    <i class="fa-brands fa-github"></i> Edit this page
+                </a>
+            </div>
+            <div class="ss-go-top">
+                <a class="smoothscroll" title="Back to Top" href="#top" aria-label="Back to top of page">
+                    <i class="fa-solid fa-arrow-up"></i>
+                </a>
+            </div> <!-- end ss-go-top -->
         </footer>
-    </div>
+    </div>  
 
-    <!-- Command Palette Modal -->
-    <div id="command-palette" class="command-palette">
-        <div class="command-palette-content">
-            <input type="text" id="command-input" placeholder="Type a command or search...">
-            <div id="command-results"></div>
+    <!-- Command Palette -->
+    <div id="simple-command-palette" class="simple-command-palette" style="display: none;">
+        <div class="simple-command-palette-backdrop"></div>
+        <div class="simple-command-palette-modal">
+            <input type="text" id="command-palette-input" placeholder="Type a command..." autocomplete="off">
+            <div id="command-palette-results" class="command-palette-results"></div>
+            <div class="command-palette-footer">
+                <span class="command-palette-footer-item"><kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+                <span class="command-palette-footer-item"><kbd>enter</kbd> to select</span>
+                <span class="command-palette-footer-item"><kbd>esc</kbd> to close</span>
+            </div>
         </div>
     </div>
 
-    <!-- Main JavaScript -->
-    <script src="//assets/js/main.js"></script>
 
     <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function() {

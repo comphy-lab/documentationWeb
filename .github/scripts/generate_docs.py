@@ -92,6 +92,62 @@ def extract_h1_from_readme(readme_path: Path) -> str:
 WIKI_TITLE = extract_h1_from_readme(README_PATH)
 
 
+def process_template_for_assets(template_path: Path) -> str:
+    """
+    Process the custom template to ensure correct asset paths.
+    
+    This function reads the template HTML file and ensures that all asset references
+    use the correct paths relative to the root. It converts paths like $base$/assets/...
+    to the correct format for the generated documentation.
+    
+    Args:
+        template_path: Path to the custom HTML template
+        
+    Returns:
+        The processed template content as a string
+    """
+    try:
+        with open(template_path, 'r', encoding='utf-8') as f:
+            template_content = f.read()
+        
+        # Make sure all $base$/assets/ paths are correctly formatted
+        # No changes needed as the template already uses $base$/assets/ which will be correctly
+        # expanded by pandoc using the -V base=BASE_URL parameter
+        
+        # Make sure the js paths are correct (jquery, etc.)
+        # These paths should be $base$/js/ not just js/
+        template_content = template_content.replace('src="$base$/js/', 'src="$base$/js/')
+        
+        # Add FontAwesome loader script to make sure icons work
+        fontawesome_script = '''
+    <!-- FontAwesome loader script -->
+    <script defer src="$base$/assets/js/fontawesome-loader.js"></script>'''
+        
+        # Add the script right before the end of the head section
+        head_end_pos = template_content.find('</head>')
+        if head_end_pos != -1:
+            template_content = template_content[:head_end_pos] + fontawesome_script + template_content[head_end_pos:]
+        
+        # Fix any missing color class on social icons
+        template_content = template_content.replace('class="fa-brands fa-github" style="font-size: 1.75em"', 
+                                                  'class="fa-brands fa-github" style="font-size: 1.75em; color: #333;"')
+        
+        # Ensure the command-palette.js script is properly referenced
+        if 'command-palette.js' in template_content and 'command-data.js' in template_content:
+            debug_print("Command palette scripts found in template")
+        
+        # Make sure the content div has proper padding for mobile
+        template_content = template_content.replace('class="page-content"', 
+                                                  'class="page-content" style="padding: 0 1rem;"')
+        
+        debug_print("Template processed for correct asset paths")
+        return template_content
+        
+    except Exception as e:
+        print(f"Error processing template for assets: {e}")
+        return None
+
+
 def validate_config() -> bool:
     """
     Validates that all required configuration paths exist.
@@ -99,6 +155,8 @@ def validate_config() -> bool:
     Checks if the necessary directories (BASILISK_DIR and DARCSIT_DIR) and files (TEMPLATE_PATH and the literate-c script)
     are present. If any path is missing, an error is printed and the function returns False; otherwise, it returns True.
     """
+    global TEMPLATE_PATH
+    
     essential_paths = [
         (BASILISK_DIR, "BASILISK_DIR"),
         (DARCSIT_DIR, "DARCSIT_DIR"),
@@ -110,6 +168,31 @@ def validate_config() -> bool:
         if not (path.is_dir() if name.endswith("DIR") else path.is_file()):
             print(f"Error: {name} not found at {path}")
             return False
+    
+    # Process the template to ensure correct asset paths
+    processed_template = process_template_for_assets(TEMPLATE_PATH)
+    if processed_template is None:
+        return False
+    
+    # Create a temporary template file with processed content
+    temp_template_path = TEMPLATE_PATH.with_suffix('.temp.html')
+    
+    # Clean up any existing temporary file
+    if temp_template_path.exists():
+        try:
+            temp_template_path.unlink()
+        except Exception as e:
+            print(f"Warning: Could not delete existing temporary template: {e}")
+    
+    try:
+        with open(temp_template_path, 'w', encoding='utf-8') as f:
+            f.write(processed_template)
+        # Replace the template path with the temporary one
+        TEMPLATE_PATH = temp_template_path
+    except Exception as e:
+        print(f"Error creating temporary template file: {e}")
+        return False
+    
     return True
 
 
@@ -1389,6 +1472,265 @@ def copy_css_file(css_path: Path, docs_dir: Path) -> bool:
         return False
 
 
+def create_favicon_files(docs_dir: Path, logos_dir: Path) -> bool:
+    """
+    Create necessary favicon files in the docs/assets/favicon directory.
+    
+    This function ensures all required favicon files exist in the destination
+    directory, creating them if needed from source logo files.
+    
+    Args:
+        docs_dir: The documentation root directory
+        logos_dir: Directory containing source logo files
+        
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        # Create favicon directory
+        favicon_dir = docs_dir / "assets" / "favicon"
+        favicon_dir.mkdir(exist_ok=True)
+        
+        # Copy any existing favicon files from .github/assets/favicon if it exists
+        source_favicon_dir = Path(logos_dir.parent, "favicon")
+        if source_favicon_dir.exists() and source_favicon_dir.is_dir():
+            for item in source_favicon_dir.glob('*'):
+                if item.is_file():
+                    shutil.copy2(item, favicon_dir / item.name)
+                    debug_print(f"Copied favicon file: {item.name}")
+        
+        # Create essential favicon files if they don't exist
+        favicon_files = [
+            "favicon.ico",
+            "favicon.svg",
+            "apple-touch-icon.png",
+            "favicon-96x96.png",
+            "site.webmanifest"
+        ]
+        
+        # Check if we have the required logo to create favicons
+        logo_file = None
+        for potential_logo in ["CoMPhy-Lab.svg", "CoMPhy-Lab-no-name.png", "logoBasilisk_TransparentBackground.png"]:
+            if (logos_dir / potential_logo).exists():
+                logo_file = logos_dir / potential_logo
+                break
+        
+        if logo_file:
+            # Create a basic site.webmanifest if it doesn't exist
+            webmanifest_path = favicon_dir / "site.webmanifest"
+            if not webmanifest_path.exists():
+                with open(webmanifest_path, 'w', encoding='utf-8') as f:
+                    f.write('''{
+  "name": "CoMPhy Lab",
+  "short_name": "CoMPhy",
+  "icons": [
+    {
+      "src": "/assets/favicon/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/favicon/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}''')
+                debug_print(f"Created site.webmanifest")
+        
+        return True
+    except Exception as e:
+        print(f"Error creating favicon files: {e}")
+        return False
+
+
+def create_fontawesome_script(docs_dir: Path) -> bool:
+    """
+    Create a script to load FontAwesome icons in the docs directory.
+    
+    This function creates a JavaScript file that conditionally loads FontAwesome
+    icons based on whether the site is being viewed locally or in production.
+    
+    Args:
+        docs_dir: The documentation root directory
+        
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        # Create the js directory if it doesn't exist
+        js_dir = docs_dir / "assets" / "js"
+        js_dir.mkdir(exist_ok=True, parents=True)
+        
+        # Create the FontAwesome loader script
+        fa_script_path = js_dir / "fontawesome-loader.js"
+        
+        with open(fa_script_path, 'w', encoding='utf-8') as f:
+            f.write('''// Check if we're on localhost
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+  // Load only specific Font Awesome icons for local development
+  var icons = ['github', 'search', 'arrow-up-right-from-square', 'bluesky', 'youtube', 'arrow-up'];
+  var link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'https://use.fontawesome.com/releases/v6.7.2/css/solid.css';
+  link.crossOrigin = 'anonymous';
+  document.head.appendChild(link);
+  
+  var link2 = document.createElement('link');
+  link2.rel = 'stylesheet';
+  link2.href = 'https://use.fontawesome.com/releases/v6.7.2/css/brands.css';
+  link2.crossOrigin = 'anonymous';
+  document.head.appendChild(link2);
+  
+  var link3 = document.createElement('link');
+  link3.rel = 'stylesheet';
+  link3.href = 'https://use.fontawesome.com/releases/v6.7.2/css/fontawesome.css';
+  link3.crossOrigin = 'anonymous';
+  document.head.appendChild(link3);
+} else {
+  // Use Kit for production with defer
+  var script = document.createElement('script');
+  script.src = 'https://kit.fontawesome.com/b1cfd9ca75.js';
+  script.crossOrigin = 'anonymous';
+  script.defer = true;
+  document.head.appendChild(script);
+}''')
+        
+        debug_print(f"Created FontAwesome loader script at {fa_script_path}")
+        
+        # Create a main.js file if it doesn't exist
+        main_js_path = js_dir / "main.js"
+        if not main_js_path.exists():
+            with open(main_js_path, 'w', encoding='utf-8') as f:
+                f.write('''document.addEventListener('DOMContentLoaded', function() {
+    // Remove preloader
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        setTimeout(function() {
+            preloader.style.opacity = '0';
+            setTimeout(function() {
+                preloader.style.display = 'none';
+            }, 500);
+        }, 300);
+    }
+
+    // Mobile menu toggle
+    const menuToggle = document.querySelector('.s-header__menu-toggle');
+    const navList = document.querySelector('.s-header__nav');
+    const closeBtn = document.querySelector('.s-header__nav-close-btn');
+    
+    if (menuToggle && navList && closeBtn) {
+        menuToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            navList.classList.add('is-visible');
+        });
+        
+        closeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            navList.classList.remove('is-visible');
+        });
+    }
+
+    // Back to top button
+    const backToTop = document.querySelector('.ss-go-top');
+    if (backToTop) {
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 500) {
+                backToTop.classList.add('link-is-visible');
+            } else {
+                backToTop.classList.remove('link-is-visible');
+            }
+        });
+    }
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a.smoothscroll').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                window.scrollTo({
+                    top: target.offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+});''')
+            debug_print(f"Created main.js at {main_js_path}")
+        
+        return True
+    except Exception as e:
+        print(f"Error creating FontAwesome script: {e}")
+        return False
+
+
+def copy_assets(assets_dir: Path, docs_dir: Path) -> bool:
+    """
+    Recursively copies all assets from the assets directory to the docs directory.
+    
+    This function creates a docs/assets directory and copies all subdirectories and files
+    from the .github/assets directory, preserving the directory structure.
+    It handles CSS, JavaScript, logos, fonts, favicon, and other required assets.
+    
+    Args:
+        assets_dir: Source directory containing assets (.github/assets)
+        docs_dir: Destination directory for documentation
+        
+    Returns:
+        True if all assets were copied successfully; otherwise, False
+    """
+    try:
+        # Create the target assets directory
+        target_assets_dir = docs_dir / "assets"
+        target_assets_dir.mkdir(exist_ok=True)
+        
+        # Copy all subdirectories and files
+        for item in assets_dir.glob('*'):
+            if item.is_dir():
+                # For directories, recursively copy the directory
+                target_dir = target_assets_dir / item.name
+                if target_dir.exists() and target_dir.is_dir():
+                    # If directory exists, remove it first to ensure clean copy
+                    shutil.rmtree(target_dir)
+                shutil.copytree(item, target_dir)
+                debug_print(f"Copied directory: {item.name} -> {target_dir}")
+            else:
+                # For files, copy the file
+                shutil.copy2(item, target_assets_dir / item.name)
+                debug_print(f"Copied file: {item.name} -> {target_assets_dir / item.name}")
+        
+        # Copy js files that template relies on
+        js_dir = docs_dir / "js"
+        js_dir.mkdir(exist_ok=True)
+        
+        # Check if source js files exist
+        basilisk_js_dir = BASILISK_DIR / "src" / "darcsit" / "js"
+        if basilisk_js_dir.exists():
+            for js_file in ["jquery.min.js", "jquery-ui.packed.js", "plots.js"]:
+                js_path = basilisk_js_dir / js_file
+                if js_path.exists():
+                    shutil.copy2(js_path, js_dir / js_file)
+                    debug_print(f"Copied JS file: {js_file} -> {js_dir / js_file}")
+        
+        # Create favicon files as needed
+        logos_dir = assets_dir / "logos"
+        if logos_dir.exists():
+            create_favicon_files(docs_dir, logos_dir)
+        
+        # Create FontAwesome loader script
+        create_fontawesome_script(docs_dir)
+        
+        return True
+    except Exception as e:
+        print(f"Error copying assets: {e}")
+        return False
+
+
 def main():
     """
     Generate HTML documentation for the project.
@@ -1403,71 +1745,83 @@ def main():
     if not validate_config():
         return
     
-    # Create docs directory if it doesn't exist
-    DOCS_DIR.mkdir(exist_ok=True)
-    
-    # Copy CSS file to docs directory
-    print("\nCopying CSS file...")
-    if not copy_css_file(CSS_PATH, DOCS_DIR):
-        print("Failed to copy CSS file.")
-        return
-    
-    # Find all source files
-    source_files = find_source_files(REPO_ROOT, SOURCE_DIRS)
-    if not source_files:
-        print("No source files found.")
-        return
-    
-    # Dictionary to store generated HTML files
-    generated_files = {}
-    
-    # Process each source file
-    for file_path in source_files:
-        # Determine output path
-        relative_path = file_path.relative_to(REPO_ROOT)
+    try:
+        # Create docs directory if it doesn't exist
+        DOCS_DIR.mkdir(exist_ok=True)
         
-        # Create output path with file extension preserved in the HTML filename
-        # For example: file.c -> file.c.html, file.h -> file.h.html, file.py -> file.py.html
-        output_html_path = DOCS_DIR / relative_path.with_suffix(relative_path.suffix + '.html')
+        # Copy all assets (CSS, JS, logos, fonts, etc.) to docs directory
+        print("\nCopying assets...")
+        assets_dir = REPO_ROOT / '.github' / 'assets'
+        if not copy_assets(assets_dir, DOCS_DIR):
+            print("Failed to copy assets.")
+            return
         
-        # Create output directory if it doesn't exist
-        output_html_path.parent.mkdir(parents=True, exist_ok=True)
+        # Find all source files
+        source_files = find_source_files(REPO_ROOT, SOURCE_DIRS)
+        if not source_files:
+            print("No source files found.")
+            return
         
-        # Process file and generate HTML
-        if process_file_with_page2html_logic(
-            file_path, 
-            output_html_path, 
-            REPO_ROOT, 
-            BASILISK_DIR, 
-            DARCSIT_DIR, 
-            TEMPLATE_PATH, 
-            BASE_URL, 
-            WIKI_TITLE, 
-            LITERATE_C_SCRIPT,
-            DOCS_DIR
-        ):
-            generated_files[file_path] = output_html_path
-    
-    # Generate index.html
-    print("\nGenerating index.html...")
-    if not generate_index(README_PATH, INDEX_PATH, generated_files, DOCS_DIR, REPO_ROOT):
-        print("Failed to generate index.html.")
-        return
-    
-    # Generate robots.txt
-    print("\nGenerating robots.txt...")
-    if not generate_robots_txt(DOCS_DIR):
-        print("Failed to generate robots.txt.")
-        return
-    
-    # Generate sitemap
-    print("\nGenerating sitemap...")
-    if not generate_sitemap(DOCS_DIR, generated_files):
-        print("Failed to generate sitemap.")
-        return
-    
-    print("\nDocumentation generation complete.")
-    print(f"Output generated in: {DOCS_DIR}")
+        # Dictionary to store generated HTML files
+        generated_files = {}
+        
+        # Process each source file
+        for file_path in source_files:
+            # Determine output path
+            relative_path = file_path.relative_to(REPO_ROOT)
+            
+            # Create output path with file extension preserved in the HTML filename
+            # For example: file.c -> file.c.html, file.h -> file.h.html, file.py -> file.py.html
+            output_html_path = DOCS_DIR / relative_path.with_suffix(relative_path.suffix + '.html')
+            
+            # Create output directory if it doesn't exist
+            output_html_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Process file and generate HTML
+            if process_file_with_page2html_logic(
+                file_path, 
+                output_html_path, 
+                REPO_ROOT, 
+                BASILISK_DIR, 
+                DARCSIT_DIR, 
+                TEMPLATE_PATH, 
+                BASE_URL, 
+                WIKI_TITLE, 
+                LITERATE_C_SCRIPT,
+                DOCS_DIR
+            ):
+                generated_files[file_path] = output_html_path
+        
+        # Generate index.html
+        print("\nGenerating index.html...")
+        if not generate_index(README_PATH, INDEX_PATH, generated_files, DOCS_DIR, REPO_ROOT):
+            print("Failed to generate index.html.")
+            return
+        
+        # Generate robots.txt
+        print("\nGenerating robots.txt...")
+        if not generate_robots_txt(DOCS_DIR):
+            print("Failed to generate robots.txt.")
+            return
+        
+        # Generate sitemap
+        print("\nGenerating sitemap...")
+        if not generate_sitemap(DOCS_DIR, generated_files):
+            print("Failed to generate sitemap.")
+            return
+        
+        print("\nDocumentation generation complete.")
+        print(f"Output generated in: {DOCS_DIR}")
+        
+    finally:
+        # Clean up temporary template file
+        temp_template_path = TEMPLATE_PATH.parent / (TEMPLATE_PATH.stem.replace('.temp', '') + '.temp.html')
+        if temp_template_path.exists():
+            try:
+                temp_template_path.unlink()
+                debug_print(f"Cleaned up temporary template file: {temp_template_path}")
+            except Exception as e:
+                print(f"Warning: Could not delete temporary template file: {e}")
 
 
 if __name__ == "__main__":
