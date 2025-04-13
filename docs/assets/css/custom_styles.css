@@ -23,6 +23,12 @@ body {
   --heading-color: #2c3e50;
 }
 
+/* Dark mode specific styles */
+[data-theme="dark"] {
+  --heading-color: #e0e0e0;
+  --border-color: #404040;
+}
+
 /* Main content spacing */
 main.content {
   padding-top: 100px; /* Add padding to account for fixed header (80px height + 20px buffer) */
@@ -59,8 +65,16 @@ main.content {
   margin-top: 2rem;
   font-size: 2.4rem;
   color: var(--heading-color, #2c3e50);
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--border-color, #e9ecef);
   padding-bottom: 0.3rem;
+  text-shadow: none;
+}
+
+/* Dark theme heading overrides */
+[data-theme="dark"] .page-content h2 {
+  color: var(--heading-color);
+  border-bottom-color: var(--border-color);
+  text-shadow: none;
 }
 
 .page-content h3 {
