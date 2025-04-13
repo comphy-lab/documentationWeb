@@ -22,7 +22,7 @@
   --nav-item-color: #1a1a1a;
   --nav-item-hover-bg: rgba(255, 255, 255, 0.35);
   --nav-item-shadow: rgba(0, 0, 0, 0.1);
-  --nav-item-hover-shadow: rgba(0, 0, 0, 0.15);
+  --nav-item-hover-shadow: rgba(0, 0, 0, 0.4);
 }
 
 /* Dark theme variables */
@@ -32,8 +32,8 @@
   --color-primary: #4c8dff;
   --color-secondary: #a0a0a0;
   --color-primary-hover: #6fa1ff;
-  --color-link: #4c8dff;
-  --color-link-hover: #6fa1ff;
+  --color-link: #58A6FF;
+  --color-link-hover: #79B8FF;
   
   /* Heading styling */
   --h2-gradient-start: #78aaff;
@@ -1366,7 +1366,7 @@ img.youtube-stats-dark {
 
 @media screen and (max-width: 900px) {
   .team-grid {
-    grid-template-columns: 400px;
+    grid-template-columns: repeat(1, 400px);
   }
 }
 
@@ -2667,4 +2667,9 @@ img.youtube-stats-dark {
   display: flex;
   align-items: center;
   height: 40px;
+}
+
+/* Explicitly set visited link color in dark mode */
+[data-theme="dark"] a:visited {
+  color: var(--color-link); /* Use the same variable for consistency */
 }
