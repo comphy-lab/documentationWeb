@@ -153,7 +153,7 @@
     content.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.3)';
     
     // Media query for dark mode
-    if (window?.matchMedia?.('prefers-color-scheme: dark)')?.matches) {
+    if (window?.matchMedia?.('(prefers-color-scheme: dark)')?.matches) {
       content.style.backgroundColor = '#333';
       content.style.color = '#fff';
     }
