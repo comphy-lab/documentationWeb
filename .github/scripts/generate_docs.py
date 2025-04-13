@@ -109,43 +109,11 @@ def process_template_for_assets(template_path: Path) -> str:
     try:
         with open(template_path, 'r', encoding='utf-8') as f:
             template_content = f.read()
-        
-        # Make sure all $base$/assets/ paths are correctly formatted
-        # No changes needed as the template already uses $base$/assets/ which will be correctly
-        # expanded by pandoc using the -V base=BASE_URL parameter
-        
-        # Make sure the js paths are correct (jquery, etc.)
-        # These paths should be $base$/js/ not just js/
-        template_content = template_content.replace('src="$base$/js/', 'src="$base$/js/')
-        
-        # Add FontAwesome loader script to make sure icons work
-        fontawesome_script = '''
-    <!-- FontAwesome loader script -->
-    <script defer src="$base$/assets/js/fontawesome-loader.js"></script>'''
-        
-        # Add the script right before the end of the head section
-        head_end_pos = template_content.find('</head>')
-        if head_end_pos != -1:
-            template_content = template_content[:head_end_pos] + fontawesome_script + template_content[head_end_pos:]
-        
-        # Fix any missing color class on social icons
-        template_content = template_content.replace('class="fa-brands fa-github" style="font-size: 1.75em"', 
-                                                  'class="fa-brands fa-github" style="font-size: 1.75em; color: #333;"')
-        
-        # Ensure the command-palette.js script is properly referenced
-        if 'command-palette.js' in template_content and 'command-data.js' in template_content:
-            debug_print("Command palette scripts found in template")
-        
-        # Make sure the content div has proper padding for mobile
-        template_content = template_content.replace('class="page-content"', 
-                                                  'class="page-content" style="padding: 0 1rem;"')
-        
         debug_print("Template processed for correct asset paths")
         return template_content
-        
     except Exception as e:
         print(f"Error processing template for assets: {e}")
-        return None
+        return ""
 
 
 def validate_config() -> bool:
@@ -1551,183 +1519,95 @@ def create_favicon_files(docs_dir: Path, logos_dir: Path) -> bool:
         return False
 
 
-def create_fontawesome_script(docs_dir: Path) -> bool:
+def copy_assets(assets_dir: Path, docs_dir: Path) -> bool:
     """
-    Create a script to load FontAwesome icons in the docs directory.
+    Copy assets from source to destination.
     
-    This function creates a JavaScript file that conditionally loads FontAwesome
-    icons based on whether the site is being viewed locally or in production.
+    This function copies assets such as CSS, JavaScript, images, etc. from the
+    source assets directory to the destination docs directory.
     
     Args:
-        docs_dir: The documentation root directory
+        assets_dir: The source assets directory
+        docs_dir: The destination docs directory
         
     Returns:
         True if successful, False otherwise
     """
     try:
-        # Create the js directory if it doesn't exist
-        js_dir = docs_dir / "assets" / "js"
-        js_dir.mkdir(exist_ok=True, parents=True)
+        debug_print(f"Copying assets from {assets_dir} to {docs_dir}")
         
-        # Create the FontAwesome loader script
-        fa_script_path = js_dir / "fontawesome-loader.js"
+        # Create the assets directory in docs if it doesn't exist
+        docs_assets_dir = docs_dir / "assets"
+        docs_assets_dir.mkdir(exist_ok=True)
         
-        with open(fa_script_path, 'w', encoding='utf-8') as f:
-            f.write('''// Check if we're on localhost
-if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-  // Load only specific Font Awesome icons for local development
-  var icons = ['github', 'search', 'arrow-up-right-from-square', 'bluesky', 'youtube', 'arrow-up'];
-  var link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = 'https://use.fontawesome.com/releases/v6.7.2/css/solid.css';
-  link.crossOrigin = 'anonymous';
-  document.head.appendChild(link);
-  
-  var link2 = document.createElement('link');
-  link2.rel = 'stylesheet';
-  link2.href = 'https://use.fontawesome.com/releases/v6.7.2/css/brands.css';
-  link2.crossOrigin = 'anonymous';
-  document.head.appendChild(link2);
-  
-  var link3 = document.createElement('link');
-  link3.rel = 'stylesheet';
-  link3.href = 'https://use.fontawesome.com/releases/v6.7.2/css/fontawesome.css';
-  link3.crossOrigin = 'anonymous';
-  document.head.appendChild(link3);
-} else {
-  // Use Kit for production with defer
-  var script = document.createElement('script');
-  script.src = 'https://kit.fontawesome.com/b1cfd9ca75.js';
-  script.crossOrigin = 'anonymous';
-  script.defer = true;
-  document.head.appendChild(script);
-}''')
+        # Copy CSS files
+        css_dir = assets_dir / "css"
+        docs_css_dir = docs_assets_dir / "css"
+        docs_css_dir.mkdir(exist_ok=True, parents=True)
         
-        debug_print(f"Created FontAwesome loader script at {fa_script_path}")
+        if css_dir.exists():
+            for css_file in css_dir.glob("**/*"):
+                if css_file.is_file():
+                    rel_path = css_file.relative_to(css_dir)
+                    dest_path = docs_css_dir / rel_path
+                    dest_path.parent.mkdir(exist_ok=True, parents=True)
+                    shutil.copy2(css_file, dest_path)
+                    debug_print(f"Copied {css_file} to {dest_path}")
         
-        # Create a main.js file if it doesn't exist
-        main_js_path = js_dir / "main.js"
-        if not main_js_path.exists():
-            with open(main_js_path, 'w', encoding='utf-8') as f:
-                f.write('''document.addEventListener('DOMContentLoaded', function() {
-    // Remove preloader
-    const preloader = document.getElementById('preloader');
-    if (preloader) {
-        setTimeout(function() {
-            preloader.style.opacity = '0';
-            setTimeout(function() {
-                preloader.style.display = 'none';
-            }, 500);
-        }, 300);
-    }
-
-    // Mobile menu toggle
-    const menuToggle = document.querySelector('.s-header__menu-toggle');
-    const navList = document.querySelector('.s-header__nav');
-    const closeBtn = document.querySelector('.s-header__nav-close-btn');
-    
-    if (menuToggle && navList && closeBtn) {
-        menuToggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            navList.classList.add('is-visible');
-        });
+        # Copy JS files
+        js_dir = assets_dir / "js"
+        docs_js_dir = docs_assets_dir / "js"
+        docs_js_dir.mkdir(exist_ok=True, parents=True)
         
-        closeBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            navList.classList.remove('is-visible');
-        });
-    }
-
-    // Back to top button
-    const backToTop = document.querySelector('.ss-go-top');
-    if (backToTop) {
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 500) {
-                backToTop.classList.add('link-is-visible');
-            } else {
-                backToTop.classList.remove('link-is-visible');
-            }
-        });
-    }
-
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a.smoothscroll').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                window.scrollTo({
-                    top: target.offsetTop,
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
-});''')
-            debug_print(f"Created main.js at {main_js_path}")
+        if js_dir.exists():
+            for js_file in js_dir.glob("**/*"):
+                if js_file.is_file():
+                    rel_path = js_file.relative_to(js_dir)
+                    dest_path = docs_js_dir / rel_path
+                    dest_path.parent.mkdir(exist_ok=True, parents=True)
+                    shutil.copy2(js_file, dest_path)
+                    debug_print(f"Copied {js_file} to {dest_path}")
         
-        return True
-    except Exception as e:
-        print(f"Error creating FontAwesome script: {e}")
-        return False
-
-
-def copy_assets(assets_dir: Path, docs_dir: Path) -> bool:
-    """
-    Recursively copies all assets from the assets directory to the docs directory.
-    
-    This function creates a docs/assets directory and copies all subdirectories and files
-    from the .github/assets directory, preserving the directory structure.
-    It handles CSS, JavaScript, logos, fonts, favicon, and other required assets.
-    
-    Args:
-        assets_dir: Source directory containing assets (.github/assets)
-        docs_dir: Destination directory for documentation
+        # Copy images
+        img_dir = assets_dir / "images"
+        docs_img_dir = docs_assets_dir / "images"
         
-    Returns:
-        True if all assets were copied successfully; otherwise, False
-    """
-    try:
-        # Create the target assets directory
-        target_assets_dir = docs_dir / "assets"
-        target_assets_dir.mkdir(exist_ok=True)
+        if img_dir.exists():
+            docs_img_dir.mkdir(exist_ok=True, parents=True)
+            for img_file in img_dir.glob("**/*"):
+                if img_file.is_file():
+                    rel_path = img_file.relative_to(img_dir)
+                    dest_path = docs_img_dir / rel_path
+                    dest_path.parent.mkdir(exist_ok=True, parents=True)
+                    shutil.copy2(img_file, dest_path)
+                    debug_print(f"Copied {img_file} to {dest_path}")
+                    
+        # Copy logo files
+        logos_dir = assets_dir / "logos"
+        docs_logos_dir = docs_assets_dir / "logos"
         
-        # Copy all subdirectories and files
-        for item in assets_dir.glob('*'):
-            if item.is_dir():
-                # For directories, recursively copy the directory
-                target_dir = target_assets_dir / item.name
-                if target_dir.exists() and target_dir.is_dir():
-                    # If directory exists, remove it first to ensure clean copy
-                    shutil.rmtree(target_dir)
-                shutil.copytree(item, target_dir)
-                debug_print(f"Copied directory: {item.name} -> {target_dir}")
-            else:
-                # For files, copy the file
-                shutil.copy2(item, target_assets_dir / item.name)
-                debug_print(f"Copied file: {item.name} -> {target_assets_dir / item.name}")
+        if logos_dir.exists():
+            docs_logos_dir.mkdir(exist_ok=True, parents=True)
+            for logo_file in logos_dir.glob("**/*"):
+                if logo_file.is_file():
+                    rel_path = logo_file.relative_to(logos_dir)
+                    dest_path = docs_logos_dir / rel_path
+                    dest_path.parent.mkdir(exist_ok=True, parents=True)
+                    shutil.copy2(logo_file, dest_path)
+                    debug_print(f"Copied {logo_file} to {dest_path}")
         
-        # Copy js files that template relies on
-        js_dir = docs_dir / "js"
-        js_dir.mkdir(exist_ok=True)
-        
-        # Check if source js files exist
-        basilisk_js_dir = BASILISK_DIR / "src" / "darcsit" / "js"
-        if basilisk_js_dir.exists():
-            for js_file in ["jquery.min.js", "jquery-ui.packed.js", "plots.js"]:
-                js_path = basilisk_js_dir / js_file
-                if js_path.exists():
-                    shutil.copy2(js_path, js_dir / js_file)
-                    debug_print(f"Copied JS file: {js_file} -> {js_dir / js_file}")
+        # Copy custom CSS to root directory
+        if css_dir.exists():
+            custom_styles_path = css_dir / "custom_styles.css"
+            if custom_styles_path.exists():
+                # Also copy to root directory to prevent 404s
+                shutil.copy2(custom_styles_path, docs_dir / "custom_styles.css")
+                debug_print(f"Copied custom_styles.css to root directory")
         
         # Create favicon files as needed
         logos_dir = assets_dir / "logos"
         if logos_dir.exists():
             create_favicon_files(docs_dir, logos_dir)
-        
-        # Create FontAwesome loader script
-        create_fontawesome_script(docs_dir)
         
         return True
     except Exception as e:

@@ -77,12 +77,39 @@
     <script defer src="../assets/js/theme-toggle.js"></script>
 
     <script>
+        // Check if we're on localhost
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          // Load Font Awesome stylesheets with improved error handling and version extraction
+          function loadStylesheet(href) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = href;
+            link.crossOrigin = 'anonymous';
+            link.onerror = () => console.error(`Failed to load stylesheet: `);
+            document.head.appendChild(link);
+            return link;
+          }
+    
+          const FA_VERSION = '6.7.2';  // Extract version to a constant for easier updates
+          
+          loadStylesheet(`https://use.fontawesome.com/releases/v/css/solid.css`);
+          loadStylesheet(`https://use.fontawesome.com/releases/v/css/brands.css`);
+          loadStylesheet(`https://use.fontawesome.com/releases/v/css/fontawesome.css`);
+        } else {
+          // Use Kit for production with defer
+          var script = document.createElement('script');
+          script.src = 'https://kit.fontawesome.com/b1cfd9ca75.js';
+          script.crossOrigin = 'anonymous';
+          script.defer = true;
+          document.head.appendChild(script);
+        }
+    </script>
+
+    <script>
         document.documentElement.classList.remove('no-js');
         document.documentElement.classList.add('js');
     </script>
-
-    <!-- FontAwesome loader script -->
-    <script defer src="//assets/js/fontawesome-loader.js"></script>    <link href="custom_styles.css" rel="stylesheet" type="text/css" />
+    <link href="custom_styles.css" rel="stylesheet" type="text/css" />
     </head>
 <body id="top">
 
@@ -123,7 +150,7 @@
                         </div>
                     </li>
                     <li style="background: none;"><a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" style="background: none; padding: 0;" aria-label="Google Scholar Profile"><i class="ai ai-google-scholar" style="font-size: 1.75em;"></i></a></li>
-                    <li style="background: none;"><a href="https://github.com/comphy-lab" style="background: none; padding: 0;" aria-label="GitHub Organization"><i class="fa-brands fa-github" style="font-size: 1.75em; color: #333;"></i></a></li>
+                    <li style="background: none;"><a href="https://github.com/comphy-lab" style="background: none; padding: 0;" aria-label="GitHub Organization"><i class="fa-brands fa-github" style="font-size: 1.75em"></i></a></li>
                     <li><a href="https://comphy-lab.org/#about" class="smoothscroll">About</a></li>
                     <li><a href="https://comphy-lab.org/team/">Team</a></li>
                     <li><a href="https://comphy-lab.org/research">Research</a></li>
@@ -148,7 +175,7 @@
         <!-- Main content -->
         <main class="content">
             
-            <div class="page-content" style="padding: 0 1rem;">
+            <div class="page-content">
                 
                                 
                 

@@ -16,50 +16,6 @@
             preloader.style.display = 'none';
         });
     }
-
-    /* Load About Content - Only on main page
-    * -------------------------------------------------- */
-    const loadAboutContent = async () => {
-        // Only load aboutCoMPhy.md if we're on the main page
-        if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
-            try {
-                const response = await fetch('/aboutCoMPhy.md');
-                const text = await response.text();
-                const aboutContent = document.getElementById('about-content');
-                if (aboutContent) {
-                    aboutContent.innerHTML = marked.parse(text);
-                }
-            } catch (error) {
-                console.error('Error loading about content:', error);
-            }
-        }
-    };
-
-    /* Load News Content - Only on main page
-    * -------------------------------------------------- */
-    const loadNewsContent = async () => {
-        // Only load News.md if we're on the main page
-        if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
-            try {
-                const response = await fetch('/News.md');
-                const text = await response.text();
-                const newsContent = document.getElementById('news-content');
-                if (newsContent) {
-                    // Parse the markdown content
-                    newsContent.innerHTML = marked.parse(text);
-                    
-                    // Fix line breaks in list items after parsing
-                    const listItemParagraphs = newsContent.querySelectorAll('li p');
-                    listItemParagraphs.forEach(paragraph => {
-                        paragraph.style.display = 'inline';
-                        paragraph.style.margin = '0';
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading news content:', error);
-            }
-        }
-    };
     
     // No need for a resize event handler as the CSS will handle everything
 
