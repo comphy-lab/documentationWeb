@@ -7,36 +7,43 @@
     // Navigation commands
     {
       id: "home",
-      title: "Go to Home",
+      title: "Go to Home (this wiki)",
       handler: () => { window.location.href = '/'; },
+      section: "Navigation",
+      icon: '<i class="fa-solid fa-brain"></i>'
+    },
+    {
+      id: "comphy",
+      title: "Go to CoMPhy Home",
+      handler: () => { window.location.href = 'https://comphy-lab.org'; },
       section: "Navigation",
       icon: '<i class="fa-solid fa-home"></i>'
     },
     {
       id: "team",
       title: "Go to Team Page",
-      handler: () => { window.location.href = '/team/'; },
+      handler: () => { window.location.href = 'https://comphy-lab.org/team/'; },
       section: "Navigation",
       icon: '<i class="fa-solid fa-users"></i>'
     },
     {
       id: "research",
       title: "Go to Research Page",
-      handler: () => { window.location.href = '/research'; },
+      handler: () => { window.location.href = 'https://comphy-lab.org/research/'; },
       section: "Navigation",
       icon: '<i class="fa-solid fa-flask"></i>'
     },
     {
       id: "teaching",
       title: "Go to Teaching Page",
-      handler: () => { window.location.href = '/teaching'; },
+      handler: () => { window.location.href = 'https://comphy-lab.org/teaching/'; },
       section: "Navigation",
       icon: '<i class="fa-solid fa-chalkboard-teacher"></i>'
     },
     {
       id: "join",
       title: "Go to Join Us Page",
-      handler: () => { window.location.href = '/join'; },
+      handler: () => { window.location.href = 'https://comphy-lab.org/join/'; },
       section: "Navigation",
       icon: '<i class="fa-solid fa-handshake"></i>'
     },
@@ -109,13 +116,6 @@
     },
     
     // Help commands
-    {
-      id: "help",
-      title: "View Keyboard Shortcuts",
-      handler: () => { window.displayShortcutsHelp(); },
-      section: "Help",
-      icon: '<i class="fa-solid fa-question-circle"></i>'
-    },
     {
       id: "repository",
       title: "View Website Repository",
@@ -501,7 +501,7 @@
         {
           id: "contact-team",
           title: "Contact Team",
-          handler: () => { window.location.href = '/join'; },
+          handler: () => { window.location.href = 'https://comphy-lab.org/join/'; },
           section: "Page Actions",
           icon: '<i class="fa-solid fa-envelope"></i>'
         }
