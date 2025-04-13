@@ -237,13 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initCommandPalette();
   
   // Show appropriate shortcut text based on platform
-  const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-  document.querySelectorAll('.mac-theme-text').forEach(el => {
-    el.style.display = isMac ? 'inline' : 'none';
-  });
-  document.querySelectorAll('.default-theme-text').forEach(el => {
-    el.style.display = isMac ? 'none' : 'inline';
-  });
+  updatePlatformSpecificElements();
   
   // Set the appropriate shortcut hint based on platform
   const shortcutHint = document.getElementById('command-palette-shortcut');
