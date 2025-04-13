@@ -138,10 +138,10 @@ def validate_config() -> bool:
             return False
     
     # Process the template to ensure correct asset paths
+    # Process the template to ensure correct asset paths
     processed_template = process_template_for_assets(TEMPLATE_PATH)
-    if processed_template is None:
+    if not processed_template:
         return False
-    
     # Create a temporary template file with processed content
     temp_template_path = TEMPLATE_PATH.with_suffix('.temp.html')
     
