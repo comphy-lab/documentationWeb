@@ -22,6 +22,7 @@ main.content {
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  margin-bottom: 3rem; /* Add space between content and footer */
 }
 
 /* Documentation specific headings */
@@ -124,6 +125,9 @@ code, pre {
   background-color: #2d2d2d !important;
   color: #e0e0e0 !important;
 }
+
+/* Dark theme syntax highlighting overrides */
+[data-theme="dark"] .sourceCode .im { color: #7ccdfd !important; } /* Import/Include - light blue for dark mode */
 
 /* Copy button container for code blocks */
 .code-block-container {

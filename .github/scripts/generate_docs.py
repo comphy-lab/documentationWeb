@@ -1329,6 +1329,7 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
         '--template', str(TEMPLATE_PATH),
         '-V', f'wikititle={WIKI_TITLE}',
         '-V', f'base={BASE_URL}',
+        '-V', 'notitle=true',  # Add notitle=true to avoid duplicate h1 elements
         '-o', str(index_path)
     ]
 
