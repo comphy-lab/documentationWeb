@@ -1075,7 +1075,9 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
         # Calculate relative URL path for the page
         # Ensure URL starts with / and uses forward slashes
         page_url = (base_url + output_html_path.relative_to(repo_root / 'docs').as_posix()).replace('//', '/')
-        page_title = file_path.relative_to(repo_root).as_posix()  # Use relative path as title
+        
+        # Clean up the page title - remove leading/trailing dashes and spaces
+        page_title = file_path.relative_to(repo_root).as_posix().strip('- \t')
         
         # Run pandoc to convert to HTML
         pandoc_stdout = run_pandoc(
@@ -1330,6 +1332,7 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
         '-V', f'wikititle={WIKI_TITLE}',
         '-V', f'base={BASE_URL}',
         '-V', 'notitle=true',  # Add notitle=true to avoid duplicate h1 elements
+        '-V', f'pagetitle={WIKI_TITLE}',  # Set the page title to be the same as wiki title
         '-o', str(index_path)
     ]
 
