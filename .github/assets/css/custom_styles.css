@@ -128,6 +128,18 @@ code, pre {
 
 /* Dark theme syntax highlighting overrides */
 [data-theme="dark"] .sourceCode .im { color: #7ccdfd !important; } /* Import/Include - light blue for dark mode */
+[data-theme="dark"] .sourceCode .st { color: #ce9178 !important; } /* String - light orange/pink for dark mode */
+[data-theme="dark"] .sourceCode .kw { color: #569cd6 !important; } /* Keyword - blue for dark mode */
+[data-theme="dark"] .sourceCode .dt { color: #4ec9b0 !important; } /* DataType - teal for dark mode */
+[data-theme="dark"] .sourceCode .dv, 
+[data-theme="dark"] .sourceCode .bn, 
+[data-theme="dark"] .sourceCode .fl { color: #b5cea8 !important; } /* Numbers - light green for dark mode */
+[data-theme="dark"] .sourceCode .ch { color: #ce9178 !important; } /* Char - same as string */
+[data-theme="dark"] .sourceCode .co { color: #6a9955 !important; } /* Comment - green for dark mode */
+[data-theme="dark"] .sourceCode .fu { color: #dcdcaa !important; } /* Function - yellow for dark mode */
+[data-theme="dark"] .sourceCode .op { color: #d4d4d4 !important; } /* Operator - light grey for dark mode */
+[data-theme="dark"] .sourceCode .cf { color: #c586c0 !important; } /* ControlFlow - purple for dark mode */
+[data-theme="dark"] .sourceCode .pp { color: #c586c0 !important; } /* Preprocessor - purple for dark mode */
 
 /* Copy button container for code blocks */
 .code-block-container {
