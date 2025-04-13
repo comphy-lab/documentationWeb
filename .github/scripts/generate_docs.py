@@ -55,7 +55,7 @@ DARCSIT_DIR = BASILISK_DIR / 'src' / 'darcsit'
 TEMPLATE_PATH = REPO_ROOT / '.github' / 'assets' / 'custom_template.html'  # Use the modified local template
 LITERATE_C_SCRIPT = DARCSIT_DIR / 'literate-c'  # Path to the literate-c script
 BASE_URL = "/"  # Relative base URL for links within the site
-CSS_PATH = REPO_ROOT / '.github' / 'assets' / 'custom_styles.css'  # Path to custom CSS
+CSS_PATH = REPO_ROOT / '.github' / 'assets' / 'css' / 'custom_styles.css'  # Path to custom CSS
 
 # Read domain from CNAME file or use default
 try:
@@ -92,6 +92,30 @@ def extract_h1_from_readme(readme_path: Path) -> str:
 WIKI_TITLE = extract_h1_from_readme(README_PATH)
 
 
+def process_template_for_assets(template_path: Path) -> str:
+    """
+    Process the custom template to ensure correct asset paths.
+    
+    This function reads the template HTML file and ensures that all asset references
+    use the correct paths relative to the root. It converts paths like $base$/assets/...
+    to the correct format for the generated documentation.
+    
+    Args:
+        template_path: Path to the custom HTML template
+        
+    Returns:
+        The processed template content as a string
+    """
+    try:
+        with open(template_path, 'r', encoding='utf-8') as f:
+            template_content = f.read()
+        debug_print("Template processed for correct asset paths")
+        return template_content
+    except Exception as e:
+        print(f"Error processing template for assets: {e}")
+        return ""
+
+
 def validate_config() -> bool:
     """
     Validates that all required configuration paths exist.
@@ -99,6 +123,8 @@ def validate_config() -> bool:
     Checks if the necessary directories (BASILISK_DIR and DARCSIT_DIR) and files (TEMPLATE_PATH and the literate-c script)
     are present. If any path is missing, an error is printed and the function returns False; otherwise, it returns True.
     """
+    global TEMPLATE_PATH
+    
     essential_paths = [
         (BASILISK_DIR, "BASILISK_DIR"),
         (DARCSIT_DIR, "DARCSIT_DIR"),
@@ -110,6 +136,31 @@ def validate_config() -> bool:
         if not (path.is_dir() if name.endswith("DIR") else path.is_file()):
             print(f"Error: {name} not found at {path}")
             return False
+    
+    # Process the template to ensure correct asset paths
+    # Process the template to ensure correct asset paths
+    processed_template = process_template_for_assets(TEMPLATE_PATH)
+    if not processed_template:
+        return False
+    # Create a temporary template file with processed content
+    temp_template_path = TEMPLATE_PATH.with_suffix('.temp.html')
+    
+    # Clean up any existing temporary file
+    if temp_template_path.exists():
+        try:
+            temp_template_path.unlink()
+        except Exception as e:
+            print(f"Warning: Could not delete existing temporary template: {e}")
+    
+    try:
+        with open(temp_template_path, 'w', encoding='utf-8') as f:
+            f.write(processed_template)
+        # Replace the template path with the temporary one
+        TEMPLATE_PATH = temp_template_path
+    except Exception as e:
+        print(f"Error creating temporary template file: {e}")
+        return False
+    
     return True
 
 
@@ -992,7 +1043,9 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
         # Calculate relative URL path for the page
         # Ensure URL starts with / and uses forward slashes
         page_url = (base_url + output_html_path.relative_to(repo_root / 'docs').as_posix()).replace('//', '/')
-        page_title = file_path.relative_to(repo_root).as_posix()  # Use relative path as title
+        
+        # Clean up the page title - remove leading/trailing dashes and spaces
+        page_title = file_path.relative_to(repo_root).as_posix().strip('- \t')
         
         # Run pandoc to convert to HTML
         pandoc_stdout = run_pandoc(
@@ -1246,6 +1299,8 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
         '--template', str(TEMPLATE_PATH),
         '-V', f'wikititle={WIKI_TITLE}',
         '-V', f'base={BASE_URL}',
+        '-V', 'notitle=true',  # Add notitle=true to avoid duplicate h1 elements
+        '-V', f'pagetitle={WIKI_TITLE}',  # Set the page title to be the same as wiki title
         '-o', str(index_path)
     ]
 
@@ -1389,6 +1444,177 @@ def copy_css_file(css_path: Path, docs_dir: Path) -> bool:
         return False
 
 
+def create_favicon_files(docs_dir: Path, logos_dir: Path) -> bool:
+    """
+    Create necessary favicon files in the docs/assets/favicon directory.
+    
+    This function ensures all required favicon files exist in the destination
+    directory, creating them if needed from source logo files.
+    
+    Args:
+        docs_dir: The documentation root directory
+        logos_dir: Directory containing source logo files
+        
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        # Create favicon directory
+        favicon_dir = docs_dir / "assets" / "favicon"
+        favicon_dir.mkdir(exist_ok=True)
+        
+        # Copy any existing favicon files from .github/assets/favicon if it exists
+        source_favicon_dir = Path(logos_dir.parent, "favicon")
+        if source_favicon_dir.exists() and source_favicon_dir.is_dir():
+            for item in source_favicon_dir.glob('*'):
+                if item.is_file():
+                    shutil.copy2(item, favicon_dir / item.name)
+                    debug_print(f"Copied favicon file: {item.name}")
+        
+        # Create essential favicon files if they don't exist
+        favicon_files = [
+            "favicon.ico",
+            "favicon.svg",
+            "apple-touch-icon.png",
+            "favicon-96x96.png",
+            "site.webmanifest"
+        ]
+        
+        # Check if we have the required logo to create favicons
+        logo_file = None
+        for potential_logo in ["CoMPhy-Lab.svg", "CoMPhy-Lab-no-name.png", "logoBasilisk_TransparentBackground.png"]:
+            if (logos_dir / potential_logo).exists():
+                logo_file = logos_dir / potential_logo
+                break
+        
+        if logo_file:
+            # Create a basic site.webmanifest if it doesn't exist
+            webmanifest_path = favicon_dir / "site.webmanifest"
+            if not webmanifest_path.exists():
+                with open(webmanifest_path, 'w', encoding='utf-8') as f:
+                    f.write('''{
+  "name": "CoMPhy Lab",
+  "short_name": "CoMPhy",
+  "icons": [
+    {
+      "src": "/assets/favicon/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/favicon/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}''')
+                debug_print(f"Created site.webmanifest")
+        
+        return True
+    except Exception as e:
+        print(f"Error creating favicon files: {e}")
+        return False
+
+
+def copy_assets(assets_dir: Path, docs_dir: Path) -> bool:
+    """
+    Copy assets from source to destination.
+    
+    This function copies assets such as CSS, JavaScript, images, etc. from the
+    source assets directory to the destination docs directory.
+    
+    Args:
+        assets_dir: The source assets directory
+        docs_dir: The destination docs directory
+        
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        debug_print(f"Copying assets from {assets_dir} to {docs_dir}")
+        
+        # Create the assets directory in docs if it doesn't exist
+        docs_assets_dir = docs_dir / "assets"
+        docs_assets_dir.mkdir(exist_ok=True)
+        
+        # Copy CSS files
+        css_dir = assets_dir / "css"
+        docs_css_dir = docs_assets_dir / "css"
+        docs_css_dir.mkdir(exist_ok=True, parents=True)
+        
+        if css_dir.exists():
+            for css_file in css_dir.glob("**/*"):
+                if css_file.is_file():
+                    rel_path = css_file.relative_to(css_dir)
+                    dest_path = docs_css_dir / rel_path
+                    dest_path.parent.mkdir(exist_ok=True, parents=True)
+                    shutil.copy2(css_file, dest_path)
+                    debug_print(f"Copied {css_file} to {dest_path}")
+        
+        # Copy JS files
+        js_dir = assets_dir / "js"
+        docs_js_dir = docs_assets_dir / "js"
+        docs_js_dir.mkdir(exist_ok=True, parents=True)
+        
+        if js_dir.exists():
+            for js_file in js_dir.glob("**/*"):
+                if js_file.is_file():
+                    rel_path = js_file.relative_to(js_dir)
+                    dest_path = docs_js_dir / rel_path
+                    dest_path.parent.mkdir(exist_ok=True, parents=True)
+                    shutil.copy2(js_file, dest_path)
+                    debug_print(f"Copied {js_file} to {dest_path}")
+        
+        # Copy images
+        img_dir = assets_dir / "images"
+        docs_img_dir = docs_assets_dir / "images"
+        
+        if img_dir.exists():
+            docs_img_dir.mkdir(exist_ok=True, parents=True)
+            for img_file in img_dir.glob("**/*"):
+                if img_file.is_file():
+                    rel_path = img_file.relative_to(img_dir)
+                    dest_path = docs_img_dir / rel_path
+                    dest_path.parent.mkdir(exist_ok=True, parents=True)
+                    shutil.copy2(img_file, dest_path)
+                    debug_print(f"Copied {img_file} to {dest_path}")
+                    
+        # Copy logo files
+        logos_dir = assets_dir / "logos"
+        docs_logos_dir = docs_assets_dir / "logos"
+        
+        if logos_dir.exists():
+            docs_logos_dir.mkdir(exist_ok=True, parents=True)
+            for logo_file in logos_dir.glob("**/*"):
+                if logo_file.is_file():
+                    rel_path = logo_file.relative_to(logos_dir)
+                    dest_path = docs_logos_dir / rel_path
+                    dest_path.parent.mkdir(exist_ok=True, parents=True)
+                    shutil.copy2(logo_file, dest_path)
+                    debug_print(f"Copied {logo_file} to {dest_path}")
+        
+        # Copy custom CSS to root directory
+        if css_dir.exists():
+            custom_styles_path = css_dir / "custom_styles.css"
+            if custom_styles_path.exists():
+                # Also copy to root directory to prevent 404s
+                shutil.copy2(custom_styles_path, docs_dir / "custom_styles.css")
+                debug_print(f"Copied custom_styles.css to root directory")
+        
+        # Create favicon files as needed
+        logos_dir = assets_dir / "logos"
+        if logos_dir.exists():
+            create_favicon_files(docs_dir, logos_dir)
+        
+        return True
+    except Exception as e:
+        print(f"Error copying assets: {e}")
+        return False
+
+
 def main():
     """
     Generate HTML documentation for the project.
@@ -1403,71 +1629,83 @@ def main():
     if not validate_config():
         return
     
-    # Create docs directory if it doesn't exist
-    DOCS_DIR.mkdir(exist_ok=True)
-    
-    # Copy CSS file to docs directory
-    print("\nCopying CSS file...")
-    if not copy_css_file(CSS_PATH, DOCS_DIR):
-        print("Failed to copy CSS file.")
-        return
-    
-    # Find all source files
-    source_files = find_source_files(REPO_ROOT, SOURCE_DIRS)
-    if not source_files:
-        print("No source files found.")
-        return
-    
-    # Dictionary to store generated HTML files
-    generated_files = {}
-    
-    # Process each source file
-    for file_path in source_files:
-        # Determine output path
-        relative_path = file_path.relative_to(REPO_ROOT)
+    try:
+        # Create docs directory if it doesn't exist
+        DOCS_DIR.mkdir(exist_ok=True)
         
-        # Create output path with file extension preserved in the HTML filename
-        # For example: file.c -> file.c.html, file.h -> file.h.html, file.py -> file.py.html
-        output_html_path = DOCS_DIR / relative_path.with_suffix(relative_path.suffix + '.html')
+        # Copy all assets (CSS, JS, logos, fonts, etc.) to docs directory
+        print("\nCopying assets...")
+        assets_dir = REPO_ROOT / '.github' / 'assets'
+        if not copy_assets(assets_dir, DOCS_DIR):
+            print("Failed to copy assets.")
+            return
         
-        # Create output directory if it doesn't exist
-        output_html_path.parent.mkdir(parents=True, exist_ok=True)
+        # Find all source files
+        source_files = find_source_files(REPO_ROOT, SOURCE_DIRS)
+        if not source_files:
+            print("No source files found.")
+            return
         
-        # Process file and generate HTML
-        if process_file_with_page2html_logic(
-            file_path, 
-            output_html_path, 
-            REPO_ROOT, 
-            BASILISK_DIR, 
-            DARCSIT_DIR, 
-            TEMPLATE_PATH, 
-            BASE_URL, 
-            WIKI_TITLE, 
-            LITERATE_C_SCRIPT,
-            DOCS_DIR
-        ):
-            generated_files[file_path] = output_html_path
-    
-    # Generate index.html
-    print("\nGenerating index.html...")
-    if not generate_index(README_PATH, INDEX_PATH, generated_files, DOCS_DIR, REPO_ROOT):
-        print("Failed to generate index.html.")
-        return
-    
-    # Generate robots.txt
-    print("\nGenerating robots.txt...")
-    if not generate_robots_txt(DOCS_DIR):
-        print("Failed to generate robots.txt.")
-        return
-    
-    # Generate sitemap
-    print("\nGenerating sitemap...")
-    if not generate_sitemap(DOCS_DIR, generated_files):
-        print("Failed to generate sitemap.")
-        return
-    
-    print("\nDocumentation generation complete.")
-    print(f"Output generated in: {DOCS_DIR}")
+        # Dictionary to store generated HTML files
+        generated_files = {}
+        
+        # Process each source file
+        for file_path in source_files:
+            # Determine output path
+            relative_path = file_path.relative_to(REPO_ROOT)
+            
+            # Create output path with file extension preserved in the HTML filename
+            # For example: file.c -> file.c.html, file.h -> file.h.html, file.py -> file.py.html
+            output_html_path = DOCS_DIR / relative_path.with_suffix(relative_path.suffix + '.html')
+            
+            # Create output directory if it doesn't exist
+            output_html_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Process file and generate HTML
+            if process_file_with_page2html_logic(
+                file_path, 
+                output_html_path, 
+                REPO_ROOT, 
+                BASILISK_DIR, 
+                DARCSIT_DIR, 
+                TEMPLATE_PATH, 
+                BASE_URL, 
+                WIKI_TITLE, 
+                LITERATE_C_SCRIPT,
+                DOCS_DIR
+            ):
+                generated_files[file_path] = output_html_path
+        
+        # Generate index.html
+        print("\nGenerating index.html...")
+        if not generate_index(README_PATH, INDEX_PATH, generated_files, DOCS_DIR, REPO_ROOT):
+            print("Failed to generate index.html.")
+            return
+        
+        # Generate robots.txt
+        print("\nGenerating robots.txt...")
+        if not generate_robots_txt(DOCS_DIR):
+            print("Failed to generate robots.txt.")
+            return
+        
+        # Generate sitemap
+        print("\nGenerating sitemap...")
+        if not generate_sitemap(DOCS_DIR, generated_files):
+            print("Failed to generate sitemap.")
+            return
+        
+        print("\nDocumentation generation complete.")
+        print(f"Output generated in: {DOCS_DIR}")
+        
+    finally:
+        # Clean up temporary template file
+        temp_template_path = TEMPLATE_PATH.parent / (TEMPLATE_PATH.stem.replace('.temp', '') + '.temp.html')
+        if temp_template_path.exists():
+            try:
+                temp_template_path.unlink()
+                debug_print(f"Cleaned up temporary template file: {temp_template_path}")
+            except Exception as e:
+                print(f"Warning: Could not delete temporary template file: {e}")
 
 
 if __name__ == "__main__":

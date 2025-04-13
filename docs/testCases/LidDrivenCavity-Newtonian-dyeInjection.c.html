@@ -1,79 +1,203 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <!-- Basic SEO Meta Tags -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="base-url" content="..">
+    <title>testCases/LidDrivenCavity-Newtonian-dyeInjection.c | Test documentation: Lid driven cavity using dye injection</title>
+<a id="" href="#"></a>
+    <!-- Critical CSS for fastest paint -->
+    <style>
+        .s-intro__title {
+            visibility: visible;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .s-header {
+            visibility: visible;
+        }
+    </style>
+<a id="" href="#"></a>
+    <!-- Preload critical resources -->
+    <link rel="preload" href="../assets/js/main.js" as="script">
+    <link rel="preload" href="../assets/css/fontello/css/fontello.css" as="style">
+    <link rel="preload" href="../assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
+<a id="" href="#"></a>
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+    <link rel="apple-touch-icon-precomposed" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../assets/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon/favicon.svg">
+    <link rel="manifest" href="../assets/favicon/site.webmanifest">
+    <link rel="shortcut icon" href="../assets/favicon/favicon.ico">
+    <link rel="icon" href="../assets/favicon/favicon.ico">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
+<a id="" href="#"></a>
+    <!-- SEO Meta Tags -->
     <meta name="description" content="Computational fluid dynamics simulations using Basilisk C framework.">
-    <meta name="author" content="Computational Multiphase Physics Laboratory">
+    <meta name="author" content="CoMPhy Lab">
+    <meta name="robots" content="index, follow">
     <meta name="keywords" content="fluid dynamics, CFD, Basilisk, multiphase flow, computational physics">
 <a id="" href="#"></a>
-    <!-- Open Graph / Social Media Meta Tags -->
-    <meta property="og:title" content="Test documentation: Lid driven cavity using dye injection - testCases/LidDrivenCavity-Newtonian-dyeInjection.c">
-    <meta property="og:description" content="Computational fluid dynamics simulations using Basilisk C framework.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://test.comphy-lab.org/testCases/LidDrivenCavity-Newtonian-dyeInjection.c.html">
-    <meta property="og:image" content="https://test.comphy-lab.org/logo.png">
+    <!-- Font dependencies with font-display: swap -->
+    <style>
+        @font-face {
+            font-display: swap;
+            font-family: 'System Font';
+            src: local('system-ui');
+        }
+    </style>
+    <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css">
+        <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css">
+    </noscript>
 <a id="" href="#"></a>
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://test.comphy-lab.org/testCases/LidDrivenCavity-Newtonian-dyeInjection.c.html">
+    <!-- Site styles -->
+    <link rel="stylesheet" href="../assets/css/vendor.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/custom_styles.css">
+    <link rel="stylesheet" href="../assets/css/command-palette.css" media="print" onload="this.media='all'">
 <a id="" href="#"></a>
-            <title>Test documentation: Lid driven cavity using dye injection - testCases/LidDrivenCavity-Newtonian-dyeInjection.c</title>
-        <!-- <link href="css/custom.css" rel="stylesheet" media="screen, projection" type="text/css" /> -->
-    <!-- <link href="css/print.css" rel="stylesheet" media="print" type= "text/css" /> -->
-        <!--[if IE]><!-- <link href="css/ie.css" rel="stylesheet" media="screen, projection" type="text/css" /> --><![endif]-->
-    <!-- <link rel="stylesheet" href="css/basilisk.css"/> -->
-    <!-- Link to our custom styles is added by Pandoc via --css flag -->
-    <script src="//js/jquery.min.js" type="text/javascript"></script>
-    <script src="//js/jquery-ui.packed.js" type="text/javascript"></script>
-    <script src="//js/plots.js" type="text/javascript"></script>
-<link rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css"
-      integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j"
-      crossorigin="anonymous"/>
-<script defer
-	src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js"
-	integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ"
-	crossorigin="anonymous">
-</script>
-      <link href="../custom_styles.css" rel="stylesheet" type="text/css" />
+    <!-- KaTeX for Math -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js"></script>
+<a id="" href="#"></a>
+    <!-- jQuery and UI -->
+    <script src="../js/jquery.min.js"></script>
+    <script src="../js/jquery-ui.packed.js"></script>
+    <script src="../js/plots.js"></script>
+<a id="" href="#"></a>
+    <!-- Command palette -->
+    <script defer src="../assets/js/command-palette.js"></script>
+    <script defer src="../assets/js/command-data.js"></script>
+    <script defer src="../assets/js/main.js"></script>
+    <script defer src="../assets/js/theme-toggle.js"></script>
+<a id="" href="#"></a>
+    <script>
+        // Check if we're on localhost
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          // Load Font Awesome stylesheets with improved error handling and version extraction
+          function loadStylesheet(href) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = href;
+            link.crossOrigin = 'anonymous';
+            link.onerror = () => console.error(`Failed to load stylesheet: `);
+            document.head.appendChild(link);
+            return link;
+          }
+<a id="" href="#"></a>
+          const FA_VERSION = '6.4.2';  // Updating to a known stable version
+<a id="" href="#"></a>
+          loadStylesheet(`https://cdnjs.cloudflare.com/ajax/libs/font-awesome//css/solid.min.css`);
+          loadStylesheet(`https://cdnjs.cloudflare.com/ajax/libs/font-awesome//css/brands.min.css`);
+          loadStylesheet(`https://cdnjs.cloudflare.com/ajax/libs/font-awesome//css/fontawesome.min.css`);
+        } else {
+          // Use Kit for production with defer
+          var script = document.createElement('script');
+          script.src = 'https://kit.fontawesome.com/b1cfd9ca75.js';
+          script.crossOrigin = 'anonymous';
+          script.defer = true;
+          document.head.appendChild(script);
+        }
+    </script>
+<a id="" href="#"></a>
+    <script>
+        document.documentElement.classList.remove('no-js');
+        document.documentElement.classList.add('js');
+    </script>
+    <link href="../custom_styles.css" rel="stylesheet" type="text/css" />
     </head>
-  <body>
-    <div id="doc3" class="yui-t1">
-        <div id="yui-main">
-          <div id="maincol" class="yui-b">
-<!-- Removed userbox div 
-<div id="userbox">
-  <noscript>
-    <a href="//_login">Login</a>
-    <a href="//_logout">Logout</a>
-  </noscript>
-  &nbsp;
-  <a id="loginlink" class="login" href="//_login">Login / Get an account</a>
-  <a id="logoutlink" class="login" href="//_logout">Logout <span id="logged_in_user"></span></a>
-</div>
--->
-<div id="content">
-    <!-- Removed page title h1 
-    <h1 class="pageTitle"><a href="/testCases/LidDrivenCavity-Newtonian-dyeInjection.c.html">testCases/LidDrivenCavity-Newtonian-dyeInjection.c</a></h1>
--->
-  <ul class="messages" id="messages"></ul>
-  <div id="status"></div>
-    <h1
-id="lid-driven-cavity-flow-of-a-newtonian-fluid-with-dye-injection">Lid-Driven
-Cavity Flow of a Newtonian Fluid with dye Injection</h1>
-<p>This simulation models a lid-driven cavity flow for a Newtonian fluid
-with constant viscosity and includes dye injection for flow
-visualization. This extends the classic benchmark case with a passive
-tracer to visualize flow patterns.</p>
-<h2 id="parameters">Parameters</h2>
-<ul>
-<li>Reynolds number: Re = ρUL/μ = 1/μ (with ρ=1, U=1, L=1)</li>
-<li>We use μ = 1.0 by default (Re = 1)</li>
-<li>dye injection at t=0.05 in the upper center of the cavity</li>
-</ul>
-<div class="code-block-container"><div class="code-block-container"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><span class="pp">#include </span><a href="http://basilisk.fr/src/navier-stokes/centered.h" title="Link to Basilisk source for navier-stokes/centered.h"><span class="im">"navier-stokes/centered.h"</span></a></span>
+<body id="top">
+<a id="" href="#"></a>
+    <div id="preloader">
+        <div id="loader"></div>
+    </div>
+<a id="" href="#"></a>
+    <div id="page" class="s-pagewrap">
+        <header class="s-header">
+            <div class="s-header__logo">
+                <a class="logo" href="../">
+                    <img src="../assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
+                </a>
+            </div>
+            <a class="s-header__menu-toggle" href="#0">
+                <span class="s-header__menu-text">Menu</span>
+                <span class="s-header__menu-icon"></span>
+            </a>
+            <nav class="s-header__nav">
+                <a href="#0" class="s-header__nav-close-btn"><span>Close</span></a>
+                <ul class="s-header__nav-list">
+                    <li style="background: none;">
+                        <div class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light theme">
+                            <svg class="theme-toggle-icon moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                            <svg class="theme-toggle-icon sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                            </svg>
+                        </div>
+                    </li>
+                    <li style="background: none;"><a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" style="background: none; padding: 0;" aria-label="Google Scholar Profile"><i class="ai ai-google-scholar" style="font-size: 1.75em;"></i></a></li>
+                    <li style="background: none;"><a href="https://github.com/comphy-lab" style="background: none; padding: 0;" aria-label="GitHub Organization"><i class="fa-brands fa-github" style="font-size: 1.75em"></i></a></li>
+                    <li><a href="https://comphy-lab.org/#about" class="smoothscroll">About</a></li>
+                    <li><a href="https://comphy-lab.org/team/">Team</a></li>
+                    <li><a href="https://comphy-lab.org/research">Research</a></li>
+                    <li><a href="https://comphy-lab.org/teaching">Teaching</a></li>
+                    <li><a href="https://comphy-lab.org/join">Join Us</a></li>
+                    <li><a href="https://blogs.comphy-lab.org/">Blog</a></li>
+                    <li style="background: none;"><a href="https://bsky.app/profile/comphy-lab.org" style="background: none; padding: 0;" aria-label="Bluesky Profile"><i class="fa-brands fa-bluesky" style="font-size: 1.75em; color: #0085ff;"></i></a></li>
+                    <!-- Command Palette Button (Styled like search) -->
+                    <li class="command-palette-button">
+                        <div class="command-wrapper">
+                            <button class="command-k-style-btn" id="command-palette-btn" aria-label="Open command palette">
+                                <span class="default-theme-text">ctrl K</span>
+                                <span class="mac-theme-text">⌘ K</span>
+                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+<a id="" href="#"></a>
+        <!-- Main content -->
+        <main class="content">
+<a id="" href="#"></a>
+            <div class="page-content">
+<a id="" href="#"></a>
+                                <h1 class="page-title">testCases/LidDrivenCavity-Newtonian-dyeInjection.c</h1>
+<a id="" href="#"></a>
+<a id="" href="#"></a>
+                <h1
+                id="lid-driven-cavity-flow-of-a-newtonian-fluid-with-dye-injection">Lid-Driven
+                Cavity Flow of a Newtonian Fluid with dye Injection</h1>
+                <p>This simulation models a lid-driven cavity flow for a
+                Newtonian fluid with constant viscosity and includes dye
+                injection for flow visualization. This extends the
+                classic benchmark case with a passive tracer to
+                visualize flow patterns.</p>
+                <h2 id="parameters">Parameters</h2>
+                <ul>
+                <li>Reynolds number: Re = ρUL/μ = 1/μ (with ρ=1, U=1,
+                L=1)</li>
+                <li>We use μ = 1.0 by default (Re = 1)</li>
+                <li>dye injection at t=0.05 in the upper center of the
+                cavity</li>
+                </ul>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><span class="pp">#include </span><a href="http://basilisk.fr/src/navier-stokes/centered.h" title="Link to Basilisk source for navier-stokes/centered.h"><span class="im">"navier-stokes/centered.h"</span></a></span>
 <span id="cb1-2"><span class="pp">#include </span><a href="../src-local/dye-injection.h.html" title="Link to local documentation for dye-injection.h"><span class="im">"dye-injection.h"</span></a></span>
 <span id="cb1-3"></span>
 <span id="cb1-4"><span class="co">// Constants</span></span>
@@ -89,8 +213,9 @@ tracer to visualize flow patterns.</p>
 <span id="cb1-14"><span class="co">// Scalar field for convergence check</span></span>
 <span id="cb1-15">scalar un<span class="op">[];</span>  <span class="co">// Previous x-velocity</span></span>
 <span id="cb1-16"><span class="dt">const</span> face vector muv<span class="op">[]</span> <span class="op">=</span> <span class="op">{</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">};</span>      <span class="co">// Face-centered viscosity field</span></span></code></pre></div></div>
-<h2 id="boundary-conditions">Boundary Conditions</h2>
-<div class="code-block-container"><div class="code-block-container"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><span class="co">// Top moving wall (lid)</span></span>
+                <h2 id="boundary-conditions">Boundary Conditions</h2>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><span class="co">// Top moving wall (lid)</span></span>
 <span id="cb2-2">u<span class="op">.</span>t<span class="op">[</span>top<span class="op">]</span> <span class="op">=</span> dirichlet<span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
 <span id="cb2-3"><span class="co">// Other no-slip boundaries</span></span>
 <span id="cb2-4">u<span class="op">.</span>t<span class="op">[</span>bottom<span class="op">]</span> <span class="op">=</span> dirichlet<span class="op">(</span><span class="dv">0</span><span class="op">);</span></span>
@@ -100,8 +225,9 @@ tracer to visualize flow patterns.</p>
 <span id="cb2-8"><span class="co">// uf.n[right]  = 0;</span></span>
 <span id="cb2-9"><span class="co">// uf.n[top]    = 0;</span></span>
 <span id="cb2-10"><span class="co">// uf.n[bottom] = 0;</span></span></code></pre></div></div>
-<h2 id="initialization">Initialization</h2>
-<div class="code-block-container"><div class="code-block-container"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1">event init <span class="op">(</span>t <span class="op">=</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+                <h2 id="initialization">Initialization</h2>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb3-1">event init <span class="op">(</span>t <span class="op">=</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span id="cb3-2">  <span class="co">// Set constant viscosity for Newtonian fluid</span></span>
 <span id="cb3-3">  mu <span class="op">=</span> muv<span class="op">;</span></span>
 <span id="cb3-4"></span>
@@ -114,46 +240,59 @@ tracer to visualize flow patterns.</p>
 <span id="cb3-11"></span>
 <span id="cb3-12">  dump <span class="op">(</span>file <span class="op">=</span> <span class="st">&quot;start&quot;</span><span class="op">);</span></span>
 <span id="cb3-13"><span class="op">}</span></span></code></pre></div></div>
-<h2 id="snapshot-generation">Snapshot Generation</h2>
-<p>Save snapshots at regular intervals for flow visualization</p>
-<div class="code-block-container"><div class="code-block-container"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1">event writingFiles <span class="op">(</span>t<span class="op">=</span><span class="fl">0.</span><span class="op">;</span> t <span class="op">+=</span> tsnap<span class="op">;</span> t <span class="op">&lt;</span> tmax<span class="op">+</span>tsnap<span class="op">)</span> <span class="op">{</span></span>
+                <h2 id="snapshot-generation">Snapshot Generation</h2>
+                <p>Save snapshots at regular intervals for flow
+                visualization</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb4-1">event writingFiles <span class="op">(</span>t<span class="op">=</span><span class="fl">0.</span><span class="op">;</span> t <span class="op">+=</span> tsnap<span class="op">;</span> t <span class="op">&lt;</span> tmax<span class="op">+</span>tsnap<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb4-2">  <span class="dt">char</span> filename<span class="op">[</span><span class="dv">100</span><span class="op">];</span></span>
 <span id="cb4-3">  sprintf<span class="op">(</span>filename<span class="op">,</span> <span class="st">&quot;intermediate/snapshot-</span><span class="sc">%5.4f</span><span class="st">&quot;</span><span class="op">,</span> t<span class="op">);</span></span>
 <span id="cb4-4">  dump<span class="op">(</span>file<span class="op">=</span>filename<span class="op">);</span></span>
 <span id="cb4-5"><span class="op">}</span></span></code></pre></div></div>
-<h3 id="logs-simulation-progress-and-convergence-details.">Logs
-simulation progress and convergence details.</h3>
-<p>On each iteration, this event updates the stored x-velocity field for
-convergence checking and logs the current iteration number, timestep
-(dt), simulation time (t), and the convergence error (difference between
-the current and previous x-velocity fields) to the log file.</p>
-<div class="code-block-container"><div class="code-block-container"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1">event logfile <span class="op">(</span>i<span class="op">++;</span> i <span class="op">&lt;=</span> imax<span class="op">)</span> <span class="op">{</span></span>
+                <h3
+                id="logs-simulation-progress-and-convergence-details.">Logs
+                simulation progress and convergence details.</h3>
+                <p>On each iteration, this event updates the stored
+                x-velocity field for convergence checking and logs the
+                current iteration number, timestep (dt), simulation time
+                (t), and the convergence error (difference between the
+                current and previous x-velocity fields) to the log
+                file.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb5-1">event logfile <span class="op">(</span>i<span class="op">++;</span> i <span class="op">&lt;=</span> imax<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb5-2">  foreach<span class="op">()</span> <span class="op">{</span></span>
 <span id="cb5-3">    un<span class="op">[]</span> <span class="op">=</span> u<span class="op">.</span>x<span class="op">[];</span></span>
 <span id="cb5-4">  <span class="op">}</span></span>
 <span id="cb5-5">  fprintf<span class="op">(</span>ferr<span class="op">,</span> <span class="st">&quot;i = </span><span class="sc">%d</span><span class="st">: dt = </span><span class="sc">%g</span><span class="st">, t = </span><span class="sc">%g</span><span class="st">, err = </span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span> i<span class="op">,</span> dt<span class="op">,</span> t<span class="op">,</span> change<span class="op">(</span>u<span class="op">.</span>x<span class="op">,</span> un<span class="op">));</span></span>
 <span id="cb5-6"><span class="op">}</span></span></code></pre></div></div>
-<h3 id="outputs-final-simulation-results-for-visualization.">Outputs
-final simulation results for visualization.</h3>
-<p>When the simulation reaches the end time, this event outputs the
-final state of simulation fields to a file named “results” for
-post-processing and visualization.</p>
-<div class="code-block-container"><div class="code-block-container"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1">event end <span class="op">(</span>t <span class="op">=</span> end<span class="op">)</span> <span class="op">{</span></span>
+                <h3
+                id="outputs-final-simulation-results-for-visualization.">Outputs
+                final simulation results for visualization.</h3>
+                <p>When the simulation reaches the end time, this event
+                outputs the final state of simulation fields to a file
+                named “results” for post-processing and
+                visualization.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb6-1">event end <span class="op">(</span>t <span class="op">=</span> end<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb6-2">  <span class="co">// Output fields in a format suitable for visualization</span></span>
 <span id="cb6-3">  dump<span class="op">(</span>file<span class="op">=</span><span class="st">&quot;results&quot;</span><span class="op">);</span></span>
 <span id="cb6-4"><span class="op">}</span></span></code></pre></div></div>
-<h3
-id="entry-point-for-the-lid-driven-cavity-flow-simulation-with-dye-injection.">Entry
-point for the lid-driven cavity flow simulation with dye injection.</h3>
-<p>Initializes the computational grid and simulation parameters (domain
-size, timestep, tolerance, and CFL condition), and stores the initial
-velocity field for convergence monitoring. Configures dye injection
-settings by defining the injection time and location, creates a
-directory for saving intermediate simulation snapshots, and triggers the
-simulation run.</p>
-<p><span class="citation" data-cites="return">@return</span> int Exit
-status code (typically 0 upon successful completion).</p>
-<div class="code-block-container"><div class="code-block-container"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
+                <h3
+                id="entry-point-for-the-lid-driven-cavity-flow-simulation-with-dye-injection.">Entry
+                point for the lid-driven cavity flow simulation with dye
+                injection.</h3>
+                <p>Initializes the computational grid and simulation
+                parameters (domain size, timestep, tolerance, and CFL
+                condition), and stores the initial velocity field for
+                convergence monitoring. Configures dye injection
+                settings by defining the injection time and location,
+                creates a directory for saving intermediate simulation
+                snapshots, and triggers the simulation run.</p>
+                <p><span class="citation"
+                data-cites="return">@return</span> int Exit status code
+                (typically 0 upon successful completion).</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
 <span id="cb7-2">  <span class="co">// Initialize grid and parameters</span></span>
 <span id="cb7-3">  init_grid<span class="op">(</span><span class="dv">1</span><span class="op">&lt;&lt;</span>LEVEL<span class="op">);</span></span>
 <span id="cb7-4">  L0 <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
@@ -181,19 +320,73 @@ status code (typically 0 upon successful completion).</p>
 <span id="cb7-26">  run<span class="op">();</span></span>
 <span id="cb7-27"></span>
 <span id="cb7-28"><span class="op">}</span></span></code></pre></div></div>
-</div>
-          </div>
+            </div>
+        </main>
+<a id="" href="#"></a>
+        <footer class="site-footer">
+            <div class="footer-left">
+                <a href="http://basilisk.fr/sandbox/vatsal/" target="_blank">
+                    <img src="../assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
+                </a>
+                <a href="https://pof.tnw.utwente.nl/" target="_blank">
+                    <img src="../assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
+                </a>
+                <a href="https://www.utwente.nl/" target="_blank">
+                    <img src="../assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
+                </a>
+                <a href="https://www.vatsalsanjay.com/" target="_blank">
+                    <img src="../assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
+                </a>
+            </div>
+            <div class="footer-center">
+                <p class="copyright-text">
+                    &copy; Copyright<br>
+                    CoMPhy Lab 2025
+                </p>
+            </div>
+            <div class="footer-right">
+                <a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" target="_blank" aria-label="Google Scholar Profile">
+                    <i class="ai ai-google-scholar" style="font-size: 2.5em; color: white;"></i>
+                </a>
+                <a href="https://github.com/comphy-lab" target="_blank" aria-label="GitHub Organization">
+                    <i class="fa-brands fa-github" style="font-size: 2.5em; color: white;"></i>
+                </a>
+                <a href="https://www.youtube.com/@CoMPhyLab" target="_blank" aria-label="YouTube Channel">
+                    <i class="fa-brands fa-youtube" style="font-size: 2.5em; color: white;"></i>
+                </a>
+                <a href="https://x.com/VatsalSanjay" target="_blank" aria-label="X (Twitter) Profile">
+                    <i class="fa-brands fa-x-twitter" style="font-size: 2.5em; color: white;"></i>
+                </a>
+                <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" aria-label="Bluesky Profile">
+                    <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
+                </a>
+                <a href="https://github.com/comphy-lab/comphy-lab.github.io" class="edit-link" aria-label="Edit this page on GitHub">
+                    <i class="fa-brands fa-github"></i> Edit this page
+                </a>
+            </div>
+            <div class="ss-go-top">
+                <a class="smoothscroll" title="Back to Top" href="#top" aria-label="Back to top of page">
+                    <i class="fa-solid fa-arrow-up"></i>
+                </a>
+            </div> <!-- end ss-go-top -->
+        </footer>
+    </div>  
+<a id="" href="#"></a>
+    <!-- Command Palette -->
+    <div id="simple-command-palette" class="simple-command-palette" style="display: none;">
+        <div class="simple-command-palette-backdrop"></div>
+        <div class="simple-command-palette-modal">
+            <input type="text" id="command-palette-input" placeholder="Type a command..." autocomplete="off">
+            <div id="command-palette-results" class="command-palette-results"></div>
+            <div class="command-palette-footer">
+                <span class="command-palette-footer-item"><kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+                <span class="command-palette-footer-item"><kbd>enter</kbd> to select</span>
+                <span class="command-palette-footer-item"><kbd>esc</kbd> to close</span>
+            </div>
         </div>
-        <div id="sidebar" class="yui-b first">
-<!-- Removed logo div 
-<div id="logo">
-  <a href="//" alt="site logo" title="Go to top page"><img src="//img/logo.png" /></a>
-</div>
--->
-                                      </div>
     </div>
 <a id="" href="#"></a>
-      
+
     <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function() {
         // Add copy button to each code block container
@@ -245,10 +438,4 @@ status code (typically 0 upon successful completion).</p>
     });
     </script>
         </body>
-<!-- Removed footer div 
-  <div id="footer">
-    inspired by <a href="http://github.com/jgm/gitit/tree/master/">gitit</a>,
-    powered by <a href="/src/darcsit/README">darcsit</a>
-  </div>
--->
 </html>
