@@ -33,7 +33,7 @@
 
 ## Overview
 
-This directory contains all the necessary files and scripts for generating and deploying the CoMPhy Lab documentation website. The website is generated from source code files in the repository and is deployed at [comphy-lab.org](https://comphy-lab.org).
+This directory contains all the necessary files and scripts for generating and deploying the documentation of codes develped by CoMPhy Lab. The website is generated from source code files in the repository and is deployed at [comphy-lab.org/repositoryName](https://comphy-lab.org/repositoryName).
 
 ## Website Generation Process
 
