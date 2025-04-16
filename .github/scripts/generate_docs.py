@@ -45,7 +45,7 @@ def extract_seo_metadata(file_path: Path, file_content: str) -> Dict[str, str]:
 # Configuration
 # Assume the script is in .github/scripts, REPO_ROOT is the parent of .github
 REPO_ROOT = Path(__file__).parent.parent.parent
-SOURCE_DIRS = ['src-local', 'testCases', 'postProcess']  # Directories within REPO_ROOT to scan
+SOURCE_DIRS = ['src-local', 'simulationCases', 'postProcess']  # Directories within REPO_ROOT to scan
 DOCS_DIR = REPO_ROOT / 'docs'
 README_PATH = REPO_ROOT / 'README.md'
 INDEX_PATH = DOCS_DIR / 'index.html'
@@ -1253,7 +1253,7 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
     # Add documentation links section
     links_markdown = "\n\n## Generated Documentation\n\n"
     
-    # Group links by top-level directory (src-local, testCases, etc.)
+    # Group links by top-level directory (src-local, simulationCases, etc.)
     grouped_links = {}
     for original_path, html_path in generated_files.items():
         relative_html_path = html_path.relative_to(docs_dir)

@@ -191,7 +191,7 @@
                 <h2 id="documentation">Documentation</h2>
                 <p>The full documentation for this project is available
                 at <a
-                href="https://test.comphy-lab.org">test.comphy-lab.org</a>.
+                href="https://comphy-lab.org/documentationWeb/">comphy-lab.org/documentationWeb/</a>.
                 This website contains detailed explanations of the code,
                 examples, and usage instructions.</p>
                 <h2 id="overview">Overview</h2>
@@ -204,11 +204,12 @@
                 <ul>
                 <li><strong>basilisk/src/</strong> - Core Basilisk CFD
                 library (reference only, do not modify)</li>
-                <li><strong><a href="testCases">testCases/</a></strong>
-                - Test cases for simulation
+                <li><strong><a
+                href="simulationCases">simulationCases/</a></strong> -
+                Test cases for simulation
                 <ul>
                 <li><strong><a
-                href="testCases/LidDrivenCavity-Newtonian-dyeInjection.c.html">LidDrivenCavity-Newtonian-dyeInjection.c</a></strong>
+                href="simulationCases/LidDrivenCavity-Newtonian-dyeInjection.c.html">LidDrivenCavity-Newtonian-dyeInjection.c</a></strong>
                 - Lid-driven cavity with dye injection</li>
                 </ul></li>
                 <li><strong><a href="src-local">src-local/</a></strong>
@@ -270,12 +271,14 @@
                 C utility that extracts and processes numerical data
                 from simulation output files</li>
                 </ul>
-                <h3 id="testcases-directory">testCases/ Directory</h3>
-                <p>The <a href="testCases"><code>testCases/</code></a>
+                <h3 id="simulationcases-directory">simulationCases/
+                Directory</h3>
+                <p>The <a
+                href="simulationCases"><code>simulationCases/</code></a>
                 directory contains simulation configurations:</p>
                 <ul>
                 <li><a
-                href="testCases/LidDrivenCavity-Newtonian-dyeInjection.c.html">LidDrivenCavity-Newtonian-dyeInjection.c</a>:
+                href="simulationCases/LidDrivenCavity-Newtonian-dyeInjection.c.html">LidDrivenCavity-Newtonian-dyeInjection.c</a>:
                 Main simulation case that implements:
                 <ul>
                 <li>Classical lid-driven cavity flow for a Newtonian
@@ -310,7 +313,7 @@
                 BASILISK environment variable is set.</p></li>
                 <li><p>Compile a test case to verify the setup:</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> testCases</span>
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> simulationCases</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> test_name.tst</span></code></pre></div></div></li>
                 </ol>
                 <h2 id="usage">Usage</h2>
@@ -328,7 +331,7 @@
                 class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./executable</span></span></code></pre></div></div>
                 <p>Execute a specific test case:</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> testCases <span class="kw">&amp;&amp;</span> <span class="fu">make</span> test_name.tst</span></code></pre></div></div>
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> simulationCases <span class="kw">&amp;&amp;</span> <span class="fu">make</span> test_name.tst</span></code></pre></div></div>
                 <h3 id="post-processing">Post-Processing</h3>
                 <p>The <code>postProcess/</code> directory contains
                 tools for post-processing simulation results:</p>
@@ -545,15 +548,15 @@
                 <li><a
                 href="postProcess/getData-LidDriven.c.html">postProcess/getData-LidDriven.c</a></li>
                 </ul>
+                <h3 id="simulationcases">simulationCases</h3>
+                <ul>
+                <li><a
+                href="simulationCases/LidDrivenCavity-Newtonian-dyeInjection.c.html">simulationCases/LidDrivenCavity-Newtonian-dyeInjection.c</a></li>
+                </ul>
                 <h3 id="src-local">src-local</h3>
                 <ul>
                 <li><a
                 href="src-local/dye-injection.h.html">src-local/dye-injection.h</a></li>
-                </ul>
-                <h3 id="testcases">testCases</h3>
-                <ul>
-                <li><a
-                href="testCases/LidDrivenCavity-Newtonian-dyeInjection.c.html">testCases/LidDrivenCavity-Newtonian-dyeInjection.c</a></li>
                 </ul>
             </div>
         </main>
