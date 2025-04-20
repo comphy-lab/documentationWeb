@@ -1571,20 +1571,58 @@ def copy_assets(assets_dir: Path, docs_dir: Path) -> bool:
                     shutil.copy2(css_file, dest_path)
                     debug_print(f"Copied {css_file} to {dest_path}")
         
-        # Copy JS files
+        # Copy JS files (including search_db.json, command-palette.js, command-data.js)
         js_dir = assets_dir / "js"
-        docs_js_dir = docs_assets_dir / "js"
-        docs_js_dir.mkdir(exist_ok=True, parents=True)
-        
+        docs_assets_js_dir = docs_assets_dir / "js"
+        docs_assets_js_dir.mkdir(exist_ok=True, parents=True)
+
+        # Copy all JS files from .github/assets/js to docs/assets/js
         if js_dir.exists():
             for js_file in js_dir.glob("**/*"):
                 if js_file.is_file():
                     rel_path = js_file.relative_to(js_dir)
-                    dest_path = docs_js_dir / rel_path
+                    dest_path = docs_assets_js_dir / rel_path
                     dest_path.parent.mkdir(exist_ok=True, parents=True)
-                    shutil.copy2(js_file, dest_path)
-                    debug_print(f"Copied {js_file} to {dest_path}")
-        
+                    try:
+                        shutil.copy2(js_file, dest_path)
+                        debug_print(f"Copied {js_file} to {dest_path}")
+                    except Exception as e:
+                        print(f"Error copying JS file {js_file} to {dest_path}: {e}")
+        else:
+            debug_print(f"JS assets directory {js_dir} does not exist. Skipping JS copy.")
+
+        # Copy any legacy JS files from docs/js into docs/assets/js, then remove docs/js
+        legacy_js_dir = docs_dir / "js"
+        if legacy_js_dir.exists() and legacy_js_dir.is_dir():
+            for legacy_file in legacy_js_dir.glob("*"):
+                if legacy_file.is_file():
+                    try:
+                        shutil.copy2(legacy_file, docs_assets_js_dir / legacy_file.name)
+                        debug_print(f"Migrated legacy JS file {legacy_file} to assets/js/")
+                    except Exception as e:
+                        print(f"Error migrating legacy JS file {legacy_file}: {e}")
+            try:
+                for legacy_file in legacy_js_dir.glob("*"):
+                    legacy_file.unlink()
+                legacy_js_dir.rmdir()
+                debug_print("Removed legacy docs/js directory.")
+            except Exception as e:
+                print(f"Error removing legacy docs/js directory: {e}")
+
+        # Ensure required JS files are present
+        required_js = ["search_db.json", "command-palette.js", "command-data.js"]
+        for req_file in required_js:
+            src_file = js_dir / req_file
+            dest_file = docs_assets_js_dir / req_file
+            if not dest_file.exists() and src_file.exists():
+                try:
+                    shutil.copy2(src_file, dest_file)
+                    debug_print(f"Explicitly copied {src_file} to {dest_file}")
+                except Exception as e:
+                    print(f"Error copying required JS file {src_file} to {dest_file}: {e}")
+            elif not src_file.exists():
+                print(f"Warning: Required JS asset {src_file} not found.")
+
         # Copy images
         img_dir = assets_dir / "images"
         docs_img_dir = docs_assets_dir / "images"
@@ -1636,12 +1674,25 @@ def copy_assets(assets_dir: Path, docs_dir: Path) -> bool:
 
         # Copy Basilisk static JS files (jQuery, plots)
         static_js_dir = DARCSIT_DIR / "static" / "js"
-        docs_js_dir = docs_dir / "js"
-        docs_js_dir.mkdir(exist_ok=True, parents=True)
+        docs_assets_js_dir = docs_dir / "assets" / "js"
+        docs_assets_js_dir.mkdir(exist_ok=True, parents=True)
         if static_js_dir.exists() and static_js_dir.is_dir():
             for js_file in static_js_dir.glob("*.js"):
-                shutil.copy2(js_file, docs_js_dir / js_file.name)
-                debug_print(f"Copied static js file: {js_file.name}")
+                try:
+                    shutil.copy2(js_file, docs_assets_js_dir / js_file.name)
+                    debug_print(f"Copied static js file: {js_file.name} to assets/js/")
+                except Exception as e:
+                    print(f"Error copying static js file {js_file} to assets/js/: {e}")
+        # Remove any old docs/js directory if it exists
+        legacy_js_dir = docs_dir / "js"
+        if legacy_js_dir.exists() and legacy_js_dir.is_dir():
+            try:
+                for legacy_file in legacy_js_dir.glob("*"):
+                    legacy_file.unlink()
+                legacy_js_dir.rmdir()
+                debug_print("Removed legacy docs/js directory.")
+            except Exception as e:
+                print(f"Error removing legacy docs/js directory: {e}")
 
         return True
     except Exception as e:
