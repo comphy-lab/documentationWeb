@@ -1608,7 +1608,24 @@ def copy_assets(assets_dir: Path, docs_dir: Path) -> bool:
         logos_dir = assets_dir / "logos"
         if logos_dir.exists():
             create_favicon_files(docs_dir, logos_dir)
-        
+
+        # Copy favicon files to root directory to prevent 404s
+        favicon_source_dir = assets_dir / "favicon"
+        if favicon_source_dir.exists() and favicon_source_dir.is_dir():
+            for fav_file in favicon_source_dir.glob("*"):
+                if fav_file.is_file():
+                    shutil.copy2(fav_file, docs_dir / fav_file.name)
+                    debug_print(f"Copied {fav_file.name} to root directory")
+
+        # Copy Basilisk static JS files (jQuery, plots)
+        static_js_dir = DARCSIT_DIR / "static" / "js"
+        docs_js_dir = docs_dir / "js"
+        docs_js_dir.mkdir(exist_ok=True, parents=True)
+        if static_js_dir.exists() and static_js_dir.is_dir():
+            for js_file in static_js_dir.glob("*.js"):
+                shutil.copy2(js_file, docs_js_dir / js_file.name)
+                debug_print(f"Copied static js file: {js_file.name}")
+
         return True
     except Exception as e:
         print(f"Error copying assets: {e}")
@@ -1710,4 +1727,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-        
