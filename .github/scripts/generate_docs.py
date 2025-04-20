@@ -1342,6 +1342,10 @@ def generate_directory_index(directory_name: str, directory_path: Path, generate
                                           "Documentation for the CoMPhy-Lab computational fluid dynamics framework.")
         html_content = html_content.replace("$if(keywords)$$keywords$$else$fluid dynamics, CFD, Basilisk, multiphase flow, computational physics$endif$", 
                                           f"fluid dynamics, CFD, Basilisk, {directory_name}, documentation")
+        # Ensure repo name is shown in folder index pages
+        html_content = html_content.replace(
+            "$if(reponame)$$reponame$$else$Documentation$endif$", REPO_NAME
+        )
         
         # Handle $if(tabs)$ ... $tabs$ ... $endif$ section
         if "$if(tabs)$" in html_content:
@@ -1950,6 +1954,19 @@ def main():
         
         print("\nDocumentation generation complete.")
         print(f"Output generated in: {DOCS_DIR}")
+
+        # Copy required JS files from basilisk source to docs/js for website
+        js_src_dir = BASILISK_DIR / 'src' / 'darcsit' / 'static' / 'js'
+        js_dest_dir = DOCS_DIR / 'js'
+        js_dest_dir.mkdir(parents=True, exist_ok=True)
+        for js_file in ['jquery.min.js', 'jquery-ui.packed.js', 'plots.js']:
+            src = js_src_dir / js_file
+            dst = js_dest_dir / js_file
+            if src.exists():
+                shutil.copy2(src, dst)
+                print(f"Copied {src} to {dst}")
+            else:
+                print(f"Warning: {src} not found, could not copy to {dst}")
         
     finally:
         # Clean up temporary template file
