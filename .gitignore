@@ -91,9 +91,7 @@ deps/
 **/*.s.d.d.d.d
 **/Video
 **/*.mp4
-**/*.json
 **/*.bv
-# **/*.png
 
 # some ai files
 **/CLAUDE.md

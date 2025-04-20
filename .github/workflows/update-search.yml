@@ -27,17 +27,17 @@ jobs:
     - name: Clone comphy-search repository
       run: |
         git clone https://github.com/comphy-lab/comphy-search.git
-        mkdir -p assets/js
+        mkdir -p docs/assets/js
     
     - name: Copy search database
       run: |
-        cp comphy-search/search_db.json assets/js/search_db.json
+        cp comphy-search/search_db.json docs/assets/js/search_db.json
     
     - name: Commit and push changes directly (bypassing branch protection)
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add assets/js/search_db.json
+        git add docs/assets/js/search_db.json
         if git diff --staged --quiet; then
           echo "No changes to commit"
         else
