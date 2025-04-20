@@ -219,6 +219,74 @@ code, pre {
   background-color: #404040;
 }
 
+/* CSS for the logo and documentation button container */
+.s-header__logo {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Documentation button styling - matches nav bar links */
+.documentation-button {
+  display: flex;
+  align-items: center;
+  background: var(--nav-item-bg, rgba(255, 255, 255, 0.25));
+  color: var(--nav-item-color, #1a1a1a);
+  padding: 0.8rem 1.6rem;
+  height: 40px;
+  border-radius: 5px;
+  margin-left: 1rem;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.6rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 10px var(--nav-item-shadow, rgba(0, 0, 0, 0.1));
+}
+
+.documentation-button i {
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.documentation-button span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.documentation-button:hover {
+  background: var(--nav-item-hover-bg, rgba(255, 255, 255, 0.35));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--nav-item-hover-shadow, rgba(0, 0, 0, 0.4));
+}
+
+[data-theme="dark"] .documentation-button {
+  background: var(--nav-item-bg, rgba(30, 30, 30, 0.6));
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .documentation-button span {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .documentation-button:hover {
+  background: var(--nav-item-hover-bg, rgba(40, 40, 40, 0.8));
+}
+
+/* Make sure all header nav links are white in dark mode */
+[data-theme="dark"] .s-header__nav-list a,
+[data-theme="dark"] .s-header__nav-list a:visited,
+[data-theme="dark"] .s-header__nav-list a:link {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .s-header__nav-list a:hover {
+  color: #ffffff !important;
+  background: var(--nav-item-hover-bg, rgba(40, 40, 40, 0.8));
+}
+
 /* Repository Structure Sitemap Styling */
 .repository-structure {
   font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;

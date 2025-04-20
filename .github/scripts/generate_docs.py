@@ -57,6 +57,9 @@ LITERATE_C_SCRIPT = DARCSIT_DIR / 'literate-c'  # Path to the literate-c script
 BASE_URL = "/"  # Relative base URL for links within the site
 CSS_PATH = REPO_ROOT / '.github' / 'assets' / 'css' / 'custom_styles.css'  # Path to custom CSS
 
+# Get repository name from directory
+REPO_NAME = REPO_ROOT.name
+
 # Read domain from CNAME file or use default
 try:
     CNAME_PATH = REPO_ROOT / 'CNAME'
@@ -109,6 +112,10 @@ def process_template_for_assets(template_path: Path) -> str:
     try:
         with open(template_path, 'r', encoding='utf-8') as f:
             template_content = f.read()
+            
+        # Print repository name for debugging
+        print(f"Repository name: {REPO_NAME}")
+        
         debug_print("Template processed for correct asset paths")
         return template_content
     except Exception as e:
@@ -449,6 +456,7 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
         '-V', f'wikititle={wiki_title}',
         '-V', f'pageUrl={page_url}',
         '-V', f'pagetitle={page_title}',
+        '-V', f'reponame={REPO_NAME}',
         # Add SEO metadata variables
         '-V', f'description={seo_metadata.get("description", "")}',
         '-V', f'keywords={seo_metadata.get("keywords", "")}',
@@ -1048,6 +1056,12 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
         page_title = file_path.relative_to(repo_root).as_posix().strip('- \t')
         
         # Run pandoc to convert to HTML
+        # Add debugging information
+        print(f"Processing file: {file_path.name} with REPO_NAME={REPO_NAME}")
+        
+        # Pass SEO metadata with repository name
+        seo_metadata = extract_seo_metadata(file_path, pandoc_input_content)
+        
         pandoc_stdout = run_pandoc(
             pandoc_input_content, 
             output_html_path, 
@@ -1056,7 +1070,7 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
             wiki_title, 
             page_url, 
             page_title,
-            extract_seo_metadata(file_path, pandoc_input_content)
+            seo_metadata
         )
         
         # Determine file type for post-processing
@@ -1290,24 +1304,27 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
     final_readme_content = readme_content + links_markdown
 
     # Convert the combined README + links to HTML for index.html
-    cmd = [
+    print(f"Generating index.html with REPO_NAME={REPO_NAME}")
+    
+    pandoc_cmd = [
         'pandoc',
-        '-f', 'markdown+tex_math_dollars+raw_html',  # Add raw_html to preserve HTML
+        '-f', 'markdown+tex_math_dollars+raw_html',  # Use markdown with math extensions
         '-t', 'html5',
         '--standalone',
-        '--mathjax',
+        '--mathjax',  # Add support for LaTeX math
         '--template', str(TEMPLATE_PATH),
         '-V', f'wikititle={WIKI_TITLE}',
-        '-V', f'base={BASE_URL}',
-        '-V', 'notitle=true',  # Add notitle=true to avoid duplicate h1 elements
-        '-V', f'pagetitle={WIKI_TITLE}',  # Set the page title to be the same as wiki title
+        '-V', f'reponame={REPO_NAME}',  # Add repository name
+        '-V', 'base=/',
+        '-V', 'notitle=true',  # Don't add an automatic title from filename
+        '-V', f'pagetitle={WIKI_TITLE}',
         '-o', str(index_path)
     ]
 
     debug_print(f"  [Debug Index] Target path: {index_path}")
-    debug_print(f"  [Debug Index] Command: {' '.join(cmd)}")
+    debug_print(f"  [Debug Index] Command: {' '.join(pandoc_cmd)}")
 
-    process = subprocess.run(cmd, input=final_readme_content, text=True, capture_output=True, check=False)
+    process = subprocess.run(pandoc_cmd, input=final_readme_content, text=True, capture_output=True, check=False)
 
     # Print results unconditionally for debugging
     debug_print(f"  [Debug Index] Pandoc Return Code: {process.returncode}")
