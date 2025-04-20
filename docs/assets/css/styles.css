@@ -1076,11 +1076,11 @@ img.youtube-stats-dark {
   justify-content: flex-end;
   margin-right: 0;
   gap: 2rem;
-  padding-right: 100px;
+  padding-right: 0;
 }
 
 .footer-right a:last-child {
-  margin-right: 0px;
+  margin-right: -15px;
 }
 
 /* Animations */
@@ -1103,7 +1103,7 @@ img.youtube-stats-dark {
   }
 
   .footer-right {
-    padding-right: 90px;
+    padding-right: 0px;
   }
 }
 
@@ -2190,7 +2190,7 @@ img.youtube-stats-dark {
     justify-content: flex-end;
     margin-right: 0;
     gap: 2rem;
-    padding-right: 100px;
+    padding-right: 0;
 }
 
 .footer-right a:last-child {
@@ -2275,7 +2275,7 @@ img.youtube-stats-dark {
     }
 
     .footer-right {
-        padding-right: 90px;
+        padding-right: 0px;
     }
 }
 
@@ -2293,7 +2293,7 @@ img.youtube-stats-dark {
     }
     
     .footer-right {
-        padding-right: 80px;
+        padding-right: 0px;
     }
     
     .footer-right i {
