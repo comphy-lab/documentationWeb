@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'assets/js/search_db.json'
+      - 'docs/assets/js/search_db.json'
 
 permissions:
   contents: read
@@ -12,32 +12,23 @@ permissions:
   id-token: write
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.2'
-        bundler-cache: true
-    
-    - name: Build site and search database
-      run: |
-        chmod +x scripts/build.sh
-        ./scripts/build.sh
-    
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-
   deploy:
-    needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'docs'  # The directory containing your built HTML files
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
