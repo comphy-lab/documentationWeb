@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="base-url" content="..">
-    <title>postProcess | Test documentation: Lid driven cavity using dye injection | Test documentation: Lid driven cavity using dye injection</title>
+    <title>Post-Processing Tools | Documentation</title>
 
     <!-- Critical CSS for fastest paint -->
     <style>
@@ -18,27 +18,27 @@
     </style>
 
     <!-- Preload critical resources -->
-    <link rel="preload" href="../assets/js/main.js" as="script">
-    <link rel="preload" href="../assets/css/fontello/css/fontello.css" as="style">
-    <link rel="preload" href="../assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
+    <link rel="preload" href="../../assets/js/main.js" as="script">
+    <link rel="preload" href="../../assets/css/fontello/css/fontello.css" as="style">
+    <link rel="preload" href="../../assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
 
     <!-- Favicon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
-    <link rel="apple-touch-icon-precomposed" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="../assets/favicon/favicon-96x96.png">
-    <link rel="icon" type="image/svg+xml" href="../assets/favicon/favicon.svg">
-    <link rel="manifest" href="../assets/favicon/site.webmanifest">
-    <link rel="shortcut icon" href="../assets/favicon/favicon.ico">
-    <link rel="icon" href="../assets/favicon/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="../../assets/favicon/apple-touch-icon.png">
+    <link rel="apple-touch-icon-precomposed" sizes="180x180" href="../../assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../../assets/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/svg+xml" href="../../assets/favicon/favicon.svg">
+    <link rel="manifest" href="../../assets/favicon/site.webmanifest">
+    <link rel="shortcut icon" href="../../assets/favicon/favicon.ico">
+    <link rel="icon" href="../../assets/favicon/favicon.ico">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Computational fluid dynamics simulations using Basilisk C framework.">
+    <meta name="description" content="Documentation for the CoMPhy-Lab computational fluid dynamics framework.">
     <meta name="author" content="CoMPhy Lab">
     <meta name="robots" content="index, follow">
-    <meta name="keywords" content="fluid dynamics, CFD, Basilisk, multiphase flow, computational physics">
+    <meta name="keywords" content="fluid dynamics, CFD, Basilisk, postProcess, documentation">
 
     <!-- Font dependencies with font-display: swap -->
     <style>
@@ -48,18 +48,18 @@
             src: local('system-ui');
         }
     </style>
-    <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../../assets/css/fontello/css/fontello.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../../assets/css/academicons-1.7.0/css/academicons.min.css" media="print" onload="this.media='all'">
     <noscript>
-        <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css">
-        <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css">
+        <link rel="stylesheet" href="../../assets/css/fontello/css/fontello.css">
+        <link rel="stylesheet" href="../../assets/css/academicons-1.7.0/css/academicons.min.css">
     </noscript>
 
     <!-- Site styles -->
-    <link rel="stylesheet" href="../assets/css/vendor.css">
-    <link rel="stylesheet" href="../assets/css/styles.css">
-    <link rel="stylesheet" href="../assets/css/custom_styles.css">
-    <link rel="stylesheet" href="../assets/css/command-palette.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../../assets/css/vendor.css">
+    <link rel="stylesheet" href="../../assets/css/styles.css">
+    <link rel="stylesheet" href="../../assets/css/custom_styles.css">
+    <link rel="stylesheet" href="../../assets/css/command-palette.css" media="print" onload="this.media='all'">
     
     <!-- KaTeX for Math -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css">
@@ -74,10 +74,10 @@
     <script src="../js/plots.js"></script>
     
     <!-- Command palette -->
-    <script defer src="../assets/js/command-palette.js"></script>
-    <script defer src="../assets/js/command-data.js"></script>
-    <script defer src="../assets/js/main.js"></script>
-    <script defer src="../assets/js/theme-toggle.js"></script>
+    <script defer src="../../assets/js/command-palette.js"></script>
+    <script defer src="../../assets/js/command-data.js"></script>
+    <script defer src="../../assets/js/main.js"></script>
+    <script defer src="../../assets/js/theme-toggle.js"></script>
 
     <script>
         // Check if we're on localhost
@@ -88,16 +88,8 @@
             link.rel = 'stylesheet';
             link.href = href;
             link.crossOrigin = 'anonymous';
-            link.onerror = () => console.error(`Failed to load stylesheet: `);
-            document.head.appendChild(link);
-            return link;
-          }
-    
-          const FA_VERSION = '6.4.2';  // Updating to a known stable version
-          
-          loadStylesheet(`https://cdnjs.cloudflare.com/ajax/libs/font-awesome//css/solid.min.css`);
-          loadStylesheet(`https://cdnjs.cloudflare.com/ajax/libs/font-awesome//css/brands.min.css`);
-          loadStylesheet(`https://cdnjs.cloudflare.com/ajax/libs/font-awesome//css/fontawesome.min.css`);
+            link.onerror = () => console.error(`Failed to load stylesheet: {FA_VERSION}/css/solid.min.css`);
+          loadStylesheet(`https://cdnjs.cloudflare.com/ajax/libs/font-awesome/{FA_VERSION}/css/fontawesome.min.css`);
         } else {
           // Use Kit for production with defer
           var script = document.createElement('script');
@@ -123,11 +115,11 @@
         <header class="s-header">
             <div class="s-header__logo">
                 <a class="logo" href="/">
-                    <img src="../assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
+                    <img src="../../assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
                 </a>
-                <a class="documentation-button" href="/documentationWeb">
+                <a class="documentation-button" href="/Documentation">
                     <i class="fa-solid fa-book-open"></i>
-                    <span>documentationWeb</span>
+                    <span>Documentation</span>
                 </a>
             </div>
             <a class="s-header__menu-toggle" href="#0">
@@ -181,40 +173,41 @@
         <!-- Main content -->
         <main class="content">
             
+
             <div class="page-content">
-                
-                                <h1 class="page-title">postProcess | Test documentation: Lid driven cavity using dye injection</h1>
-                
-                
-                <div class="folder-landing">
-                <h2>
-                postProcess
-                </h2>
-                <ul>
-                <li>
-                <a href="2-LidDrivenCavity-Newtonian-dyeInjection.py.html">2-LidDrivenCavity-Newtonian-dyeInjection.py.html</a>
-                </li>
-                <li>
-                <a href="getData-LidDriven.c.html">getData-LidDriven.c.html</a>
-                </li>
-                </ul>
-                </div>
-            </div>
+<h1>Post-Processing Tools</h1>
+
+<div class="documentation-section">
+<table class="documentation-files">
+<tr>
+  <td class="file-icon"><span class="file-python"></span></td>
+  <td class="file-link" style="padding-right: 2em;"><a href="2-LidDrivenCavity-Newtonian-dyeInjection.py.html" class="doc-link-button">2-LidDrivenCavity-Newtonian-dyeInjection.py</a></td>
+  <td class="file-desc">Computational fluid dynamics simulations using Basilisk C framework.</td>
+</tr>
+<tr>
+  <td class="file-icon"><span class="file-c"></span></td>
+  <td class="file-link" style="padding-right: 2em;"><a href="getData-LidDriven.c.html" class="doc-link-button">getData-LidDriven.c</a></td>
+  <td class="file-desc">Computational fluid dynamics simulations using Basilisk C framework.</td>
+</tr>
+</table>
+</div>
+
+</div>
         </main>
 
         <footer class="site-footer">
             <div class="footer-left">
                 <a href="http://basilisk.fr/sandbox/vatsal/" target="_blank">
-                    <img src="../assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
+                    <img src="../../assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
                 </a>
                 <a href="https://pof.tnw.utwente.nl/" target="_blank">
-                    <img src="../assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
+                    <img src="../../assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
                 </a>
                 <a href="https://www.utwente.nl/" target="_blank">
-                    <img src="../assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
+                    <img src="../../assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
                 </a>
                 <a href="https://www.vatsalsanjay.com/" target="_blank">
-                    <img src="../assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
+                    <img src="../../assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
                 </a>
             </div>
             <div class="footer-center">

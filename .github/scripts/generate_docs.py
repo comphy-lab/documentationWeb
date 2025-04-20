@@ -1234,6 +1234,166 @@ def convert_directory_tree_to_html(readme_content: str) -> str:
     return modified_content
 
 
+def generate_directory_index(directory_name: str, directory_path: Path, generated_files: Dict[Path, Path], docs_dir: Path, repo_root: Path) -> bool:
+    """
+    Generates an aesthetically pleasing index.html page for a directory in SOURCE_DIRS.
+    
+    This function creates a landing page for each source directory that displays all HTML files
+    using the project's custom template and a clean, subtle table of contents.
+    
+    Args:
+        directory_name: Name of the directory (e.g., 'src-local', 'postProcess')
+        directory_path: Path to the directory in docs_dir where index.html will be created
+        generated_files: Dictionary mapping source file paths to their corresponding generated HTML paths
+        docs_dir: Directory where documentation files are stored
+        repo_root: Root directory of the repository used for computing relative paths
+    
+    Returns:
+        True if index.html was generated successfully, otherwise False
+    """
+    try:
+        index_path = directory_path / "index.html"
+        
+        # Filter files in this directory
+        directory_files = {}
+        for original_path, html_path in generated_files.items():
+            if html_path.parent == directory_path and html_path.name != "index.html":
+                relative_original_path = original_path.relative_to(repo_root)
+                relative_html_path = html_path.relative_to(directory_path)  # Path relative to the directory
+                directory_files[html_path] = {
+                    "html_path": relative_html_path,
+                    "original_path": relative_original_path,
+                    "name": get_title_from_filename(relative_original_path.name),
+                    "description": "",  # We'll try to extract descriptions below
+                }
+                
+        # Try to extract descriptions for each file
+        for html_path, info in directory_files.items():
+            try:
+                # Read the HTML file to extract description from meta tags
+                html_content = html_path.read_text(encoding='utf-8')
+                desc_match = re.search(r'<meta\s+name="description"\s+content="([^"]+)"', html_content)
+                if desc_match:
+                    description = desc_match.group(1).strip()
+                    # Limit description length for UI
+                    if len(description) > 120:
+                        description = description[:117] + "..."
+                    info["description"] = description
+            except Exception as e:
+                print(f"Error extracting description from {html_path}: {e}")
+        
+        # Read the template file
+        template_path = TEMPLATE_PATH
+        # Use the custom template for the index pages
+        try:
+            with open(template_path, 'r', encoding='utf-8') as f:
+                template_content = f.read()
+        except Exception as e:
+            print(f"Error reading template: {e}")
+            return False
+            
+        # Format the directory name for the title
+        formatted_dir_name = directory_name.capitalize()
+        if formatted_dir_name == 'Src-local':
+            formatted_dir_name = "Local Source Files"
+        elif formatted_dir_name == 'Simulationcases':
+            formatted_dir_name = "Simulation Cases"  
+        elif formatted_dir_name == 'Postprocess':
+            formatted_dir_name = "Post-Processing Tools"
+            
+        # Create the TOC content
+        toc_html = f"<h1>{formatted_dir_name}</h1>\n\n"
+        
+        if directory_files:
+            toc_html += '<div class="documentation-section">\n'
+            toc_html += '<table class="documentation-files">\n'
+            
+            # Sort files by name
+            sorted_files = sorted(directory_files.values(), key=lambda x: x['original_path'].name.lower())
+            
+            for info in sorted_files:
+                file_extension = info["original_path"].suffix.lower()
+                file_type_class = "file-other"
+                
+                # Assign CSS classes based on file extension
+                if file_extension in [".c", ".h"]:
+                    file_type_class = "file-c"  # C/header files
+                elif file_extension in [".py"]:
+                    file_type_class = "file-python"  # Python files
+                    
+                file_name = info["original_path"].name
+                
+                toc_html += f'<tr>\n'
+                toc_html += f'  <td class="file-icon"><span class="{file_type_class}"></span></td>\n'
+                toc_html += f'  <td class="file-link" style="padding-right: 2em;"><a href="{info["html_path"]}" class="doc-link-button">{file_name}</a></td>\n'
+                toc_html += f'  <td class="file-desc">{info["description"]}</td>\n'
+                toc_html += f'</tr>\n'
+                
+            toc_html += '</table>\n'
+            toc_html += '</div>\n'
+        else:
+            toc_html += '<p>No documentation files found in this directory.</p>\n'
+            
+        # Replace template variables
+        page_title = f"{formatted_dir_name} | Documentation"
+        html_content = template_content
+        html_content = html_content.replace("$if(pagetitle)$$pagetitle$$endif$$if(wikititle)$ | $wikititle$$endif$", page_title)
+        html_content = html_content.replace("$if(description)$$description$$else$Computational fluid dynamics simulations using Basilisk C framework.$endif$", 
+                                          "Documentation for the CoMPhy-Lab computational fluid dynamics framework.")
+        html_content = html_content.replace("$if(keywords)$$keywords$$else$fluid dynamics, CFD, Basilisk, multiphase flow, computational physics$endif$", 
+                                          f"fluid dynamics, CFD, Basilisk, {directory_name}, documentation")
+        
+        # Handle $if(tabs)$ ... $tabs$ ... $endif$ section
+        if "$if(tabs)$" in html_content:
+            html_content = re.sub(r'\$if\(tabs\)\$(.*?)\$tabs\$(.*?)\$endif\$', '', html_content, flags=re.DOTALL)
+        
+        # Replace main content
+        content_replacement = toc_html
+        html_content = re.sub(r'<div class="page-content">\s*.*?\$body\$.*?</div>', 
+                              f'<div class="page-content">\n{content_replacement}\n</div>', 
+                              html_content, flags=re.DOTALL)
+        
+        # Remove any remaining template variables
+        html_content = re.sub(r'\$[^\$]+\$', '', html_content)
+        
+        # Fix relative paths for assets
+        html_content = html_content.replace("../assets/", "../../assets/")
+        
+        # Write the HTML file
+        index_path.write_text(html_content, encoding='utf-8')
+        print(f"Generated index page for directory: {directory_name} using custom template")
+        return True
+        
+    except Exception as e:
+        print(f"Error generating directory index for {directory_name}: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
+def get_title_from_filename(filename: str) -> str:
+    """
+    Converts a filename to a more readable title by:
+    1. Removing file extensions
+    2. Replacing dashes and underscores with spaces
+    3. Capitalizing words
+    
+    Args:
+        filename: The filename to convert
+        
+    Returns:
+        A more readable title
+    """
+    # Remove any file extensions (including multiple extensions like .c.html)
+    name = filename.split('.')[0]
+    
+    # Replace dashes and underscores with spaces
+    name = name.replace('-', ' ').replace('_', ' ')
+    
+    # Title case the result (capitalize each word)
+    return ' '.join(word.capitalize() for word in name.split())
+
+
 def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Path, Path], 
                   docs_dir: Path, repo_root: Path) -> bool:
     """
@@ -1761,8 +1921,17 @@ def main():
             ):
                 generated_files[file_path] = output_html_path
         
-        # Generate index.html
-        print("\nGenerating index.html...")
+        # Generate nice folder index pages for each directory in SOURCE_DIRS
+        print("\nGenerating folder index pages...")
+        for source_dir in SOURCE_DIRS:
+            # Create path to the docs directory for this source dir
+            docs_source_dir = DOCS_DIR / source_dir
+            if docs_source_dir.exists():
+                if not generate_directory_index(source_dir, docs_source_dir, generated_files, DOCS_DIR, REPO_ROOT):
+                    print(f"Failed to generate index page for {source_dir}.")
+        
+        # Generate main index.html
+        print("\nGenerating main index.html...")
         if not generate_index(README_PATH, INDEX_PATH, generated_files, DOCS_DIR, REPO_ROOT):
             print("Failed to generate index.html.")
             return

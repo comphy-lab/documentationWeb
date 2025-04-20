@@ -1,5 +1,67 @@
 /* Custom styles for documentation */
 
+/* Modern button style for file links */
+.doc-link-button {
+  display: block;
+  width: 100%;
+  background: #fff;
+  color: #1a237e;
+  font-size: 1.18rem;
+  font-weight: 600;
+  padding: 1.1em 1.6em 1.1em 3.6em;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(26, 47, 126, 0.06), 0 1.5px 6px rgba(26, 115, 232, 0.04);
+  text-align: left;
+  text-decoration: none;
+  transition: box-shadow 0.2s, border-color 0.2s, background 0.2s, color 0.2s;
+  position: relative;
+  cursor: pointer;
+  margin-top: 0.5em;
+}
+.doc-link-button::before {
+  content: "\1F4C4"; /* 📄 document icon */
+  position: absolute;
+  left: 1.1em;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.4em;
+  opacity: 0.83;
+}
+.doc-link-button:hover, .doc-link-button:focus {
+  background: #f3f6fb;
+  border-color: #b6c5e1;
+  color: #174ea6;
+  box-shadow: 0 4px 18px rgba(26, 115, 232, 0.13);
+  outline: none;
+}
+.doc-link-button:active {
+  background: #e3eaf6;
+  border-color: #90a4c8;
+  color: #0d47a1;
+}
+[data-theme="dark"] .doc-link-button {
+  background: #1b2330;
+  color: #e3eafe;
+  border: 1.5px solid #334155;
+  box-shadow: 0 2px 10px rgba(45, 114, 233, 0.10);
+}
+[data-theme="dark"] .doc-link-button::before {
+  color: #7ea6ff;
+}
+[data-theme="dark"] .doc-link-button:hover, [data-theme="dark"] .doc-link-button:focus {
+  background: #232d3f;
+  border-color: #4462a6;
+  color: #a5c7ff;
+  box-shadow: 0 4px 18px rgba(45, 114, 233, 0.22);
+}
+[data-theme="dark"] .doc-link-button:active {
+  background: #16203a;
+  border-color: #233a6a;
+  color: #7ea6ff;
+}
+
+
 /* Override body styles while preserving core layout */
 body {
   font-family: var(--font-primary);
