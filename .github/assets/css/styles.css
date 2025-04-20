@@ -2206,7 +2206,7 @@ img.youtube-stats-dark {
 }
 
 .edit-link {
-    color: white;
+    color: white !important;
     text-decoration: none;
     font-size: 0.9em;
     padding: 0.5em 1em;
@@ -2224,8 +2224,15 @@ img.youtube-stats-dark {
     transform: translateY(-1px);
 }
 
+/* Specific dark theme override to ensure white text on edit links */
+[data-theme="dark"] .edit-link,
+[data-theme="dark"] .edit-link:visited,
+[data-theme="dark"] .edit-link:link {
+    color: white !important;
+}
+
 .edit-link i {
-    font-size: 1.1em;
+    font-size: 1.25em;
 }
 
 .footer-logo {

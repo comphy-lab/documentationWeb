@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="base-url" content="..">
     <title>Test documentation: Lid driven cavity using dye injection | Test documentation: Lid driven cavity using dye injection</title>
+    
+    <script>
+        // Dynamic base path resolution for consistent asset loading
+        window.basePath = (function() {
+            // Check if we're on localhost for correct path resolution
+            var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            // Use a consistent path structure that works for both local and GitHub deployments
+            return isLocal ? '..' : '..';
+        })();
+    </script>
 
     <!-- Critical CSS for fastest paint -->
     <style>
@@ -18,9 +28,25 @@
     </style>
 
     <!-- Preload critical resources -->
+    <script>
+        // Helper function to create dynamic asset paths
+        function assetPath(path) {
+            return window.basePath + path;
+        }
+    </script>
     <link rel="preload" href="../assets/js/main.js" as="script">
     <link rel="preload" href="../assets/css/fontello/css/fontello.css" as="style">
     <link rel="preload" href="../assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
+    
+    <!-- Base stylesheet with proper path resolution for local deployment -->
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/custom_styles.css">
+    <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css">
+    <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css">
+    <link rel="stylesheet" href="../assets/css/command-palette.css">
+    <!-- Font Awesome for icons on all documentation pages -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
@@ -69,9 +95,9 @@
     <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
     
     <!-- jQuery and UI -->
-    <script src="../js/jquery.min.js"></script>
-    <script src="../js/jquery-ui.packed.js"></script>
-    <script src="../js/plots.js"></script>
+    <script src="../assets/js/jquery.min.js"></script>
+    <script src="../assets/js/jquery-ui.packed.js"></script>
+    <script src="../assets/js/plots.js"></script>
     
     <!-- Command palette -->
     <script defer src="../assets/js/command-palette.js"></script>
@@ -80,24 +106,30 @@
     <script defer src="../assets/js/theme-toggle.js"></script>
 
     <script>
+        // Load Font Awesome with proper environment detection and fallbacks
+        function loadStylesheet(href) {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = href;
+          link.crossOrigin = 'anonymous';
+          link.onerror = (e) => {
+            console.error(`Failed to load stylesheet: `);
+            console.log('Trying alternative Font Awesome source...');
+          };
+          document.head.appendChild(link);
+          return link;
+        }
+        
         // Check if we're on localhost
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-          // Load Font Awesome stylesheets with improved error handling and version extraction
-          function loadStylesheet(href) {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = href;
-            link.crossOrigin = 'anonymous';
-            link.onerror = () => console.error(`Failed to load stylesheet: `);
-            document.head.appendChild(link);
-            return link;
-          }
-    
-          const FA_VERSION = '6.4.2';  // Updating to a known stable version
+          // Use hardcoded version numbers for reliable loading
           
-          loadStylesheet(`https://cdnjs.cloudflare.com/ajax/libs/font-awesome//css/solid.min.css`);
-          loadStylesheet(`https://cdnjs.cloudflare.com/ajax/libs/font-awesome//css/brands.min.css`);
-          loadStylesheet(`https://cdnjs.cloudflare.com/ajax/libs/font-awesome//css/fontawesome.min.css`);
+          // Load Font Awesome using multiple CDNs to maximize reliability for local development
+          loadStylesheet('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css');
+          // Backup CDN if the first one fails
+          loadStylesheet('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css');
+          // Final local fallback - ensures it will work on any localhost environment
+          loadStylesheet('https://use.fontawesome.com/releases/v6.7.2/css/all.css');
         } else {
           // Use Kit for production with defer
           var script = document.createElement('script');
@@ -106,7 +138,7 @@
           script.defer = true;
           document.head.appendChild(script);
         }
-    </script>
+      </script>
 
     <script>
         document.documentElement.classList.remove('no-js');
@@ -570,51 +602,46 @@
 
         <footer class="site-footer">
             <div class="footer-left">
-                <a href="http://basilisk.fr/sandbox/vatsal/" target="_blank">
-                    <img src="../assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
-                </a>
-                <a href="https://pof.tnw.utwente.nl/" target="_blank">
-                    <img src="../assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
-                </a>
-                <a href="https://www.utwente.nl/" target="_blank">
-                    <img src="../assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
-                </a>
-                <a href="https://www.vatsalsanjay.com/" target="_blank">
-                    <img src="../assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
-                </a>
+              <a href="http://basilisk.fr/sandbox/vatsal/" target="_blank">
+                <img src="/../assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
+              </a>
+              <a href="https://pof.tnw.utwente.nl/" target="_blank">
+                <img src="/../assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
+              </a>
+              <a href="https://www.utwente.nl/" target="_blank">
+                <img src="/../assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
+              </a>
+              <a href="https://www.vatsalsanjay.com/" target="_blank">
+                <img src="/../assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
+              </a>
             </div>
             <div class="footer-center">
-                <p class="copyright-text">
-                    &copy; Copyright<br>
-                    CoMPhy Lab 2025
-                </p>
+              <p class="copyright-text">
+                &copy; Copyright<br>
+                CoMPhy Lab 2025
+              </p>
             </div>
             <div class="footer-right">
-                <a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" target="_blank" aria-label="Google Scholar Profile">
-                    <i class="ai ai-google-scholar" style="font-size: 2.5em; color: white;"></i>
-                </a>
-                <a href="https://github.com/comphy-lab" target="_blank" aria-label="GitHub Organization">
-                    <i class="fa-brands fa-github" style="font-size: 2.5em; color: white;"></i>
-                </a>
-                <a href="https://www.youtube.com/@CoMPhyLab" target="_blank" aria-label="YouTube Channel">
-                    <i class="fa-brands fa-youtube" style="font-size: 2.5em; color: white;"></i>
-                </a>
-                <a href="https://x.com/VatsalSanjay" target="_blank" aria-label="X (Twitter) Profile">
-                    <i class="fa-brands fa-x-twitter" style="font-size: 2.5em; color: white;"></i>
-                </a>
-                <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" aria-label="Bluesky Profile">
-                    <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
-                </a>
-                <a href="https://github.com/comphy-lab/comphy-lab.github.io" class="edit-link" aria-label="Edit this page on GitHub">
-                    <i class="fa-brands fa-github"></i> Edit this page
-                </a>
+              <a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" target="_blank" aria-label="Google Scholar Profile">
+                <i class="ai ai-google-scholar" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://github.com/comphy-lab" target="_blank" aria-label="GitHub Organization">
+                <i class="fa-brands fa-github" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://www.youtube.com/@CoMPhyLab" target="_blank" aria-label="YouTube Channel">
+                <i class="fa-brands fa-youtube" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://x.com/VatsalSanjay" target="_blank" aria-label="X (Twitter) Profile">
+                <i class="fa-brands fa-x-twitter" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" aria-label="Bluesky Profile">
+                <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://github.com/comphy-lab/comphy-lab.github.io" class="edit-link" aria-label="Edit this page on GitHub">
+                <i class="fa-brands fa-github"></i> Edit this page
+              </a>
             </div>
-            <div class="ss-go-top">
-                <a class="smoothscroll" title="Back to Top" href="#top" aria-label="Back to top of page">
-                    <i class="fa-solid fa-arrow-up"></i>
-                </a>
-            </div> <!-- end ss-go-top -->
-        </footer>
+          </footer>
     </div>  
 
     <!-- Command Palette -->
