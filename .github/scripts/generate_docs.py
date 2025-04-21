@@ -658,6 +658,11 @@ def post_process_python_shell_html(html_content: str) -> str:
     processed_html = re.sub(r'<script[^>]*>\s*window\.basePath\s*=.*?</script>', '', processed_html, flags=re.DOTALL)
     processed_html = re.sub(r'<script[^>]*>\s*function\s+assetPath.*?</script>', '', processed_html, flags=re.DOTALL)
 
+    # Add repoName variable to the HTML
+    repo_script = f'\n<script>window.repoName = "{REPO_NAME}";</script>\n'
+    # Insert after opening body tag
+    processed_html = re.sub(r'<body[^>]*>', lambda m: m.group(0) + repo_script, processed_html)
+
     return processed_html
 
 
@@ -847,9 +852,6 @@ def post_process_c_html(html_content: str, file_path: Path,
                 link_url = relative_link.replace('\\', '/')  # Ensure forward slashes
                 # remove /docs/ with / in link
                 link_url = link_url.replace('/docs/', '/')
-                # debug_print(f"  [Debug Include] Relative link: {link_url}")
-                # debug_print(f"  [Debug Include] Link URL: {file_path.parent}")
-                # exit(0)
             except ValueError:
                 # Handle cases where paths are on different drives (should not happen here)
                 link_url = target_html_path.as_uri()  # Fallback to absolute URI
@@ -873,6 +875,11 @@ def post_process_c_html(html_content: str, file_path: Path,
     cleaned_html = re.sub(r'<script[^>]*>\s*// Helper function to create dynamic asset paths.*?</script>', '', cleaned_html, flags=re.DOTALL)
     cleaned_html = re.sub(r'<script[^>]*>\s*window\.basePath\s*=.*?</script>', '', cleaned_html, flags=re.DOTALL)
     cleaned_html = re.sub(r'<script[^>]*>\s*function\s+assetPath.*?</script>', '', cleaned_html, flags=re.DOTALL)
+    
+    # Add repoName variable to the HTML
+    repo_script = f'\n<script>window.repoName = "{REPO_NAME}";</script>\n'
+    # Insert after opening body tag
+    cleaned_html = re.sub(r'<body[^>]*>', lambda m: m.group(0) + repo_script, cleaned_html)
     
     return cleaned_html
 
@@ -1313,7 +1320,7 @@ def generate_directory_index(directory_name: str, directory_path: Path, generate
                 directory_files[html_path] = {
                     "html_path": relative_html_path,
                     "original_path": relative_original_path,
-                    "name": get_title_from_filename(relative_original_path.name),
+                    "name": relative_original_path.name,  # Use full filename with extension
                     "description": "",  # We'll try to extract descriptions below
                 }
                 
@@ -1371,7 +1378,7 @@ def generate_directory_index(directory_name: str, directory_path: Path, generate
                 elif file_extension in [".py"]:
                     file_type_class = "file-python"  # Python files
                     
-                file_name = info["original_path"].name
+                file_name = info["name"]  # Use the full filename with extension
                 
                 toc_html += f'<tr>\n'
                 toc_html += f'  <td class="file-icon"><span class="{file_type_class}"></span></td>\n'
@@ -1422,9 +1429,6 @@ def generate_directory_index(directory_name: str, directory_path: Path, generate
         html_content = re.sub(r'<script[^>]*>\s*window\.basePath\s*=.*?</script>', '', html_content, flags=re.DOTALL)
         html_content = re.sub(r'<script[^>]*>\s*function\s+assetPath.*?</script>', '', html_content, flags=re.DOTALL)
 
-        # Fix relative paths for assets - NO LONGER NEEDED, handled by prefix
-        # html_content = html_content.replace("../assets/", "../../assets/") # REMOVED
-        
         # Write the HTML file
         index_path.write_text(html_content, encoding='utf-8')
         print(f"Generated index page for directory: {directory_name} using custom template")
