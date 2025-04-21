@@ -9,10 +9,12 @@ from typing import Dict, List, Optional, Tuple, Set, Any, Union
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Generate documentation from source files.')
 parser.add_argument('--debug', action='store_true', help='Enable debug output')
+parser.add_argument('--force-rebuild', action='store_true', help='Force rebuilding of all HTML files, including existing ones')
 args = parser.parse_args()
 
 # Global debug flag
 DEBUG = args.debug
+FORCE_REBUILD = args.force_rebuild
 
 def debug_print(message):
     """Print debug messages only if debug mode is enabled."""
@@ -31,6 +33,11 @@ def calculate_asset_prefix(output_html_path: Path, docs_dir: Path) -> str:
         A string representing the relative prefix (e.g., '.', '..', '../..').
     """
     try:
+        # Special case for the main index.html at docs root
+        if output_html_path.name == "index.html" and output_html_path.parent == docs_dir:
+            return "."  # Use current directory for index.html
+        
+        # For all other files, calculate their depth from docs_dir
         depth = len(output_html_path.relative_to(docs_dir).parents) - 1
         if depth <= 0:
             return "."  # Root level
@@ -644,9 +651,12 @@ def post_process_python_shell_html(html_content: str) -> str:
         processed_html
     )
     
-    # Remove the dynamic basePath script as it's no longer needed
-    processed_html = re.sub(r'<script>\s*// Dynamic base path resolution.*?</script>', '', processed_html, flags=re.DOTALL)
-    processed_html = re.sub(r'<script>\s*// Helper function to create dynamic asset paths.*?</script>', '', processed_html, flags=re.DOTALL)
+    # Remove all JavaScript related to dynamic base path resolution and asset paths
+    # This includes both inline scripts and any JS variables or functions related to paths
+    processed_html = re.sub(r'<script[^>]*>\s*// Dynamic base path resolution.*?</script>', '', processed_html, flags=re.DOTALL)
+    processed_html = re.sub(r'<script[^>]*>\s*// Helper function to create dynamic asset paths.*?</script>', '', processed_html, flags=re.DOTALL)
+    processed_html = re.sub(r'<script[^>]*>\s*window\.basePath\s*=.*?</script>', '', processed_html, flags=re.DOTALL)
+    processed_html = re.sub(r'<script[^>]*>\s*function\s+assetPath.*?</script>', '', processed_html, flags=re.DOTALL)
 
     return processed_html
 
@@ -857,9 +867,12 @@ def post_process_c_html(html_content: str, file_path: Path,
     include_pattern = r'(<span class="pp">#include\s*</span>)(<span class=\"im\">)(?:\"|&quot;)(.*?)(?:\"|&quot;)(</span>)'
     cleaned_html = re.sub(include_pattern, create_include_link, cleaned_html, flags=re.DOTALL)
     
-    # Remove the dynamic basePath script as it's no longer needed
-    cleaned_html = re.sub(r'<script>\s*// Dynamic base path resolution.*?</script>', '', cleaned_html, flags=re.DOTALL)
-    cleaned_html = re.sub(r'<script>\s*// Helper function to create dynamic asset paths.*?</script>', '', cleaned_html, flags=re.DOTALL)
+    # Remove all JavaScript related to dynamic base path resolution and asset paths
+    # This includes both inline scripts and any JS variables or functions related to paths
+    cleaned_html = re.sub(r'<script[^>]*>\s*// Dynamic base path resolution.*?</script>', '', cleaned_html, flags=re.DOTALL)
+    cleaned_html = re.sub(r'<script[^>]*>\s*// Helper function to create dynamic asset paths.*?</script>', '', cleaned_html, flags=re.DOTALL)
+    cleaned_html = re.sub(r'<script[^>]*>\s*window\.basePath\s*=.*?</script>', '', cleaned_html, flags=re.DOTALL)
+    cleaned_html = re.sub(r'<script[^>]*>\s*function\s+assetPath.*?</script>', '', cleaned_html, flags=re.DOTALL)
     
     return cleaned_html
 
@@ -1404,8 +1417,10 @@ def generate_directory_index(directory_name: str, directory_path: Path, generate
         html_content = re.sub(r'\$if\([^)]+\)\$.*?\$endif\$', '', html_content, flags=re.DOTALL)
         
         # Clean up the dynamic base path script if it somehow survived
-        html_content = re.sub(r'<script>\s*// Dynamic base path resolution.*?</script>', '', html_content, flags=re.DOTALL)
-        html_content = re.sub(r'<script>\s*// Helper function to create dynamic asset paths.*?</script>', '', html_content, flags=re.DOTALL)
+        html_content = re.sub(r'<script[^>]*>\s*// Dynamic base path resolution.*?</script>', '', html_content, flags=re.DOTALL)
+        html_content = re.sub(r'<script[^>]*>\s*// Helper function to create dynamic asset paths.*?</script>', '', html_content, flags=re.DOTALL)
+        html_content = re.sub(r'<script[^>]*>\s*window\.basePath\s*=.*?</script>', '', html_content, flags=re.DOTALL)
+        html_content = re.sub(r'<script[^>]*>\s*function\s+assetPath.*?</script>', '', html_content, flags=re.DOTALL)
 
         # Fix relative paths for assets - NO LONGER NEEDED, handled by prefix
         # html_content = html_content.replace("../assets/", "../../assets/") # REMOVED
@@ -1517,6 +1532,9 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
     # Convert the combined README + links to HTML for index.html
     print(f"Generating index.html with REPO_NAME={REPO_NAME}")
     
+    # For the main index.html, make sure we're using "." as the asset path prefix
+    asset_path_prefix = "."
+    
     pandoc_cmd = [
         'pandoc',
         '-f', 'markdown+tex_math_dollars+raw_html',  # Use markdown with math extensions
@@ -1529,7 +1547,7 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
         '-V', 'base=/',
         '-V', 'notitle=true',  # Don't add an automatic title from filename
         '-V', f'pagetitle={WIKI_TITLE}',
-        '-V', 'asset_path_prefix=.', # For index.html, prefix is always '.'
+        '-V', f'asset_path_prefix={asset_path_prefix}', # For index.html, prefix is always '.'
         '-o', str(index_path)
     ]
 
@@ -1931,6 +1949,17 @@ def main():
         # Create docs directory if it doesn't exist
         DOCS_DIR.mkdir(exist_ok=True)
         
+        # If force-rebuild is enabled, clean out the docs directory first
+        if FORCE_REBUILD:
+            print("\nForce rebuild enabled. Cleaning docs directory...")
+            # Only remove HTML files to preserve assets
+            for html_file in DOCS_DIR.rglob('*.html'):
+                try:
+                    html_file.unlink()
+                    debug_print(f"Removed {html_file}")
+                except Exception as e:
+                    print(f"Warning: Could not remove {html_file}: {e}")
+        
         # Copy all assets (CSS, JS, logos, fonts, etc.) to docs directory
         print("\nCopying assets...")
         assets_dir = REPO_ROOT / '.github' / 'assets'
@@ -1959,6 +1988,12 @@ def main():
             # Create output directory if it doesn't exist
             output_html_path.parent.mkdir(parents=True, exist_ok=True)
             
+            # Skip existing files if not forcing rebuild
+            if not FORCE_REBUILD and output_html_path.exists():
+                print(f"  Skipping existing file: {output_html_path.relative_to(DOCS_DIR)}")
+                generated_files[file_path] = output_html_path
+                continue
+            
             # Process file and generate HTML
             if process_file_with_page2html_logic(
                 file_path, 
@@ -1983,7 +2018,7 @@ def main():
                 if not generate_directory_index(source_dir, docs_source_dir, generated_files, DOCS_DIR, REPO_ROOT):
                     print(f"Failed to generate index page for {source_dir}.")
         
-        # Generate main index.html
+        # Always regenerate main index.html
         print("\nGenerating main index.html...")
         if not generate_index(README_PATH, INDEX_PATH, generated_files, DOCS_DIR, REPO_ROOT):
             print("Failed to generate index.html.")
