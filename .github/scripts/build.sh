@@ -3,6 +3,22 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
+# Initialize force_rebuild flag
+FORCE_REBUILD=""
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --force-rebuild)
+      FORCE_REBUILD="--force-rebuild"
+      shift
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
 git clone https://github.com/comphy-lab/comphy-search.git
 mkdir -p .github/assets/js
 cp comphy-search/search_db.json .github/assets/js/search_db.json
@@ -15,7 +31,7 @@ DOCS_DIR="$PROJECT_ROOT/docs"
 PYTHON_SCRIPT="$PROJECT_ROOT/.github/scripts/generate_docs.py"
 
 echo "Running documentation generation script..."
-python3 "$PYTHON_SCRIPT"
+python3 "$PYTHON_SCRIPT" $FORCE_REBUILD
 
 if [ $? -ne 0 ]; then
     echo "Documentation generation failed."
