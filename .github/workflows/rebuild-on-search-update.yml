@@ -1,4 +1,4 @@
-name: Rebuild Site on Search Database Update
+name: Deploy on Search Database Update
 
 on:
   push:
@@ -11,12 +11,17 @@ permissions:
   pages: write
   id-token: write
 
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   deploy:
-    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,7 +32,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'docs'  # The directory containing your built HTML files
+          path: 'docs'  # Deploy the pre-built docs directory
 
       - name: Deploy to GitHub Pages
         id: deployment
