@@ -19,6 +19,27 @@ def debug_print(message):
     if DEBUG:
         print(message)
 
+def calculate_asset_prefix(output_html_path: Path, docs_dir: Path) -> str:
+    """
+    Calculate the relative path prefix for assets based on HTML file depth.
+
+    Args:
+        output_html_path: Path of the generated HTML file.
+        docs_dir: The root directory for documentation.
+
+    Returns:
+        A string representing the relative prefix (e.g., '.', '..', '../..').
+    """
+    try:
+        depth = len(output_html_path.relative_to(docs_dir).parents) - 1
+        if depth <= 0:
+            return "."  # Root level
+        else:
+            return "/".join([".."] * depth)
+    except ValueError:
+        # Handle cases where output_html_path is not within docs_dir (should not happen)
+        return "."
+
 def extract_seo_metadata(file_path: Path, file_content: str) -> Dict[str, str]:
     """
     Extract SEO metadata from the given file content.
@@ -420,6 +441,7 @@ def prepare_pandoc_input(file_path: Path, literate_c_script: Path) -> str:
 
 def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path, 
                base_url: str, wiki_title: str, page_url: str, page_title: str,
+               asset_path_prefix: str, # Added asset prefix
                seo_metadata: Dict[str, str] = None) -> str:
     """Converts Markdown content to a standalone HTML document using Pandoc.
     
@@ -438,6 +460,7 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
         wiki_title: Title of the documentation or wiki.
         page_url: URL of the current page.
         page_title: Title of the current page.
+        asset_path_prefix: Relative path prefix for assets (e.g., '.', '..')
         seo_metadata: Optional dictionary with SEO metadata (e.g., description, keywords, image).
     
     Returns:
@@ -461,6 +484,7 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
         '-V', f'description={seo_metadata.get("description", "")}',
         '-V', f'keywords={seo_metadata.get("keywords", "")}',
         '-V', f'image={seo_metadata.get("image", "")}',
+        '-V', f'asset_path_prefix={asset_path_prefix}', # Pass prefix to template
         '-o', str(output_html_path)
     ]
     
@@ -620,6 +644,10 @@ def post_process_python_shell_html(html_content: str) -> str:
         processed_html
     )
     
+    # Remove the dynamic basePath script as it's no longer needed
+    processed_html = re.sub(r'<script>\s*// Dynamic base path resolution.*?</script>', '', processed_html, flags=re.DOTALL)
+    processed_html = re.sub(r'<script>\s*// Helper function to create dynamic asset paths.*?</script>', '', processed_html, flags=re.DOTALL)
+
     return processed_html
 
 
@@ -828,6 +856,10 @@ def post_process_c_html(html_content: str, file_path: Path,
     # and handle potential HTML entity quotes (&quot;)
     include_pattern = r'(<span class="pp">#include\s*</span>)(<span class=\"im\">)(?:\"|&quot;)(.*?)(?:\"|&quot;)(</span>)'
     cleaned_html = re.sub(include_pattern, create_include_link, cleaned_html, flags=re.DOTALL)
+    
+    # Remove the dynamic basePath script as it's no longer needed
+    cleaned_html = re.sub(r'<script>\s*// Dynamic base path resolution.*?</script>', '', cleaned_html, flags=re.DOTALL)
+    cleaned_html = re.sub(r'<script>\s*// Helper function to create dynamic asset paths.*?</script>', '', cleaned_html, flags=re.DOTALL)
     
     return cleaned_html
 
@@ -1062,6 +1094,9 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
         # Pass SEO metadata with repository name
         seo_metadata = extract_seo_metadata(file_path, pandoc_input_content)
         
+        # Calculate asset path prefix based on output file depth
+        asset_path_prefix = calculate_asset_prefix(output_html_path, docs_dir)
+        
         pandoc_stdout = run_pandoc(
             pandoc_input_content, 
             output_html_path, 
@@ -1070,6 +1105,7 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
             wiki_title, 
             page_url, 
             page_title,
+            asset_path_prefix, # Pass the calculated prefix
             seo_metadata
         )
         
@@ -1108,8 +1144,9 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
                 f.write(cleaned_html)
         
         # Insert CSS link and JavaScript for all file types
-        is_root = output_html_path.parent == docs_dir
-        insert_css_link_in_html(output_html_path, CSS_PATH, is_root)
+        # CSS link is now handled by the template using asset_path_prefix
+        # is_root = output_html_path.parent == docs_dir
+        # insert_css_link_in_html(output_html_path, CSS_PATH, is_root) 
         insert_javascript_in_html(output_html_path)
         
         return True
@@ -1283,7 +1320,7 @@ def generate_directory_index(directory_name: str, directory_path: Path, generate
                 print(f"Error extracting description from {html_path}: {e}")
         
         # Read the template file
-        template_path = TEMPLATE_PATH
+        template_path = TEMPLATE_PATH # Use the temporary processed template
         # Use the custom template for the index pages
         try:
             with open(template_path, 'r', encoding='utf-8') as f:
@@ -1347,6 +1384,10 @@ def generate_directory_index(directory_name: str, directory_path: Path, generate
             "$if(reponame)$$reponame$$else$Documentation$endif$", REPO_NAME
         )
         
+        # Replace asset prefix based on depth
+        asset_path_prefix = calculate_asset_prefix(index_path, docs_dir)
+        html_content = html_content.replace("$asset_path_prefix$", asset_path_prefix)
+        
         # Handle $if(tabs)$ ... $tabs$ ... $endif$ section
         if "$if(tabs)$" in html_content:
             html_content = re.sub(r'\$if\(tabs\)\$(.*?)\$tabs\$(.*?)\$endif\$', '', html_content, flags=re.DOTALL)
@@ -1357,11 +1398,17 @@ def generate_directory_index(directory_name: str, directory_path: Path, generate
                               f'<div class="page-content">\n{content_replacement}\n</div>', 
                               html_content, flags=re.DOTALL)
         
-        # Remove any remaining template variables
-        html_content = re.sub(r'\$[^\$]+\$', '', html_content)
+        # Remove any remaining template variables like $base$, $body$ etc.
+        html_content = re.sub(r'\$[a-zA-Z0-9_]+\$', '', html_content)
+        # Remove conditional blocks like $if(variable)$...$endif$
+        html_content = re.sub(r'\$if\([^)]+\)\$.*?\$endif\$', '', html_content, flags=re.DOTALL)
         
-        # Fix relative paths for assets
-        html_content = html_content.replace("../assets/", "../../assets/")
+        # Clean up the dynamic base path script if it somehow survived
+        html_content = re.sub(r'<script>\s*// Dynamic base path resolution.*?</script>', '', html_content, flags=re.DOTALL)
+        html_content = re.sub(r'<script>\s*// Helper function to create dynamic asset paths.*?</script>', '', html_content, flags=re.DOTALL)
+
+        # Fix relative paths for assets - NO LONGER NEEDED, handled by prefix
+        # html_content = html_content.replace("../assets/", "../../assets/") # REMOVED
         
         # Write the HTML file
         index_path.write_text(html_content, encoding='utf-8')
@@ -1482,6 +1529,7 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
         '-V', 'base=/',
         '-V', 'notitle=true',  # Don't add an automatic title from filename
         '-V', f'pagetitle={WIKI_TITLE}',
+        '-V', 'asset_path_prefix=.', # For index.html, prefix is always '.'
         '-o', str(index_path)
     ]
 
@@ -1516,7 +1564,8 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
         # Continue even if processing fails, the base file was generated
 
     # Insert CSS and JavaScript
-    insert_css_link_in_html(index_path, CSS_PATH, True)
+    # CSS link is now handled by the template using asset_path_prefix
+    # insert_css_link_in_html(index_path, CSS_PATH, True) 
     insert_javascript_in_html(index_path)
     
     return True
