@@ -1076,7 +1076,7 @@ img.youtube-stats-dark {
   justify-content: flex-end;
   margin-right: 0;
   gap: 2rem;
-  padding-right: 100px;
+  padding-right: 0;
 }
 
 .footer-right a:last-child {
@@ -1103,7 +1103,7 @@ img.youtube-stats-dark {
   }
 
   .footer-right {
-    padding-right: 90px;
+    padding-right: 0px;
   }
 }
 
@@ -2190,7 +2190,7 @@ img.youtube-stats-dark {
     justify-content: flex-end;
     margin-right: 0;
     gap: 2rem;
-    padding-right: 100px;
+    padding-right: 0;
 }
 
 .footer-right a:last-child {
@@ -2206,7 +2206,7 @@ img.youtube-stats-dark {
 }
 
 .edit-link {
-    color: white;
+    color: white !important;
     text-decoration: none;
     font-size: 0.9em;
     padding: 0.5em 1em;
@@ -2224,8 +2224,15 @@ img.youtube-stats-dark {
     transform: translateY(-1px);
 }
 
+/* Specific dark theme override to ensure white text on edit links */
+[data-theme="dark"] .edit-link,
+[data-theme="dark"] .edit-link:visited,
+[data-theme="dark"] .edit-link:link {
+    color: white !important;
+}
+
 .edit-link i {
-    font-size: 1.1em;
+    font-size: 1.25em;
 }
 
 .footer-logo {
@@ -2268,7 +2275,7 @@ img.youtube-stats-dark {
     }
 
     .footer-right {
-        padding-right: 90px;
+        padding-right: 0px;
     }
 }
 
@@ -2286,7 +2293,7 @@ img.youtube-stats-dark {
     }
     
     .footer-right {
-        padding-right: 80px;
+        padding-right: 0px;
     }
     
     .footer-right i {

@@ -14,7 +14,7 @@ The codebase implements a classical lid driven cavity flow problem with dye inje
 
 ```
 ├── basilisk/src/               Core Basilisk CFD library (reference only, do not modify)
-├── testCases/                  Test cases for simulation
+├── simulationCases/                  Test cases for simulation
 │   └── LidDrivenCavity-Newtonian-dyeInjection.c    Lid-driven cavity with dye injection
 ├── src-local/                  Custom header files extending Basilisk functionality
 │   └── dye-injection.h         Dye injection for flow visualization
@@ -44,11 +44,11 @@ The [`postProcess/`](postProcess) directory provides tools for analyzing and vis
 
 - [getData-LidDriven.c](postProcess/getData-LidDriven.c): C utility that extracts and processes numerical data from simulation output files
 
-### testCases/ Directory
+### simulationCases/ Directory
 
-The [`testCases/`](testCases) directory contains simulation configurations:
+The [`simulationCases/`](simulationCases) directory contains simulation configurations:
 
-- [LidDrivenCavity-Newtonian-dyeInjection.c](testCases/LidDrivenCavity-Newtonian-dyeInjection.c): Main simulation case that implements:
+- [LidDrivenCavity-Newtonian-dyeInjection.c](simulationCases/LidDrivenCavity-Newtonian-dyeInjection.c): Main simulation case that implements:
   - Classical lid-driven cavity flow for a Newtonian fluid
   - Configurable Reynolds number (default: Re = 1)
   - Dye injection in the upper center of the cavity at t=0.05
@@ -77,7 +77,7 @@ The [`testCases/`](testCases) directory contains simulation configurations:
 
 3. Compile a test case to verify the setup:
    ```bash
-   cd testCases
+   cd simulationCases
    make test_name.tst
    ```
 
@@ -104,7 +104,7 @@ Run a compiled executable:
 
 Execute a specific test case:
 ```bash
-cd testCases && make test_name.tst
+cd simulationCases && make test_name.tst
 ```
 
 ### Post-Processing

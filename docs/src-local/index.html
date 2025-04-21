@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="base-url" content="..">
-    <title>src-local/dye-injection.h | Test documentation: Lid driven cavity using dye injection</title>
-<a id="" href="#"></a>
+    <title>Local Source Files | Documentation</title>
+    
     <script>
         // Dynamic base path resolution for consistent asset loading
         window.basePath = (function() {
@@ -15,7 +15,7 @@
             return isLocal ? '..' : '..';
         })();
     </script>
-<a id="" href="#"></a>
+
     <!-- Critical CSS for fastest paint -->
     <style>
         .s-intro__title {
@@ -26,7 +26,7 @@
             visibility: visible;
         }
     </style>
-<a id="" href="#"></a>
+
     <!-- Preload critical resources -->
     <script>
         // Helper function to create dynamic asset paths
@@ -34,38 +34,38 @@
             return window.basePath + path;
         }
     </script>
-    <link rel="preload" href="../assets/js/main.js" as="script">
-    <link rel="preload" href="../assets/css/fontello/css/fontello.css" as="style">
-    <link rel="preload" href="../assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
-<a id="" href="#"></a>
+    <link rel="preload" href="../../assets/js/main.js" as="script">
+    <link rel="preload" href="../../assets/css/fontello/css/fontello.css" as="style">
+    <link rel="preload" href="../../assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
+    
     <!-- Base stylesheet with proper path resolution for local deployment -->
-    <link rel="stylesheet" href="../assets/css/styles.css">
-    <link rel="stylesheet" href="../assets/css/custom_styles.css">
-    <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css">
-    <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css">
-    <link rel="stylesheet" href="../assets/css/command-palette.css">
+    <link rel="stylesheet" href="../../assets/css/styles.css">
+    <link rel="stylesheet" href="../../assets/css/custom_styles.css">
+    <link rel="stylesheet" href="../../assets/css/fontello/css/fontello.css">
+    <link rel="stylesheet" href="../../assets/css/academicons-1.7.0/css/academicons.min.css">
+    <link rel="stylesheet" href="../../assets/css/command-palette.css">
     <!-- Font Awesome for icons on all documentation pages -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-<a id="" href="#"></a>
-<a id="" href="#"></a>
+
+
     <!-- Favicon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
-    <link rel="apple-touch-icon-precomposed" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="../assets/favicon/favicon-96x96.png">
-    <link rel="icon" type="image/svg+xml" href="../assets/favicon/favicon.svg">
-    <link rel="manifest" href="../assets/favicon/site.webmanifest">
-    <link rel="shortcut icon" href="../assets/favicon/favicon.ico">
-    <link rel="icon" href="../assets/favicon/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="../../assets/favicon/apple-touch-icon.png">
+    <link rel="apple-touch-icon-precomposed" sizes="180x180" href="../../assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../../assets/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/svg+xml" href="../../assets/favicon/favicon.svg">
+    <link rel="manifest" href="../../assets/favicon/site.webmanifest">
+    <link rel="shortcut icon" href="../../assets/favicon/favicon.ico">
+    <link rel="icon" href="../../assets/favicon/favicon.ico">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
-<a id="" href="#"></a>
+    
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Computational fluid dynamics simulations using Basilisk C framework.">
+    <meta name="description" content="Documentation for the CoMPhy-Lab computational fluid dynamics framework.">
     <meta name="author" content="CoMPhy Lab">
     <meta name="robots" content="index, follow">
-    <meta name="keywords" content="fluid dynamics, CFD, Basilisk, multiphase flow, computational physics">
-<a id="" href="#"></a>
+    <meta name="keywords" content="fluid dynamics, CFD, Basilisk, src-local, documentation">
+
     <!-- Font dependencies with font-display: swap -->
     <style>
         @font-face {
@@ -74,37 +74,37 @@
             src: local('system-ui');
         }
     </style>
-    <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../../assets/css/fontello/css/fontello.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../../assets/css/academicons-1.7.0/css/academicons.min.css" media="print" onload="this.media='all'">
     <noscript>
-        <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css">
-        <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css">
+        <link rel="stylesheet" href="../../assets/css/fontello/css/fontello.css">
+        <link rel="stylesheet" href="../../assets/css/academicons-1.7.0/css/academicons.min.css">
     </noscript>
-<a id="" href="#"></a>
+
     <!-- Site styles -->
-    <link rel="stylesheet" href="../assets/css/vendor.css">
-    <link rel="stylesheet" href="../assets/css/styles.css">
-    <link rel="stylesheet" href="../assets/css/custom_styles.css">
-    <link rel="stylesheet" href="../assets/css/command-palette.css" media="print" onload="this.media='all'">
-<a id="" href="#"></a>
+    <link rel="stylesheet" href="../../assets/css/vendor.css">
+    <link rel="stylesheet" href="../../assets/css/styles.css">
+    <link rel="stylesheet" href="../../assets/css/custom_styles.css">
+    <link rel="stylesheet" href="../../assets/css/command-palette.css" media="print" onload="this.media='all'">
+    
     <!-- KaTeX for Math -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js"></script>
-<a id="" href="#"></a>
+    
     <!-- Fuse.js for search functionality -->
     <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
-<a id="" href="#"></a>
+    
     <!-- jQuery and UI -->
-    <script src="../assets/js/jquery.min.js"></script>
-    <script src="../assets/js/jquery-ui.packed.js"></script>
-    <script src="../assets/js/plots.js"></script>
-<a id="" href="#"></a>
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/jquery-ui.packed.js"></script>
+    <script src="../../assets/js/plots.js"></script>
+    
     <!-- Command palette -->
-    <script defer src="../assets/js/command-palette.js"></script>
-    <script defer src="../assets/js/command-data.js"></script>
-    <script defer src="../assets/js/main.js"></script>
-    <script defer src="../assets/js/theme-toggle.js"></script>
-<a id="" href="#"></a>
+    <script defer src="../../assets/js/command-palette.js"></script>
+    <script defer src="../../assets/js/command-data.js"></script>
+    <script defer src="../../assets/js/main.js"></script>
+    <script defer src="../../assets/js/theme-toggle.js"></script>
+
     <script>
         // Load Font Awesome with proper environment detection and fallbacks
         function loadStylesheet(href) {
@@ -113,17 +113,17 @@
           link.href = href;
           link.crossOrigin = 'anonymous';
           link.onerror = (e) => {
-            console.error(`Failed to load stylesheet: `);
+            console.error(`Failed to load stylesheet: ${href}`);
             console.log('Trying alternative Font Awesome source...');
           };
           document.head.appendChild(link);
           return link;
         }
-<a id="" href="#"></a>
+        
         // Check if we're on localhost
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
           // Use hardcoded version numbers for reliable loading
-<a id="" href="#"></a>
+          
           // Load Font Awesome using multiple CDNs to maximize reliability for local development
           loadStylesheet('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css');
           // Backup CDN if the first one fails
@@ -139,24 +139,23 @@
           document.head.appendChild(script);
         }
       </script>
-<a id="" href="#"></a>
+
     <script>
         document.documentElement.classList.remove('no-js');
         document.documentElement.classList.add('js');
     </script>
-    <link href="../custom_styles.css" rel="stylesheet" type="text/css" />
-    </head>
+</head>
 <body id="top">
-<a id="" href="#"></a>
+
     <div id="preloader">
         <div id="loader"></div>
     </div>
-<a id="" href="#"></a>
+
     <div id="page" class="s-pagewrap">
         <header class="s-header">
             <div class="s-header__logo">
                 <a class="logo" href="/">
-                    <img src="../assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
+                    <img src="../../assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
                 </a>
                 <a class="documentation-button" href="/documentationWeb">
                     <i class="fa-solid fa-book-open"></i>
@@ -210,79 +209,40 @@
                 </ul>
             </nav>
         </header>
-<a id="" href="#"></a>
+
         <!-- Main content -->
         <main class="content">
-<a id="" href="#"></a>
+            
+
             <div class="page-content">
-<a id="" href="#"></a>
-                                <h1 class="page-title">src-local/dye-injection.h</h1>
-<a id="" href="#"></a>
-<a id="" href="#"></a>
-                <h1 id="dye-injection-for-flow-visualization">dye
-                Injection for Flow Visualization</h1>
-                <p>This module introduces a circular tracer (dye) into
-                the flow at a specified time and location. The dye then
-                advects with the flow, allowing visualization of flow
-                patterns. This is useful for visualizing complex flow
-                structures in simulations like lid-driven cavity
-                flow.</p>
-                <h2 id="parameters">Parameters</h2>
-                <ul>
-                <li><code>tInjection</code>: time at which to inject the
-                dye</li>
-                <li><code>xInjection</code>, <code>yInjection</code>:
-                position where the dye is injected</li>
-                <li><code>dyeRadius</code>: radius of the circular
-                dye</li>
-                </ul>
-                <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><span class="pp">#include </span><a href="http://basilisk.fr/src/tracer.h" title="Link to Basilisk source for tracer.h"><span class="im">"tracer.h"</span></a></span>
-<span id="cb1-2"></span>
-<span id="cb1-3"><span class="co">// dye tracer parameters (can be overridden by the user)</span></span>
-<span id="cb1-4"><span class="dt">double</span> tInjection <span class="op">=</span> <span class="fl">0.1</span><span class="op">;</span>  <span class="co">// Default injection time</span></span>
-<span id="cb1-5"><span class="dt">double</span> xInjection <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span>  <span class="co">// Default X-position for injection</span></span>
-<span id="cb1-6"><span class="dt">double</span> yInjection <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span>  <span class="co">// Default Y-position for injection</span></span>
-<span id="cb1-7"><span class="dt">double</span> dyeRadius <span class="op">=</span> <span class="fl">0.05</span><span class="op">;</span>  <span class="co">// Default radius of the circular dye</span></span>
-<span id="cb1-8"></span>
-<span id="cb1-9"><span class="co">// Define the scalar field for the dye</span></span>
-<span id="cb1-10">scalar T<span class="op">[];</span></span>
-<span id="cb1-11">scalar <span class="op">*</span> tracers <span class="op">=</span> <span class="op">{</span>T<span class="op">};</span></span>
-<span id="cb1-12"></span>
-<span id="cb1-13"><span class="co">// Initialize the dye tracer to zero everywhere</span></span>
-<span id="cb1-14">event init <span class="op">(</span>t <span class="op">=</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb1-15">  foreach<span class="op">()</span></span>
-<span id="cb1-16">    T<span class="op">[]</span> <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span></span>
-<span id="cb1-17"><span class="op">}</span></span>
-<span id="cb1-18"></span>
-<span id="cb1-19"><span class="co">// Inject the dye at the specified time</span></span>
-<span id="cb1-20">event inject_dye <span class="op">(</span>t <span class="op">=</span> tInjection<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb1-21">  fprintf<span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;Injecting dye at t = </span><span class="sc">%g</span><span class="st">, position = (</span><span class="sc">%g</span><span class="st">, </span><span class="sc">%g</span><span class="st">), radius = </span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span></span>
-<span id="cb1-22">          t<span class="op">,</span> xInjection<span class="op">,</span> yInjection<span class="op">,</span> dyeRadius<span class="op">);</span></span>
-<span id="cb1-23"></span>
-<span id="cb1-24">  <span class="co">// Set dye concentration to 1.0 within the circular region</span></span>
-<span id="cb1-25">  foreach<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb1-26">    <span class="dt">double</span> dist <span class="op">=</span> sqrt<span class="op">(</span>sq<span class="op">(</span>x <span class="op">-</span> xInjection<span class="op">)</span> <span class="op">+</span> sq<span class="op">(</span>y <span class="op">-</span> yInjection<span class="op">));</span></span>
-<span id="cb1-27">    <span class="cf">if</span> <span class="op">(</span>dist <span class="op">&lt;=</span> dyeRadius<span class="op">)</span></span>
-<span id="cb1-28">      T<span class="op">[]</span> <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
-<span id="cb1-29">  <span class="op">}</span></span>
-<span id="cb1-30"><span class="op">}</span></span></code></pre></div></div>
-            </div>
+<h1>Local Source Files</h1>
+
+<div class="documentation-section">
+<table class="documentation-files">
+<tr>
+  <td class="file-icon"><span class="file-c"></span></td>
+  <td class="file-link" style="padding-right: 2em;"><a href="dye-injection.h.html" class="doc-link-button">dye-injection.h</a></td>
+  <td class="file-desc">Computational fluid dynamics simulations using Basilisk C framework.</td>
+</tr>
+</table>
+</div>
+
+</div>
         </main>
-<a id="" href="#"></a>
+
         <footer class="site-footer">
             <div class="footer-left">
               <a href="http://basilisk.fr/sandbox/vatsal/" target="_blank">
-                <img src="/../assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
+                <img src="/../../assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
               </a>
               <a href="https://pof.tnw.utwente.nl/" target="_blank">
-                <img src="/../assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
+                <img src="/../../assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
               </a>
               <a href="https://www.utwente.nl/" target="_blank">
-                <img src="/../assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
+                <img src="/../../assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
               </a>
               <a href="https://www.vatsalsanjay.com/" target="_blank">
-                <img src="/../assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
+                <img src="/../../assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
               </a>
             </div>
             <div class="footer-center">
@@ -313,7 +273,7 @@
             </div>
           </footer>
     </div>  
-<a id="" href="#"></a>
+
     <!-- Command Palette -->
     <div id="simple-command-palette" class="simple-command-palette" style="display: none;">
         <div class="simple-command-palette-backdrop"></div>
@@ -327,57 +287,6 @@
             </div>
         </div>
     </div>
-<a id="" href="#"></a>
 
-    <script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add copy button to each code block container
-        const codeBlocks = document.querySelectorAll('.code-block-container pre');
-        codeBlocks.forEach(function(codeBlock, index) {
-            // Create button element
-            const button = document.createElement('button');
-            button.className = 'copy-button';
-            button.textContent = 'Copy';
-            button.setAttribute('aria-label', 'Copy code to clipboard');
-            button.setAttribute('data-copy-state', 'copy');
-            
-            // Get the code block container (parent of the pre)
-            const container = codeBlock.parentNode;
-            
-            // Add the button to the container
-            container.appendChild(button);
-            
-            // Set up click event
-            button.addEventListener('click', function() {
-                // Create a textarea element to copy from
-                const textarea = document.createElement('textarea');
-                // Get the text content from the pre element (the actual code)
-                textarea.value = codeBlock.textContent;
-                document.body.appendChild(textarea);
-                textarea.select();
-                
-                try {
-                    // Execute copy command
-                    document.execCommand('copy');
-                    // Update button state
-                    button.textContent = 'Copied!';
-                    button.classList.add('copied');
-                    
-                    // Reset button state after 2 seconds
-                    setTimeout(function() {
-                        button.textContent = 'Copy';
-                        button.classList.remove('copied');
-                    }, 2000);
-                } catch (err) {
-                    console.error('Copy failed:', err);
-                    button.textContent = 'Error!';
-                }
-                
-                // Clean up
-                document.body.removeChild(textarea);
-            });
-        });
-    });
-    </script>
-        </body>
+</body>
 </html>

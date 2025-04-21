@@ -45,7 +45,7 @@ def extract_seo_metadata(file_path: Path, file_content: str) -> Dict[str, str]:
 # Configuration
 # Assume the script is in .github/scripts, REPO_ROOT is the parent of .github
 REPO_ROOT = Path(__file__).parent.parent.parent
-SOURCE_DIRS = ['src-local', 'testCases', 'postProcess']  # Directories within REPO_ROOT to scan
+SOURCE_DIRS = ['src-local', 'simulationCases', 'postProcess']  # Directories within REPO_ROOT to scan
 DOCS_DIR = REPO_ROOT / 'docs'
 README_PATH = REPO_ROOT / 'README.md'
 INDEX_PATH = DOCS_DIR / 'index.html'
@@ -56,6 +56,9 @@ TEMPLATE_PATH = REPO_ROOT / '.github' / 'assets' / 'custom_template.html'  # Use
 LITERATE_C_SCRIPT = DARCSIT_DIR / 'literate-c'  # Path to the literate-c script
 BASE_URL = "/"  # Relative base URL for links within the site
 CSS_PATH = REPO_ROOT / '.github' / 'assets' / 'css' / 'custom_styles.css'  # Path to custom CSS
+
+# Get repository name from directory
+REPO_NAME = REPO_ROOT.name
 
 # Read domain from CNAME file or use default
 try:
@@ -109,6 +112,10 @@ def process_template_for_assets(template_path: Path) -> str:
     try:
         with open(template_path, 'r', encoding='utf-8') as f:
             template_content = f.read()
+            
+        # Print repository name for debugging
+        print(f"Repository name: {REPO_NAME}")
+        
         debug_print("Template processed for correct asset paths")
         return template_content
     except Exception as e:
@@ -449,6 +456,7 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
         '-V', f'wikititle={wiki_title}',
         '-V', f'pageUrl={page_url}',
         '-V', f'pagetitle={page_title}',
+        '-V', f'reponame={REPO_NAME}',
         # Add SEO metadata variables
         '-V', f'description={seo_metadata.get("description", "")}',
         '-V', f'keywords={seo_metadata.get("keywords", "")}',
@@ -1048,6 +1056,12 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
         page_title = file_path.relative_to(repo_root).as_posix().strip('- \t')
         
         # Run pandoc to convert to HTML
+        # Add debugging information
+        print(f"Processing file: {file_path.name} with REPO_NAME={REPO_NAME}")
+        
+        # Pass SEO metadata with repository name
+        seo_metadata = extract_seo_metadata(file_path, pandoc_input_content)
+        
         pandoc_stdout = run_pandoc(
             pandoc_input_content, 
             output_html_path, 
@@ -1056,7 +1070,7 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
             wiki_title, 
             page_url, 
             page_title,
-            extract_seo_metadata(file_path, pandoc_input_content)
+            seo_metadata
         )
         
         # Determine file type for post-processing
@@ -1220,6 +1234,170 @@ def convert_directory_tree_to_html(readme_content: str) -> str:
     return modified_content
 
 
+def generate_directory_index(directory_name: str, directory_path: Path, generated_files: Dict[Path, Path], docs_dir: Path, repo_root: Path) -> bool:
+    """
+    Generates an aesthetically pleasing index.html page for a directory in SOURCE_DIRS.
+    
+    This function creates a landing page for each source directory that displays all HTML files
+    using the project's custom template and a clean, subtle table of contents.
+    
+    Args:
+        directory_name: Name of the directory (e.g., 'src-local', 'postProcess')
+        directory_path: Path to the directory in docs_dir where index.html will be created
+        generated_files: Dictionary mapping source file paths to their corresponding generated HTML paths
+        docs_dir: Directory where documentation files are stored
+        repo_root: Root directory of the repository used for computing relative paths
+    
+    Returns:
+        True if index.html was generated successfully, otherwise False
+    """
+    try:
+        index_path = directory_path / "index.html"
+        
+        # Filter files in this directory
+        directory_files = {}
+        for original_path, html_path in generated_files.items():
+            if html_path.parent == directory_path and html_path.name != "index.html":
+                relative_original_path = original_path.relative_to(repo_root)
+                relative_html_path = html_path.relative_to(directory_path)  # Path relative to the directory
+                directory_files[html_path] = {
+                    "html_path": relative_html_path,
+                    "original_path": relative_original_path,
+                    "name": get_title_from_filename(relative_original_path.name),
+                    "description": "",  # We'll try to extract descriptions below
+                }
+                
+        # Try to extract descriptions for each file
+        for html_path, info in directory_files.items():
+            try:
+                # Read the HTML file to extract description from meta tags
+                html_content = html_path.read_text(encoding='utf-8')
+                desc_match = re.search(r'<meta\s+name="description"\s+content="([^"]+)"', html_content)
+                if desc_match:
+                    description = desc_match.group(1).strip()
+                    # Limit description length for UI
+                    if len(description) > 120:
+                        description = description[:117] + "..."
+                    info["description"] = description
+            except Exception as e:
+                print(f"Error extracting description from {html_path}: {e}")
+        
+        # Read the template file
+        template_path = TEMPLATE_PATH
+        # Use the custom template for the index pages
+        try:
+            with open(template_path, 'r', encoding='utf-8') as f:
+                template_content = f.read()
+        except Exception as e:
+            print(f"Error reading template: {e}")
+            return False
+            
+        # Format the directory name for the title
+        formatted_dir_name = directory_name.capitalize()
+        if formatted_dir_name == 'Src-local':
+            formatted_dir_name = "Local Source Files"
+        elif formatted_dir_name == 'Simulationcases':
+            formatted_dir_name = "Simulation Cases"  
+        elif formatted_dir_name == 'Postprocess':
+            formatted_dir_name = "Post-Processing Tools"
+            
+        # Create the TOC content
+        toc_html = f"<h1>{formatted_dir_name}</h1>\n\n"
+        
+        if directory_files:
+            toc_html += '<div class="documentation-section">\n'
+            toc_html += '<table class="documentation-files">\n'
+            
+            # Sort files by name
+            sorted_files = sorted(directory_files.values(), key=lambda x: x['original_path'].name.lower())
+            
+            for info in sorted_files:
+                file_extension = info["original_path"].suffix.lower()
+                file_type_class = "file-other"
+                
+                # Assign CSS classes based on file extension
+                if file_extension in [".c", ".h"]:
+                    file_type_class = "file-c"  # C/header files
+                elif file_extension in [".py"]:
+                    file_type_class = "file-python"  # Python files
+                    
+                file_name = info["original_path"].name
+                
+                toc_html += f'<tr>\n'
+                toc_html += f'  <td class="file-icon"><span class="{file_type_class}"></span></td>\n'
+                toc_html += f'  <td class="file-link" style="padding-right: 2em;"><a href="{info["html_path"]}" class="doc-link-button">{file_name}</a></td>\n'
+                toc_html += f'  <td class="file-desc">{info["description"]}</td>\n'
+                toc_html += f'</tr>\n'
+                
+            toc_html += '</table>\n'
+            toc_html += '</div>\n'
+        else:
+            toc_html += '<p>No documentation files found in this directory.</p>\n'
+            
+        # Replace template variables
+        page_title = f"{formatted_dir_name} | Documentation"
+        html_content = template_content
+        html_content = html_content.replace("$if(pagetitle)$$pagetitle$$endif$$if(wikititle)$ | $wikititle$$endif$", page_title)
+        html_content = html_content.replace("$if(description)$$description$$else$Computational fluid dynamics simulations using Basilisk C framework.$endif$", 
+                                          "Documentation for the CoMPhy-Lab computational fluid dynamics framework.")
+        html_content = html_content.replace("$if(keywords)$$keywords$$else$fluid dynamics, CFD, Basilisk, multiphase flow, computational physics$endif$", 
+                                          f"fluid dynamics, CFD, Basilisk, {directory_name}, documentation")
+        # Ensure repo name is shown in folder index pages
+        html_content = html_content.replace(
+            "$if(reponame)$$reponame$$else$Documentation$endif$", REPO_NAME
+        )
+        
+        # Handle $if(tabs)$ ... $tabs$ ... $endif$ section
+        if "$if(tabs)$" in html_content:
+            html_content = re.sub(r'\$if\(tabs\)\$(.*?)\$tabs\$(.*?)\$endif\$', '', html_content, flags=re.DOTALL)
+        
+        # Replace main content
+        content_replacement = toc_html
+        html_content = re.sub(r'<div class="page-content">\s*.*?\$body\$.*?</div>', 
+                              f'<div class="page-content">\n{content_replacement}\n</div>', 
+                              html_content, flags=re.DOTALL)
+        
+        # Remove any remaining template variables
+        html_content = re.sub(r'\$[^\$]+\$', '', html_content)
+        
+        # Fix relative paths for assets
+        html_content = html_content.replace("../assets/", "../../assets/")
+        
+        # Write the HTML file
+        index_path.write_text(html_content, encoding='utf-8')
+        print(f"Generated index page for directory: {directory_name} using custom template")
+        return True
+        
+    except Exception as e:
+        print(f"Error generating directory index for {directory_name}: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
+def get_title_from_filename(filename: str) -> str:
+    """
+    Converts a filename to a more readable title by:
+    1. Removing file extensions
+    2. Replacing dashes and underscores with spaces
+    3. Capitalizing words
+    
+    Args:
+        filename: The filename to convert
+        
+    Returns:
+        A more readable title
+    """
+    # Remove any file extensions (including multiple extensions like .c.html)
+    name = filename.split('.')[0]
+    
+    # Replace dashes and underscores with spaces
+    name = name.replace('-', ' ').replace('_', ' ')
+    
+    # Title case the result (capitalize each word)
+    return ' '.join(word.capitalize() for word in name.split())
+
+
 def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Path, Path], 
                   docs_dir: Path, repo_root: Path) -> bool:
     """
@@ -1253,7 +1431,7 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
     # Add documentation links section
     links_markdown = "\n\n## Generated Documentation\n\n"
     
-    # Group links by top-level directory (src-local, testCases, etc.)
+    # Group links by top-level directory (src-local, simulationCases, etc.)
     grouped_links = {}
     for original_path, html_path in generated_files.items():
         relative_html_path = html_path.relative_to(docs_dir)
@@ -1290,24 +1468,27 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
     final_readme_content = readme_content + links_markdown
 
     # Convert the combined README + links to HTML for index.html
-    cmd = [
+    print(f"Generating index.html with REPO_NAME={REPO_NAME}")
+    
+    pandoc_cmd = [
         'pandoc',
-        '-f', 'markdown+tex_math_dollars+raw_html',  # Add raw_html to preserve HTML
+        '-f', 'markdown+tex_math_dollars+raw_html',  # Use markdown with math extensions
         '-t', 'html5',
         '--standalone',
-        '--mathjax',
+        '--mathjax',  # Add support for LaTeX math
         '--template', str(TEMPLATE_PATH),
         '-V', f'wikititle={WIKI_TITLE}',
-        '-V', f'base={BASE_URL}',
-        '-V', 'notitle=true',  # Add notitle=true to avoid duplicate h1 elements
-        '-V', f'pagetitle={WIKI_TITLE}',  # Set the page title to be the same as wiki title
+        '-V', f'reponame={REPO_NAME}',  # Add repository name
+        '-V', 'base=/',
+        '-V', 'notitle=true',  # Don't add an automatic title from filename
+        '-V', f'pagetitle={WIKI_TITLE}',
         '-o', str(index_path)
     ]
 
     debug_print(f"  [Debug Index] Target path: {index_path}")
-    debug_print(f"  [Debug Index] Command: {' '.join(cmd)}")
+    debug_print(f"  [Debug Index] Command: {' '.join(pandoc_cmd)}")
 
-    process = subprocess.run(cmd, input=final_readme_content, text=True, capture_output=True, check=False)
+    process = subprocess.run(pandoc_cmd, input=final_readme_content, text=True, capture_output=True, check=False)
 
     # Print results unconditionally for debugging
     debug_print(f"  [Debug Index] Pandoc Return Code: {process.returncode}")
@@ -1554,20 +1735,58 @@ def copy_assets(assets_dir: Path, docs_dir: Path) -> bool:
                     shutil.copy2(css_file, dest_path)
                     debug_print(f"Copied {css_file} to {dest_path}")
         
-        # Copy JS files
+        # Copy JS files (including search_db.json, command-palette.js, command-data.js)
         js_dir = assets_dir / "js"
-        docs_js_dir = docs_assets_dir / "js"
-        docs_js_dir.mkdir(exist_ok=True, parents=True)
-        
+        docs_assets_js_dir = docs_assets_dir / "js"
+        docs_assets_js_dir.mkdir(exist_ok=True, parents=True)
+
+        # Copy all JS files from .github/assets/js to docs/assets/js
         if js_dir.exists():
             for js_file in js_dir.glob("**/*"):
                 if js_file.is_file():
                     rel_path = js_file.relative_to(js_dir)
-                    dest_path = docs_js_dir / rel_path
+                    dest_path = docs_assets_js_dir / rel_path
                     dest_path.parent.mkdir(exist_ok=True, parents=True)
-                    shutil.copy2(js_file, dest_path)
-                    debug_print(f"Copied {js_file} to {dest_path}")
-        
+                    try:
+                        shutil.copy2(js_file, dest_path)
+                        debug_print(f"Copied {js_file} to {dest_path}")
+                    except Exception as e:
+                        print(f"Error copying JS file {js_file} to {dest_path}: {e}")
+        else:
+            debug_print(f"JS assets directory {js_dir} does not exist. Skipping JS copy.")
+
+        # Copy any legacy JS files from docs/js into docs/assets/js, then remove docs/js
+        legacy_js_dir = docs_dir / "js"
+        if legacy_js_dir.exists() and legacy_js_dir.is_dir():
+            for legacy_file in legacy_js_dir.glob("*"):
+                if legacy_file.is_file():
+                    try:
+                        shutil.copy2(legacy_file, docs_assets_js_dir / legacy_file.name)
+                        debug_print(f"Migrated legacy JS file {legacy_file} to assets/js/")
+                    except Exception as e:
+                        print(f"Error migrating legacy JS file {legacy_file}: {e}")
+            try:
+                for legacy_file in legacy_js_dir.glob("*"):
+                    legacy_file.unlink()
+                legacy_js_dir.rmdir()
+                debug_print("Removed legacy docs/js directory.")
+            except Exception as e:
+                print(f"Error removing legacy docs/js directory: {e}")
+
+        # Ensure required JS files are present
+        required_js = ["search_db.json", "command-palette.js", "command-data.js"]
+        for req_file in required_js:
+            src_file = js_dir / req_file
+            dest_file = docs_assets_js_dir / req_file
+            if not dest_file.exists() and src_file.exists():
+                try:
+                    shutil.copy2(src_file, dest_file)
+                    debug_print(f"Explicitly copied {src_file} to {dest_file}")
+                except Exception as e:
+                    print(f"Error copying required JS file {src_file} to {dest_file}: {e}")
+            elif not src_file.exists():
+                print(f"Warning: Required JS asset {src_file} not found.")
+
         # Copy images
         img_dir = assets_dir / "images"
         docs_img_dir = docs_assets_dir / "images"
@@ -1608,7 +1827,37 @@ def copy_assets(assets_dir: Path, docs_dir: Path) -> bool:
         logos_dir = assets_dir / "logos"
         if logos_dir.exists():
             create_favicon_files(docs_dir, logos_dir)
-        
+
+        # Copy favicon files to root directory to prevent 404s
+        favicon_source_dir = assets_dir / "favicon"
+        if favicon_source_dir.exists() and favicon_source_dir.is_dir():
+            for fav_file in favicon_source_dir.glob("*"):
+                if fav_file.is_file():
+                    shutil.copy2(fav_file, docs_dir / fav_file.name)
+                    debug_print(f"Copied {fav_file.name} to root directory")
+
+        # Copy Basilisk static JS files (jQuery, plots)
+        static_js_dir = DARCSIT_DIR / "static" / "js"
+        docs_assets_js_dir = docs_dir / "assets" / "js"
+        docs_assets_js_dir.mkdir(exist_ok=True, parents=True)
+        if static_js_dir.exists() and static_js_dir.is_dir():
+            for js_file in static_js_dir.glob("*.js"):
+                try:
+                    shutil.copy2(js_file, docs_assets_js_dir / js_file.name)
+                    debug_print(f"Copied static js file: {js_file.name} to assets/js/")
+                except Exception as e:
+                    print(f"Error copying static js file {js_file} to assets/js/: {e}")
+        # Remove any old docs/js directory if it exists
+        legacy_js_dir = docs_dir / "js"
+        if legacy_js_dir.exists() and legacy_js_dir.is_dir():
+            try:
+                for legacy_file in legacy_js_dir.glob("*"):
+                    legacy_file.unlink()
+                legacy_js_dir.rmdir()
+                debug_print("Removed legacy docs/js directory.")
+            except Exception as e:
+                print(f"Error removing legacy docs/js directory: {e}")
+
         return True
     except Exception as e:
         print(f"Error copying assets: {e}")
@@ -1676,8 +1925,17 @@ def main():
             ):
                 generated_files[file_path] = output_html_path
         
-        # Generate index.html
-        print("\nGenerating index.html...")
+        # Generate nice folder index pages for each directory in SOURCE_DIRS
+        print("\nGenerating folder index pages...")
+        for source_dir in SOURCE_DIRS:
+            # Create path to the docs directory for this source dir
+            docs_source_dir = DOCS_DIR / source_dir
+            if docs_source_dir.exists():
+                if not generate_directory_index(source_dir, docs_source_dir, generated_files, DOCS_DIR, REPO_ROOT):
+                    print(f"Failed to generate index page for {source_dir}.")
+        
+        # Generate main index.html
+        print("\nGenerating main index.html...")
         if not generate_index(README_PATH, INDEX_PATH, generated_files, DOCS_DIR, REPO_ROOT):
             print("Failed to generate index.html.")
             return
@@ -1696,6 +1954,19 @@ def main():
         
         print("\nDocumentation generation complete.")
         print(f"Output generated in: {DOCS_DIR}")
+
+        # Copy required JS files from basilisk source directly to docs/assets/js for website
+        js_src_dir = BASILISK_DIR / 'src' / 'darcsit' / 'static' / 'js'
+        js_dest_dir = DOCS_DIR / 'assets' / 'js'
+        js_dest_dir.mkdir(parents=True, exist_ok=True)
+        for js_file in ['jquery.min.js', 'jquery-ui.packed.js', 'plots.js']:
+            src = js_src_dir / js_file
+            dst = js_dest_dir / js_file
+            if src.exists():
+                shutil.copy2(src, dst)
+                print(f"Copied Basilisk JS file {src} to {dst}")
+            else:
+                print(f"Warning: Basilisk JS file {src} not found, could not copy to {dst}")
         
     finally:
         # Clean up temporary template file
@@ -1710,4 +1981,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-        

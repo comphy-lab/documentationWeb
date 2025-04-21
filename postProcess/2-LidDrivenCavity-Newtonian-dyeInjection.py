@@ -208,7 +208,7 @@ def main():
     parser.add_argument('--ZMIN', type=float, default=-0.5, help='Minimum Z value')
     parser.add_argument('--RMIN', type=float, default=-0.5, help='Minimum R value')
     parser.add_argument('--tsnap', type=float, default=0.01, help='Time snap')
-    parser.add_argument('--caseToProcess', type=str, default='../testCases/2-LidDrivenCavity-Newtonian-dyeInjection', help='Case to process')  
+    parser.add_argument('--caseToProcess', type=str, default='../simulationCases/2-LidDrivenCavity-Newtonian-dyeInjection', help='Case to process')  
     parser.add_argument('--folderToSave', type=str, default='2-LidDrivenCavity-Newtonian-dyeInjection', help='Folder to save')
     args = parser.parse_args()
 
