@@ -8,7 +8,7 @@
     {
       id: "home",
       title: "Go to Home (this wiki)",
-      handler: () => { window.location.href = '/'; },
+      handler: () => { window.location.href = `/${window.repoName || ''}`; },
       section: "Navigation",
       icon: '<i class="fa-solid fa-brain"></i>'
     },

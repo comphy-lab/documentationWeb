@@ -552,17 +552,15 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
 
 def post_process_python_shell_html(html_content: str) -> str:
     """
-    Enhance HTML for improved code block display and documentation link accuracy.
+    Post-processes HTML from Python or shell files for enhanced code block display and navigation.
     
-    Processes raw HTML generated from Python or shell files by wrapping <pre><code> and Pandoc's
-    source code blocks in a container div for copy button functionality. Additionally, appends ".html"
-    to local links pointing to documentation files to ensure correct navigation.
+    Wraps code blocks in container divs for styling and copy button support, updates local documentation links to include the `.html` extension, removes dynamic asset path JavaScript, and inserts a script setting `window.repoName` after the opening `<body>` tag.
     
     Args:
-        html_content: Raw HTML content to be processed.
+        html_content: Raw HTML content generated from a Python or shell file.
     
     Returns:
-        Processed HTML content with enhanced code blocks and updated links.
+        The processed HTML content with improved code block containers, corrected documentation links, and repository metadata.
     """
     # Fix any <pre><code> blocks by wrapping them in a container div
     def wrap_pre_code_with_container(match):
@@ -658,6 +656,11 @@ def post_process_python_shell_html(html_content: str) -> str:
     processed_html = re.sub(r'<script[^>]*>\s*window\.basePath\s*=.*?</script>', '', processed_html, flags=re.DOTALL)
     processed_html = re.sub(r'<script[^>]*>\s*function\s+assetPath.*?</script>', '', processed_html, flags=re.DOTALL)
 
+    # Add repoName variable to the HTML
+    repo_script = f'\n<script>window.repoName = "{REPO_NAME}";</script>\n'
+    # Insert after opening body tag
+    processed_html = re.sub(r'<body[^>]*>', lambda m: m.group(0) + repo_script, processed_html)
+
     return processed_html
 
 
@@ -724,24 +727,20 @@ def run_awk_post_processing(html_content: str, file_path: Path,
 def post_process_c_html(html_content: str, file_path: Path, 
                        repo_root: Path, darcsit_dir: Path, docs_dir: Path) -> str:
     """
-    Enhance C/C++ HTML content with code block containers and include-link corrections.
-    
-    This function post-processes HTML generated from C/C++ source files to improve its
-    presentation in documentation. It removes extraneous trailing line numbers from the
-    literate-c output, wraps <pre><code> blocks and sourceCode divs in container divs for
-    consistent styling, and converts #include statements into hyperlinks that reference either
-    locally generated documentation or external sources.
-    
-    Args:
-        html_content: The original HTML output from processing a C/C++ file.
-        file_path: Path to the source file corresponding to the HTML content.
-        repo_root: Root directory of the repository.
-        darcsit_dir: Directory containing darcsit scripts.
-        docs_dir: Output directory for the generated HTML documentation.
-    
-    Returns:
-        The modified HTML content with enhanced styling and linked #include statements.
-    """
+                       Post-processes HTML generated from C/C++ source files to enhance documentation presentation.
+                       
+                       This function cleans up and restructures HTML output from C/C++ files by removing extraneous line numbers, wrapping code blocks in container divs for consistent styling, and converting `#include` statements into hyperlinks to either local documentation or the Basilisk source repository. It also removes JavaScript related to dynamic asset paths and inserts a script defining `window.repoName` after the opening `<body>` tag.
+                       
+                       Args:
+                           html_content: HTML content generated from a C/C++ source file.
+                           file_path: Path to the original source file.
+                           repo_root: Root directory of the repository.
+                           darcsit_dir: Directory containing darcsit scripts.
+                           docs_dir: Output directory for generated HTML documentation.
+                       
+                       Returns:
+                           The modified HTML content with improved code block styling, linked includes, and repository metadata.
+                       """
     # Remove trailing line numbers added by literate-c
     cleaned_html = re.sub(
         r'(\s*(?:<span class="[^"]*">\s*\d+\s*</span>|\s+\d+)\s*)+(\s*</span>)', 
@@ -804,26 +803,15 @@ def post_process_c_html(html_content: str, file_path: Path,
     # Add links to #include statements
     def create_include_link(match):
         """
-        Transforms an include directive match into an HTML hyperlink.
+        Converts a matched C/C++ #include directive into an HTML hyperlink.
         
-        Converts a regex match object capturing parts of an include directive into an HTML anchor element.
-        The function extracts the filename and checks if a corresponding file exists in the local
-        'src-local' directory. If it does, a relative link to the generated local documentation is created;
-        otherwise, a link to the Basilisk source repository is returned. The original span formatting is preserved.
+        Given a regex match object for an include directive, generates an anchor tag linking to local documentation if the included file exists in the 'src-local' directory, or to the Basilisk source repository otherwise. Preserves the original HTML span formatting of the include statement.
         
-        Parameters:
-            match: A regex match object with four capture groups:
-                   1. The prefix span for the include statement.
-                   2. The opening tag for the filename.
-                   3. The filename (which may include a path).
-                   4. The closing tag for the filename.
+        Args:
+            match: A regex match object with four groups representing the prefix span, opening span tag, filename, and closing span tag.
         
         Returns:
-            A string containing the HTML hyperlink wrapping the original include directive span.
-        
-        Note:
-            This function relies on the global variables `repo_root`, `docs_dir`, and `file_path` for
-            file path resolution.
+            An HTML string with the include filename wrapped in a hyperlink to the appropriate documentation or source.
         """
         prefix = match.group(1)  # e.g., <span class="pp">#include </span>
         span_tag_open = match.group(2)  # e.g., <span class="im">
@@ -847,9 +835,6 @@ def post_process_c_html(html_content: str, file_path: Path,
                 link_url = relative_link.replace('\\', '/')  # Ensure forward slashes
                 # remove /docs/ with / in link
                 link_url = link_url.replace('/docs/', '/')
-                # debug_print(f"  [Debug Include] Relative link: {link_url}")
-                # debug_print(f"  [Debug Include] Link URL: {file_path.parent}")
-                # exit(0)
             except ValueError:
                 # Handle cases where paths are on different drives (should not happen here)
                 link_url = target_html_path.as_uri()  # Fallback to absolute URI
@@ -873,6 +858,11 @@ def post_process_c_html(html_content: str, file_path: Path,
     cleaned_html = re.sub(r'<script[^>]*>\s*// Helper function to create dynamic asset paths.*?</script>', '', cleaned_html, flags=re.DOTALL)
     cleaned_html = re.sub(r'<script[^>]*>\s*window\.basePath\s*=.*?</script>', '', cleaned_html, flags=re.DOTALL)
     cleaned_html = re.sub(r'<script[^>]*>\s*function\s+assetPath.*?</script>', '', cleaned_html, flags=re.DOTALL)
+    
+    # Add repoName variable to the HTML
+    repo_script = f'\n<script>window.repoName = "{REPO_NAME}";</script>\n'
+    # Insert after opening body tag
+    cleaned_html = re.sub(r'<body[^>]*>', lambda m: m.group(0) + repo_script, cleaned_html)
     
     return cleaned_html
 
@@ -1286,20 +1276,9 @@ def convert_directory_tree_to_html(readme_content: str) -> str:
 
 def generate_directory_index(directory_name: str, directory_path: Path, generated_files: Dict[Path, Path], docs_dir: Path, repo_root: Path) -> bool:
     """
-    Generates an aesthetically pleasing index.html page for a directory in SOURCE_DIRS.
+    Generates an index.html page for a documentation directory listing all generated HTML files.
     
-    This function creates a landing page for each source directory that displays all HTML files
-    using the project's custom template and a clean, subtle table of contents.
-    
-    Args:
-        directory_name: Name of the directory (e.g., 'src-local', 'postProcess')
-        directory_path: Path to the directory in docs_dir where index.html will be created
-        generated_files: Dictionary mapping source file paths to their corresponding generated HTML paths
-        docs_dir: Directory where documentation files are stored
-        repo_root: Root directory of the repository used for computing relative paths
-    
-    Returns:
-        True if index.html was generated successfully, otherwise False
+    Creates a landing page for a given source directory using a custom template, displaying a table of contents with links to each documentation file and their descriptions. Extracts file descriptions from meta tags in the HTML files and formats the directory name for display. Returns True if the index page is generated successfully, otherwise False.
     """
     try:
         index_path = directory_path / "index.html"
@@ -1313,7 +1292,7 @@ def generate_directory_index(directory_name: str, directory_path: Path, generate
                 directory_files[html_path] = {
                     "html_path": relative_html_path,
                     "original_path": relative_original_path,
-                    "name": get_title_from_filename(relative_original_path.name),
+                    "name": relative_original_path.name,  # Use full filename with extension
                     "description": "",  # We'll try to extract descriptions below
                 }
                 
@@ -1371,7 +1350,7 @@ def generate_directory_index(directory_name: str, directory_path: Path, generate
                 elif file_extension in [".py"]:
                     file_type_class = "file-python"  # Python files
                     
-                file_name = info["original_path"].name
+                file_name = info["name"]  # Use the full filename with extension
                 
                 toc_html += f'<tr>\n'
                 toc_html += f'  <td class="file-icon"><span class="{file_type_class}"></span></td>\n'
@@ -1422,9 +1401,6 @@ def generate_directory_index(directory_name: str, directory_path: Path, generate
         html_content = re.sub(r'<script[^>]*>\s*window\.basePath\s*=.*?</script>', '', html_content, flags=re.DOTALL)
         html_content = re.sub(r'<script[^>]*>\s*function\s+assetPath.*?</script>', '', html_content, flags=re.DOTALL)
 
-        # Fix relative paths for assets - NO LONGER NEEDED, handled by prefix
-        # html_content = html_content.replace("../assets/", "../../assets/") # REMOVED
-        
         # Write the HTML file
         index_path.write_text(html_content, encoding='utf-8')
         print(f"Generated index page for directory: {directory_name} using custom template")
