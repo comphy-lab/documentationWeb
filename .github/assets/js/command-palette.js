@@ -128,7 +128,7 @@ function renderSections(sections, container) {
 function initCommandPalette() {
   // Ensure search database is preloaded for command palette search functionality
   // Try to prefetch the search database if it exists
-  fetch('../assets/js/search_db.json').then(response => {
+  fetch('/assets/js/search_db.json').then(response => {
     if (response.ok) {
       return response.json();
     }
