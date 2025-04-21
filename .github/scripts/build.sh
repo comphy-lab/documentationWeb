@@ -15,7 +15,7 @@ DOCS_DIR="$PROJECT_ROOT/docs"
 PYTHON_SCRIPT="$PROJECT_ROOT/.github/scripts/generate_docs.py"
 
 echo "Running documentation generation script..."
-python3 "$PYTHON_SCRIPT"
+python3 "$PYTHON_SCRIPT" --force-rebuild
 
 if [ $? -ne 0 ]; then
     echo "Documentation generation failed."
