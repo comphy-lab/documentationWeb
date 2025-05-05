@@ -8,6 +8,7 @@ BASILISK := $(shell . ../.project_config && echo $$BASILISK)
 CFLAGS += -O2 -disable-dimensions
 CFLAGS += -I$(PWD)/src-local -I$(PWD)/../src-local
 
+.PHONY: fix-permissions
 # Fix permissions for runtest script
 fix-permissions:
 	@chmod +x $(BASILISK)/src/runtest
