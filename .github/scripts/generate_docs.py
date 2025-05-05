@@ -5,6 +5,8 @@ import shutil
 import argparse
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Set, Any, Union
+import html
+import json
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Generate documentation from source files.')
@@ -201,18 +203,14 @@ def validate_config() -> bool:
 
 def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
     """
-    Recursively searches for C, header, Python, and shell script files in specified directories.
+    Recursively finds source files of supported types in specified directories.
     
-    This function scans each directory listed in `source_dirs` (relative to `root_dir`)
-    using a recursive search for files with extensions .c, .h, .py, and .sh. It also
-    identifies .sh files that are directly located in the `root_dir`.
-    
-    Args:
-        root_dir: The root directory to begin the search.
-        source_dirs: List of directory names (relative to `root_dir`) to search recursively.
+    Searches each directory in `source_dirs` (relative to `root_dir`) for files with
+    extensions `.c`, `.h`, `.py`, `.sh`, and `.ipynb`, including all subdirectories.
+    Also includes `.sh` files located directly in the `root_dir`.
     
     Returns:
-        A list of Path objects for all discovered source files.
+        List of Path objects representing all discovered source files.
     """
     files = []
     # Search in source directories
@@ -223,6 +221,7 @@ def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
             files.extend(src_path.rglob('*.h'))
             files.extend(src_path.rglob('*.py'))
             files.extend(src_path.rglob('*.sh'))
+            files.extend(src_path.rglob('*.ipynb'))
     
     # Also search for .sh files directly in the root directory
     for sh_file in root_dir.glob('*.sh'):
@@ -251,37 +250,245 @@ def process_markdown_file(file_path: Path) -> str:
 
 def process_shell_file(file_path: Path) -> str:
     """
-    Reads the specified shell script and wraps its content in a bash code block.
-    
-    This function opens the given shell file with UTF-8 encoding, reads its complete 
-    content, and encloses it within markdown fenced code block delimiters labeled 
-    with "bash" to facilitate HTML conversion.
+    Reads a shell script file and returns its content as a Markdown-formatted bash code block.
     
     Args:
         file_path: Path to the shell script file.
     
     Returns:
-        A string containing the shell script content formatted as a bash code block.
+        The shell script content wrapped in a Markdown fenced code block labeled 'bash'.
     """
     with open(file_path, 'r', encoding='utf-8') as f:
         file_content = f.read()
     return f"```bash\n{file_content}\n```"
 
 
-def process_python_file(file_path: Path) -> str:
+def process_jupyter_notebook(file_path: Path) -> str:
     """
-    Process a Python file for Markdown conversion.
+    Generates an HTML snippet to embed a Jupyter notebook with preview and external links.
     
-    Reads a Python source file and separates its triple-quoted docstrings from its code. Docstrings
-    are cleaned of enclosing quotes and inserted as plain text, while code blocks are wrapped in
-    Markdown fences with a Python specifier. This formatting produces a Markdown string suitable for
-    HTML conversion via pandoc.
+    Reads a Jupyter notebook file, extracts its title, description, and key features from the first markdown cell if available, and produces HTML that embeds a live preview via nbviewer.org. The output includes buttons to download the notebook, view it on nbviewer, or open it in Google Colab, along with error handling for preview failures.
     
     Args:
-        file_path: The path to the Python file to process.
+        file_path: Path to the Jupyter notebook (.ipynb) file.
     
     Returns:
-        A Markdown-formatted string containing the processed content.
+        An HTML string for embedding the notebook preview and providing external access options.
+    """
+    notebook_filename = file_path.name
+    
+    try:
+        # Read the notebook to extract basic information
+        with open(file_path, 'r', encoding='utf-8') as f:
+            notebook_content = f.read()
+        
+        # Get the notebook's directory within the repository
+        rel_path = file_path.relative_to(REPO_ROOT).parent
+        if rel_path.as_posix() == '.':
+            notebook_path = notebook_filename
+        else:
+            notebook_path = f"{rel_path}/{notebook_filename}"
+            
+        # Extract title and description if available
+        notebook_title = notebook_filename
+        notebook_description = ""
+        notebook_features = []
+        
+        try:
+            notebook_data = json.loads(notebook_content)
+            # Try to get a better title from the notebook
+            for cell in notebook_data.get('cells', []):
+                if cell.get('cell_type') == 'markdown':
+                    source = ''.join(cell.get('source', []))
+                    # Look for a title in the first cell
+                    title_match = re.search(r'^#\s+(.+)$', source, re.MULTILINE)
+                    if title_match:
+                        notebook_title = title_match.group(1).strip()
+                        # Look for description text after the title
+                        desc_match = re.search(r'^#\s+.+\n\n(.+?)(?=\n\n|\Z)', source, re.DOTALL | re.MULTILINE)
+                        if desc_match:
+                            notebook_description = desc_match.group(1).strip()
+                            # Look for bullet points that might be features
+                            features_match = re.findall(r'^\s*[\*\-\+]\s+(.+)$', source, re.MULTILINE)
+                            if features_match:
+                                notebook_features = [f.strip() for f in features_match[:3]]  # Limit to 3 features
+                        break
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            # If parsing fails, use defaults
+            pass
+            
+        # Set default description if none found
+        if not notebook_description:
+            notebook_description = f"This notebook provides visualization and analysis related to {notebook_filename.split('.')[0].replace('-', ' ').replace('_', ' ')}."
+            
+        # Set default features if none found
+        if not notebook_features:
+            notebook_features = [
+                "Visualization of data and results",
+                "Analysis of simulation outputs",
+                "Interactive exploration of parameters"
+            ]
+        
+        # Escape user-supplied metadata to prevent XSS
+        safe_notebook_title = html.escape(notebook_title)
+        safe_notebook_description = html.escape(notebook_description)
+        safe_notebook_features = [html.escape(f) for f in notebook_features]
+        
+        # Create feature list HTML
+        features_html = "\n".join([f'<li>{feature}</li>' for feature in safe_notebook_features])
+        
+        # Create raw HTML output that won't get escaped by pandoc
+        # This is key - we use triple backticks with {=html} to tell pandoc to interpret this as raw HTML
+        embed_html = f"""# {safe_notebook_title}
+
+```{{=html}}
+<div class="jupyter-notebook-embed">
+    <h2>Jupyter Notebook: {safe_notebook_title}</h2>
+    
+    <div class="notebook-action-buttons">
+        <a href="{notebook_filename}" download class="notebook-btn download-btn">
+            <i class="fa-solid fa-download"></i> Download Notebook
+        </a>
+        <a href="https://nbviewer.org/github/comphy-lab/{REPO_NAME}/blob/main/{notebook_path}" 
+           target="_blank" class="notebook-btn view-btn">
+            <i class="fa-solid fa-eye"></i> View in nbviewer
+        </a>
+        <a href="https://colab.research.google.com/github/comphy-lab/{REPO_NAME}/blob/main/{notebook_path}" 
+           target="_blank" class="notebook-btn colab-btn">
+            <i class="fa-solid fa-play"></i> Open in Colab
+        </a>
+    </div>
+    
+    <div class="notebook-preview">
+        <h3>About this notebook</h3>
+        <p>{safe_notebook_description}</p>
+        
+        <h3>Key Features:</h3>
+        <ul>
+            {features_html}
+        </ul>
+    </div>
+    
+    <div class="notebook-tip">
+        <p><strong>Tip:</strong> For the best interactive experience, download the notebook or open it in Google Colab.</p>
+    </div>
+
+    <!-- Embedded Jupyter Notebook -->
+    <div class="embedded-notebook">
+        <h3>Notebook Preview</h3>
+        <div id="notebook-container-{notebook_filename.replace('.', '-')}" >
+            <iframe id="notebook-iframe-{notebook_filename.replace('.', '-')}" 
+                    src="https://nbviewer.org/github/comphy-lab/{REPO_NAME}/blob/main/{notebook_path}" 
+                    width="100%" height="800px" frameborder="0"
+                    onload="checkIframeLoaded('{notebook_filename.replace('.', '-')}')"
+                    onerror="handleIframeError('{notebook_filename.replace('.', '-')}')"></iframe>
+            <div id="notebook-error-{notebook_filename.replace('.', '-')}" 
+                 class="notebook-error-message" style="display: none;">
+                <div class="error-container">
+                    <i class="fa-solid fa-exclamation-triangle"></i>
+                    <h4>Notebook Preview Unavailable</h4>
+                    <p>The notebook preview could not be loaded. This may be because:</p>
+                    <ul>
+                        <li>The notebook file is not yet available in the repository</li>
+                        <li>The nbviewer service is temporarily unavailable</li>
+                        <li>The repository is private or has access restrictions</li>
+                    </ul>
+                    <p>You can still download the notebook using the button above or view it directly through one of the external services.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .notebook-error-message {{
+        padding: 20px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        margin: 20px 0;
+        text-align: center;
+    }}
+    
+    .error-container {{
+        max-width: 600px;
+        margin: 0 auto;
+    }}
+    
+    .notebook-error-message i {{
+        font-size: 2em;
+        color: #dc3545;
+        margin-bottom: 10px;
+    }}
+    
+    .notebook-error-message h4 {{
+        color: #dc3545;
+        margin-bottom: 15px;
+    }}
+    
+    .notebook-error-message ul {{
+        text-align: left;
+        display: inline-block;
+        margin: 10px 0;
+    }}
+</style>
+
+<script>
+    function checkIframeLoaded(id) {{
+        try {{
+            const iframe = document.getElementById('notebook-iframe-' + id);
+            // Check if we can access the iframe content
+            const iframeContent = iframe.contentWindow || iframe.contentDocument;
+            
+            // Try to check if iframe contains a 404 or error message
+            // This may fail due to cross-origin policies, which is itself a sign the iframe is not working properly
+            try {{
+                if (iframeContent.document.title.includes('404') || 
+                    iframeContent.document.body.textContent.includes('404 Not Found')) {{
+                    handleIframeError(id);
+                }}
+            }} catch (e) {{
+                // Cross-origin error might occur, but that's expected for successful loading too
+                // So we don't trigger the error handling here
+            }}
+        }} catch (e) {{
+            handleIframeError(id);
+        }}
+    }}
+    
+    function handleIframeError(id) {{
+        const iframe = document.getElementById('notebook-iframe-' + id);
+        const errorDiv = document.getElementById('notebook-error-' + id);
+        
+        if (iframe && errorDiv) {{
+            iframe.style.display = 'none';
+            errorDiv.style.display = 'block';
+        }}
+    }}
+    
+    // Additional check - try to detect 404 page after the iframe has fully loaded
+    document.addEventListener('DOMContentLoaded', function() {{
+        const iframes = document.querySelectorAll('iframe[id^="notebook-iframe-"]');
+        iframes.forEach(iframe => {{
+            iframe.addEventListener('load', function() {{
+                const id = iframe.id.replace('notebook-iframe-', '');
+                setTimeout(() => checkIframeLoaded(id), 1000); // Check after a slight delay
+            }});
+        }});
+    }});
+</script>
+```
+"""
+        return embed_html
+    except Exception as e:
+        return f"# {notebook_filename}\n\nError processing notebook: {str(e)}"
+
+
+def process_python_file(file_path: Path) -> str:
+    """
+    Converts a Python source file into Markdown by separating docstrings and code.
+    
+    Reads the file, extracts triple-quoted docstrings as plain text, and formats code blocks with Markdown Python fences. The result is a Markdown string suitable for HTML conversion.
     """
     with open(file_path, 'r', encoding='utf-8') as f:
         file_content = f.read()
@@ -423,16 +630,9 @@ def process_c_file(file_path: Path, literate_c_script: Path) -> str:
 
 def prepare_pandoc_input(file_path: Path, literate_c_script: Path) -> str:
     """
-    Prepare file content for Pandoc conversion.
+    Prepares source file content for Pandoc conversion based on file type.
     
-    Determines the processing function to use based on the file extension. Markdown (.md), Python (.py), and shell (.sh) files are handled using their specialized functions, while C/C++ files are processed with a provided literate-C script to generate a Markdown representation.
-    
-    Args:
-        file_path: Path of the source file to process.
-        literate_c_script: Path to the script for processing C/C++ files via literate programming.
-    
-    Returns:
-        The processed content as a string, ready for Pandoc conversion.
+    Selects the appropriate processing function for Markdown, Python, shell, Jupyter notebook, or C/C++ files, returning the content as a string suitable for Pandoc conversion.
     """
     file_suffix = file_path.suffix.lower()
     
@@ -442,6 +642,8 @@ def prepare_pandoc_input(file_path: Path, literate_c_script: Path) -> str:
         return process_python_file(file_path)
     elif file_suffix == '.sh':
         return process_shell_file(file_path)
+    elif file_suffix == '.ipynb':
+        return process_jupyter_notebook(file_path)
     else:  # C/C++ files
         return process_c_file(file_path, literate_c_script)
 
@@ -1053,33 +1255,28 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
                                      basilisk_dir: Path, darcsit_dir: Path, template_path: Path, 
                                      base_url: str, wiki_title: str, literate_c_script: Path, docs_dir: Path) -> bool:
     """
-    Converts a source file to HTML and applies file-type-specific post processing.
-    
-    The function prepares input for Pandoc conversion based on the file type and then
-    applies additional steps tailored to the source file. For Python, shell, and Markdown
-    files, it post-processes the output HTML to enhance code block presentation. For C/C++
-    files, it uses awk-based post processing followed by further cleanup. CSS and JavaScript
-    are then inserted to improve styling and interactive functionality. Any errors during
-    processing are caught, and the function returns a success flag.
-    
-    Args:
-        file_path: Path to the source file.
-        output_html_path: Path where the generated HTML will be saved.
-        repo_root: Repository root directory used for computing relative paths.
-        basilisk_dir: Directory containing resources for Basilisk.
-        darcsit_dir: Directory containing darcsit scripts.
-        template_path: Path to the HTML template for conversion.
-        base_url: Base URL for constructing links within the documentation.
-        wiki_title: Title for the documentation or wiki.
-        literate_c_script: Path to the literate-c script for processing C/C++ files.
-        docs_dir: Directory where documentation files are stored.
-    
-    Returns:
-        True if the HTML was generated and post-processed successfully, False otherwise.
-    """
+                                     Converts a source file to HTML and applies file-type-specific post-processing.
+                                     
+                                     Prepares the source file for Pandoc conversion based on its type, generates HTML output, and applies enhancements tailored to the file format. For Python, shell, Markdown, and Jupyter notebook files, it post-processes the HTML to improve code block presentation and interactivity; for Jupyter notebooks, it also copies the original `.ipynb` file to the documentation directory. For C/C++ files, it applies awk-based processing and further HTML cleanup. Inserts JavaScript for code block copy buttons. Returns True if processing succeeds, otherwise False.
+                                     """
     print(f"  Processing {file_path.relative_to(repo_root)} -> {output_html_path.relative_to(repo_root / 'docs')}")
 
     try:
+        # Check if we're processing a Jupyter notebook
+        is_jupyter_notebook = file_path.suffix.lower() == '.ipynb'
+        
+        # For Jupyter notebooks, copy the original .ipynb file to the docs directory
+        if is_jupyter_notebook:
+            # The destination should be in the same directory as the HTML file
+            notebook_dest = output_html_path.parent / file_path.name
+            # Copy the notebook file
+            try:
+                import shutil
+                shutil.copy2(file_path, notebook_dest)
+                print(f"  Copied notebook {file_path.name} to {notebook_dest.relative_to(repo_root / 'docs')}")
+            except Exception as e:
+                print(f"  Warning: Failed to copy notebook file: {e}")
+        
         # Prepare pandoc input based on file type
         pandoc_input_content = prepare_pandoc_input(file_path, literate_c_script)
         
@@ -1118,8 +1315,8 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
         is_markdown_file = file_path.suffix.lower() == '.md'
         
         # Apply appropriate post-processing based on file type
-        if is_python_file or is_shell_file or is_markdown_file:
-            # For Python, Shell, and Markdown files
+        if is_python_file or is_shell_file or is_markdown_file or is_jupyter_notebook:
+            # For Python, Shell, Markdown, and Jupyter notebook files
             # Read the generated HTML file
             with open(output_html_path, 'r', encoding='utf-8') as f:
                 html_content = f.read()
@@ -1278,7 +1475,7 @@ def generate_directory_index(directory_name: str, directory_path: Path, generate
     """
     Generates an index.html page for a documentation directory listing all generated HTML files.
     
-    Creates a landing page for a given source directory using a custom template, displaying a table of contents with links to each documentation file and their descriptions. Extracts file descriptions from meta tags in the HTML files and formats the directory name for display. Returns True if the index page is generated successfully, otherwise False.
+    Creates a landing page for the specified directory using a custom template, displaying a table of contents with links to each documentation file and their descriptions (extracted from meta tags). Assigns CSS classes to file types for styling, formats the directory name for display, and writes the resulting HTML index page. Returns True if the index page is generated successfully, otherwise False.
     """
     try:
         index_path = directory_path / "index.html"
@@ -1349,6 +1546,8 @@ def generate_directory_index(directory_name: str, directory_path: Path, generate
                     file_type_class = "file-c"  # C/header files
                 elif file_extension in [".py"]:
                     file_type_class = "file-python"  # Python files
+                elif file_extension in [".ipynb"]:
+                    file_type_class = "file-jupyter"  # Jupyter notebook files
                     
                 file_name = info["name"]  # Use the full filename with extension
                 

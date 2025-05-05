@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="base-url" content="..">
-    <title>Post-Processing Tools | Documentation</title>
+    <title>postProcess/LidDrivenCavity-Newtonian-dyeInjection.ipynb | Test documentation: Lid driven cavity using dye injection</title>
     
     <!-- Critical CSS for fastest paint -->
     <style>
@@ -44,10 +44,10 @@
     <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Documentation for the CoMPhy-Lab computational fluid dynamics framework.">
+    <meta name="description" content="Computational fluid dynamics simulations using Basilisk C framework.">
     <meta name="author" content="CoMPhy Lab">
     <meta name="robots" content="index, follow">
-    <meta name="keywords" content="fluid dynamics, CFD, Basilisk, postProcess, documentation">
+    <meta name="keywords" content="fluid dynamics, CFD, Basilisk, multiphase flow, computational physics">
 
     <!-- Font dependencies with font-display: swap -->
     <style>
@@ -96,7 +96,7 @@
           link.href = href;
           link.crossOrigin = 'anonymous';
           link.onerror = (e) => {
-            console.error(`Failed to load stylesheet: ${href}`);
+            console.error(`Failed to load stylesheet: `);
             console.log('Trying alternative Font Awesome source...');
           };
           document.head.appendChild(link);
@@ -129,6 +129,8 @@
     </script>
 </head>
 <body id="top">
+<script>window.repoName = "documentationWeb";</script>
+
 
     <div id="preloader">
         <div id="loader"></div>
@@ -196,31 +198,152 @@
         <!-- Main content -->
         <main class="content">
             
-
             <div class="page-content">
-<h1>Post-Processing Tools</h1>
+                
+                                <h1 class="page-title">postProcess/LidDrivenCavity-Newtonian-dyeInjection.ipynb</h1>
+                
+                
+                <h1
+                id="post-processing-test-for-lid-driven-cavity-flow-with-dye-injection.">Post-processing
+                test for Lid-Driven Cavity flow with dye injection.</h1>
+                <div class="jupyter-notebook-embed">
+                    <h2>Jupyter Notebook: Post-processing test for Lid-Driven Cavity flow with dye injection.</h2>
+                    
+                    <div class="notebook-action-buttons">
+                        <a href="LidDrivenCavity-Newtonian-dyeInjection.ipynb" download class="notebook-btn download-btn">
+                            <i class="fa-solid fa-download"></i> Download Notebook
+                        </a>
+                        <a href="https://nbviewer.org/github/comphy-lab/documentationWeb/blob/main/postProcess/LidDrivenCavity-Newtonian-dyeInjection.ipynb" 
+                           target="_blank" class="notebook-btn view-btn">
+                            <i class="fa-solid fa-eye"></i> View in nbviewer
+                        </a>
+                        <a href="https://colab.research.google.com/github/comphy-lab/documentationWeb/blob/main/postProcess/LidDrivenCavity-Newtonian-dyeInjection.ipynb" 
+                           target="_blank" class="notebook-btn colab-btn">
+                            <i class="fa-solid fa-play"></i> Open in Colab
+                        </a>
+                    </div>
+                    
+                    <div class="notebook-preview">
+                        <h3>About this notebook</h3>
+                        <p>Import all relevant libraries.</p>
+                        
+                        <h3>Key Features:</h3>
+                        <ul>
+                            <li>Visualization of data and results</li>
+                <li>Analysis of simulation outputs</li>
+                <li>Interactive exploration of parameters</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="notebook-tip">
+                        <p><strong>Tip:</strong> For the best interactive experience, download the notebook or open it in Google Colab.</p>
+                    </div>
 
-<div class="documentation-section">
-<table class="documentation-files">
-<tr>
-  <td class="file-icon"><span class="file-c"></span></td>
-  <td class="file-link" style="padding-right: 2em;"><a href="getData-LidDriven.c.html" class="doc-link-button">getData-LidDriven.c</a></td>
-  <td class="file-desc">Computational fluid dynamics simulations using Basilisk C framework.</td>
-</tr>
-<tr>
-  <td class="file-icon"><span class="file-jupyter"></span></td>
-  <td class="file-link" style="padding-right: 2em;"><a href="LidDrivenCavity-Newtonian-dyeInjection.ipynb.html" class="doc-link-button">LidDrivenCavity-Newtonian-dyeInjection.ipynb</a></td>
-  <td class="file-desc">Computational fluid dynamics simulations using Basilisk C framework.</td>
-</tr>
-<tr>
-  <td class="file-icon"><span class="file-python"></span></td>
-  <td class="file-link" style="padding-right: 2em;"><a href="LidDrivenCavity-Newtonian-dyeInjection.py.html" class="doc-link-button">LidDrivenCavity-Newtonian-dyeInjection.py</a></td>
-  <td class="file-desc">Computational fluid dynamics simulations using Basilisk C framework.</td>
-</tr>
-</table>
-</div>
+                    <!-- Embedded Jupyter Notebook -->
+                    <div class="embedded-notebook">
+                        <h3>Notebook Preview</h3>
+                        <div id="notebook-container-LidDrivenCavity-Newtonian-dyeInjection-ipynb" >
+                            <iframe id="notebook-iframe-LidDrivenCavity-Newtonian-dyeInjection-ipynb" 
+                                    src="https://nbviewer.org/github/comphy-lab/documentationWeb/blob/main/postProcess/LidDrivenCavity-Newtonian-dyeInjection.ipynb" 
+                                    width="100%" height="800px" frameborder="0"
+                                    onload="checkIframeLoaded('LidDrivenCavity-Newtonian-dyeInjection-ipynb')"
+                                    onerror="handleIframeError('LidDrivenCavity-Newtonian-dyeInjection-ipynb')"></iframe>
+                            <div id="notebook-error-LidDrivenCavity-Newtonian-dyeInjection-ipynb" 
+                                 class="notebook-error-message" style="display: none;">
+                                <div class="error-container">
+                                    <i class="fa-solid fa-exclamation-triangle"></i>
+                                    <h4>Notebook Preview Unavailable</h4>
+                                    <p>The notebook preview could not be loaded. This may be because:</p>
+                                    <ul>
+                                        <li>The notebook file is not yet available in the repository</li>
+                                        <li>The nbviewer service is temporarily unavailable</li>
+                                        <li>The repository is private or has access restrictions</li>
+                                    </ul>
+                                    <p>You can still download the notebook using the button above or view it directly through one of the external services.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-</div>
+                <style>
+                    .notebook-error-message {
+                        padding: 20px;
+                        background-color: #f8f9fa;
+                        border: 1px solid #dee2e6;
+                        border-radius: 4px;
+                        margin: 20px 0;
+                        text-align: center;
+                    }
+                    
+                    .error-container {
+                        max-width: 600px;
+                        margin: 0 auto;
+                    }
+                    
+                    .notebook-error-message i {
+                        font-size: 2em;
+                        color: #dc3545;
+                        margin-bottom: 10px;
+                    }
+                    
+                    .notebook-error-message h4 {
+                        color: #dc3545;
+                        margin-bottom: 15px;
+                    }
+                    
+                    .notebook-error-message ul {
+                        text-align: left;
+                        display: inline-block;
+                        margin: 10px 0;
+                    }
+                </style>
+
+                <script>
+                    function checkIframeLoaded(id) {
+                        try {
+                            const iframe = document.getElementById('notebook-iframe-' + id);
+                            // Check if we can access the iframe content
+                            const iframeContent = iframe.contentWindow || iframe.contentDocument;
+                            
+                            // Try to check if iframe contains a 404 or error message
+                            // This may fail due to cross-origin policies, which is itself a sign the iframe is not working properly
+                            try {
+                                if (iframeContent.document.title.includes('404') || 
+                                    iframeContent.document.body.textContent.includes('404 Not Found')) {
+                                    handleIframeError(id);
+                                }
+                            } catch (e) {
+                                // Cross-origin error might occur, but that's expected for successful loading too
+                                // So we don't trigger the error handling here
+                            }
+                        } catch (e) {
+                            handleIframeError(id);
+                        }
+                    }
+                    
+                    function handleIframeError(id) {
+                        const iframe = document.getElementById('notebook-iframe-' + id);
+                        const errorDiv = document.getElementById('notebook-error-' + id);
+                        
+                        if (iframe && errorDiv) {
+                            iframe.style.display = 'none';
+                            errorDiv.style.display = 'block';
+                        }
+                    }
+                    
+                    // Additional check - try to detect 404 page after the iframe has fully loaded
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const iframes = document.querySelectorAll('iframe[id^="notebook-iframe-"]');
+                        iframes.forEach(iframe => {
+                            iframe.addEventListener('load', function() {
+                                const id = iframe.id.replace('notebook-iframe-', '');
+                                setTimeout(() => checkIframeLoaded(id), 1000); // Check after a slight delay
+                            });
+                        });
+                    });
+                </script>
+            </div>
         </main>
 
         <footer class="site-footer">
@@ -281,5 +404,56 @@
         </div>
     </div>
 
-</body>
+
+    <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add copy button to each code block container
+        const codeBlocks = document.querySelectorAll('.code-block-container pre');
+        codeBlocks.forEach(function(codeBlock, index) {
+            // Create button element
+            const button = document.createElement('button');
+            button.className = 'copy-button';
+            button.textContent = 'Copy';
+            button.setAttribute('aria-label', 'Copy code to clipboard');
+            button.setAttribute('data-copy-state', 'copy');
+            
+            // Get the code block container (parent of the pre)
+            const container = codeBlock.parentNode;
+            
+            // Add the button to the container
+            container.appendChild(button);
+            
+            // Set up click event
+            button.addEventListener('click', function() {
+                // Create a textarea element to copy from
+                const textarea = document.createElement('textarea');
+                // Get the text content from the pre element (the actual code)
+                textarea.value = codeBlock.textContent;
+                document.body.appendChild(textarea);
+                textarea.select();
+                
+                try {
+                    // Execute copy command
+                    document.execCommand('copy');
+                    // Update button state
+                    button.textContent = 'Copied!';
+                    button.classList.add('copied');
+                    
+                    // Reset button state after 2 seconds
+                    setTimeout(function() {
+                        button.textContent = 'Copy';
+                        button.classList.remove('copied');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Copy failed:', err);
+                    button.textContent = 'Error!';
+                }
+                
+                // Clean up
+                document.body.removeChild(textarea);
+            });
+        });
+    });
+    </script>
+        </body>
 </html>

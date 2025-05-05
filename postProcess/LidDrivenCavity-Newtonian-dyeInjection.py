@@ -195,9 +195,9 @@ def process_timestep(ti, caseToProcess, folder, tsnap, GridsPerR, rmin, rmax, zm
 def main():
     # Get number of CPUs from command line argument, or use all available
     """
-    Parses command-line arguments and initiates parallel processing of simulation timesteps.
+    Parses command-line arguments and processes simulation timesteps in parallel.
     
-    This function reads simulation configuration and processing parameters from the command line, including grid settings, simulation bounds, and performance options. It ensures that the output directory exists and then sets up a multiprocessing pool to concurrently process simulation data timesteps by mapping a worker function that generates visualizations.
+    Reads simulation and processing parameters from the command line, prepares the output directory, and uses a multiprocessing pool to generate visualizations for each simulation timestep concurrently.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('--CPUs', type=int, default=mp.cpu_count(), help='Number of CPUs to use')
@@ -208,8 +208,8 @@ def main():
     parser.add_argument('--ZMIN', type=float, default=-0.5, help='Minimum Z value')
     parser.add_argument('--RMIN', type=float, default=-0.5, help='Minimum R value')
     parser.add_argument('--tsnap', type=float, default=0.01, help='Time snap')
-    parser.add_argument('--caseToProcess', type=str, default='../simulationCases/2-LidDrivenCavity-Newtonian-dyeInjection', help='Case to process')  
-    parser.add_argument('--folderToSave', type=str, default='2-LidDrivenCavity-Newtonian-dyeInjection', help='Folder to save')
+    parser.add_argument('--caseToProcess', type=str, default='../simulationCases/LidDrivenCavity-Newtonian-dyeInjection', help='Case to process')  
+    parser.add_argument('--folderToSave', type=str, default='LidDrivenCavity-Newtonian-dyeInjection', help='Folder to save')
     args = parser.parse_args()
 
     num_processes = args.CPUs

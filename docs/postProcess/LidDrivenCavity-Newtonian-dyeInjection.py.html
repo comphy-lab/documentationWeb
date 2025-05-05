@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="base-url" content="..">
-    <title>postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py | Test documentation: Lid driven cavity using dye injection</title>
+    <title>postProcess/LidDrivenCavity-Newtonian-dyeInjection.py | Test documentation: Lid driven cavity using dye injection</title>
     
     <!-- Critical CSS for fastest paint -->
     <style>
@@ -200,7 +200,7 @@
             
             <div class="page-content">
                 
-                                <h1 class="page-title">postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py</h1>
+                                <h1 class="page-title">postProcess/LidDrivenCavity-Newtonian-dyeInjection.py</h1>
                 
                 
                 <div class="code-block-container"><div class="code-block-container"><pre
@@ -403,15 +403,12 @@
 <span id="cb3-88"></span>
 <span id="cb3-89"><span class="kw">def</span> main():</span>
 <span id="cb3-90">    <span class="co"># Get number of CPUs from command line argument, or use all available</span></span></code></pre></div></div>
-                <p>Parses command-line arguments and initiates parallel
-                processing of simulation timesteps.</p>
-                <p>This function reads simulation configuration and
-                processing parameters from the command line, including
-                grid settings, simulation bounds, and performance
-                options. It ensures that the output directory exists and
-                then sets up a multiprocessing pool to concurrently
-                process simulation data timesteps by mapping a worker
-                function that generates visualizations.</p>
+                <p>Parses command-line arguments and processes
+                simulation timesteps in parallel.</p>
+                <p>Reads simulation and processing parameters from the
+                command line, prepares the output directory, and uses a
+                multiprocessing pool to generate visualizations for each
+                simulation timestep concurrently.</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
                 class="sourceCode python"><code class="sourceCode python"><span id="cb4-1">    parser <span class="op">=</span> argparse.ArgumentParser()</span>
 <span id="cb4-2">    parser.add_argument(<span class="st">&#39;--CPUs&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>, default<span class="op">=</span>mp.cpu_count(), <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Number of CPUs to use&#39;</span>)</span>
@@ -422,8 +419,8 @@
 <span id="cb4-7">    parser.add_argument(<span class="st">&#39;--ZMIN&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">float</span>, default<span class="op">=-</span><span class="fl">0.5</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Minimum Z value&#39;</span>)</span>
 <span id="cb4-8">    parser.add_argument(<span class="st">&#39;--RMIN&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">float</span>, default<span class="op">=-</span><span class="fl">0.5</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Minimum R value&#39;</span>)</span>
 <span id="cb4-9">    parser.add_argument(<span class="st">&#39;--tsnap&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">float</span>, default<span class="op">=</span><span class="fl">0.01</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Time snap&#39;</span>)</span>
-<span id="cb4-10">    parser.add_argument(<span class="st">&#39;--caseToProcess&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">str</span>, default<span class="op">=</span><span class="st">&#39;../simulationCases/2-LidDrivenCavity-Newtonian-dyeInjection&#39;</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Case to process&#39;</span>)  </span>
-<span id="cb4-11">    parser.add_argument(<span class="st">&#39;--folderToSave&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">str</span>, default<span class="op">=</span><span class="st">&#39;2-LidDrivenCavity-Newtonian-dyeInjection&#39;</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Folder to save&#39;</span>)</span>
+<span id="cb4-10">    parser.add_argument(<span class="st">&#39;--caseToProcess&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">str</span>, default<span class="op">=</span><span class="st">&#39;../simulationCases/LidDrivenCavity-Newtonian-dyeInjection&#39;</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Case to process&#39;</span>)  </span>
+<span id="cb4-11">    parser.add_argument(<span class="st">&#39;--folderToSave&#39;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">str</span>, default<span class="op">=</span><span class="st">&#39;LidDrivenCavity-Newtonian-dyeInjection&#39;</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;Folder to save&#39;</span>)</span>
 <span id="cb4-12">    args <span class="op">=</span> parser.parse_args()</span>
 <span id="cb4-13"></span>
 <span id="cb4-14">    num_processes <span class="op">=</span> args.CPUs</span>

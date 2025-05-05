@@ -99,6 +99,7 @@ deps/
 **/.cursorrules
 
 # Custom executables
+**/LidDrivenCavity-Newtonian-dyeInjection
 **/1-conduction-simple
 **/1-conduction-transient
 **/1-conduction-simple-basilisk
@@ -148,3 +149,5 @@ deps/
 !*.sbatch
 **/getData-generic
 **/getData-Line
+
+**/.claude/settings.local.json

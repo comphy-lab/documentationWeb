@@ -19,7 +19,8 @@ The codebase implements a classical lid driven cavity flow problem with dye inje
 ├── src-local/                  Custom header files extending Basilisk functionality
 │   └── dye-injection.h         Dye injection for flow visualization
 └── postProcess/                Project-specific post-processing tools
-    ├── 2-LidDrivenCavity-Newtonian-dyeInjection.py Visualization script for post-processing
+    ├── LidDrivenCavity-Newtonian-dyeInjection.ipynb  Jupyter notebook for analysis and visualization
+    ├── LidDrivenCavity-Newtonian-dyeInjection.py     Python script for post-processing
     └── getData-LidDriven.c     Data extraction utility
 ```
 
@@ -36,7 +37,13 @@ The [`src-local/`](src-local) directory contains custom header files that extend
 
 The [`postProcess/`](postProcess) directory provides tools for analyzing and visualizing simulation results:
 
-- [2-LidDrivenCavity-Newtonian-dyeInjection.py](postProcess/2-LidDrivenCavity-Newtonian-dyeInjection.py): Python script for generating visualizations that:
+- [LidDrivenCavity-Newtonian-dyeInjection.ipynb](postProcess/LidDrivenCavity-Newtonian-dyeInjection.ipynb): Jupyter notebook that:
+  - Provides interactive analysis of simulation results
+  - Visualizes dye transport in the cavity
+  - Contains both code and documentation in a single document
+  - Allows for reproducible analysis workflow
+
+- [LidDrivenCavity-Newtonian-dyeInjection.py](postProcess/LidDrivenCavity-Newtonian-dyeInjection.py): Python script for generating visualizations that:
   - Processes simulation timesteps in parallel
   - Creates two-panel plots showing dye concentration and velocity magnitude
   - Adds streamlines to visualize flow patterns
