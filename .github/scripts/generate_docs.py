@@ -6,6 +6,7 @@ import argparse
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Set, Any, Union
 import html
+import json
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Generate documentation from source files.')
@@ -289,7 +290,6 @@ def process_jupyter_notebook(file_path: Path) -> str:
             notebook_path = f"{rel_path}/{notebook_filename}"
             
         # Extract title and description if available
-        import json
         notebook_title = notebook_filename
         notebook_description = ""
         notebook_features = []
@@ -313,7 +313,7 @@ def process_jupyter_notebook(file_path: Path) -> str:
                             if features_match:
                                 notebook_features = [f.strip() for f in features_match[:3]]  # Limit to 3 features
                         break
-        except:
+        except (json.JSONDecodeError, UnicodeDecodeError):
             # If parsing fails, use defaults
             pass
             
