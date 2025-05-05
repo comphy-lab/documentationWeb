@@ -195,9 +195,9 @@ def process_timestep(ti, caseToProcess, folder, tsnap, GridsPerR, rmin, rmax, zm
 def main():
     # Get number of CPUs from command line argument, or use all available
     """
-    Parses command-line arguments and initiates parallel processing of simulation timesteps.
+    Parses command-line arguments and processes simulation timesteps in parallel.
     
-    This function reads simulation configuration and processing parameters from the command line, including grid settings, simulation bounds, and performance options. It ensures that the output directory exists and then sets up a multiprocessing pool to concurrently process simulation data timesteps by mapping a worker function that generates visualizations.
+    Reads simulation and processing parameters from the command line, prepares the output directory, and uses a multiprocessing pool to generate visualizations for each simulation timestep concurrently.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('--CPUs', type=int, default=mp.cpu_count(), help='Number of CPUs to use')

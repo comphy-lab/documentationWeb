@@ -201,18 +201,14 @@ def validate_config() -> bool:
 
 def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
     """
-    Recursively searches for C, header, Python, shell script, and Jupyter notebook files in specified directories.
+    Recursively finds source files of supported types in specified directories.
     
-    This function scans each directory listed in `source_dirs` (relative to `root_dir`)
-    using a recursive search for files with extensions .c, .h, .py, .sh, and .ipynb. It also
-    identifies .sh files that are directly located in the `root_dir`.
-    
-    Args:
-        root_dir: The root directory to begin the search.
-        source_dirs: List of directory names (relative to `root_dir`) to search recursively.
+    Searches each directory in `source_dirs` (relative to `root_dir`) for files with
+    extensions `.c`, `.h`, `.py`, `.sh`, and `.ipynb`, including all subdirectories.
+    Also includes `.sh` files located directly in the `root_dir`.
     
     Returns:
-        A list of Path objects for all discovered source files.
+        List of Path objects representing all discovered source files.
     """
     files = []
     # Search in source directories
@@ -252,17 +248,13 @@ def process_markdown_file(file_path: Path) -> str:
 
 def process_shell_file(file_path: Path) -> str:
     """
-    Reads the specified shell script and wraps its content in a bash code block.
-    
-    This function opens the given shell file with UTF-8 encoding, reads its complete 
-    content, and encloses it within markdown fenced code block delimiters labeled 
-    with "bash" to facilitate HTML conversion.
+    Reads a shell script file and returns its content as a Markdown-formatted bash code block.
     
     Args:
         file_path: Path to the shell script file.
     
     Returns:
-        A string containing the shell script content formatted as a bash code block.
+        The shell script content wrapped in a Markdown fenced code block labeled 'bash'.
     """
     with open(file_path, 'r', encoding='utf-8') as f:
         file_content = f.read()
@@ -271,18 +263,15 @@ def process_shell_file(file_path: Path) -> str:
 
 def process_jupyter_notebook(file_path: Path) -> str:
     """
-    Process a Jupyter notebook for embedding in HTML.
+    Generates an HTML snippet to embed a Jupyter notebook with preview and external links.
     
-    This version creates HTML that works reliably in the documentation website,
-    providing clear links to view the notebook in nbviewer.org, download it directly,
-    or open it in Google Colab. It also embeds the notebook directly in the page.
+    Reads a Jupyter notebook file, extracts its title, description, and key features from the first markdown cell if available, and produces HTML that embeds a live preview via nbviewer.org. The output includes buttons to download the notebook, view it on nbviewer, or open it in Google Colab, along with error handling for preview failures.
     
     Args:
-        file_path: Path to the Jupyter notebook (.ipynb) file
-        
+        file_path: Path to the Jupyter notebook (.ipynb) file.
+    
     Returns:
-        A string containing HTML that provides links to properly view the notebook
-        and embeds the notebook itself
+        An HTML string for embedding the notebook preview and providing external access options.
     """
     notebook_filename = file_path.name
     
@@ -491,18 +480,9 @@ def process_jupyter_notebook(file_path: Path) -> str:
 
 def process_python_file(file_path: Path) -> str:
     """
-    Process a Python file for Markdown conversion.
+    Converts a Python source file into Markdown by separating docstrings and code.
     
-    Reads a Python source file and separates its triple-quoted docstrings from its code. Docstrings
-    are cleaned of enclosing quotes and inserted as plain text, while code blocks are wrapped in
-    Markdown fences with a Python specifier. This formatting produces a Markdown string suitable for
-    HTML conversion via pandoc.
-    
-    Args:
-        file_path: The path to the Python file to process.
-    
-    Returns:
-        A Markdown-formatted string containing the processed content.
+    Reads the file, extracts triple-quoted docstrings as plain text, and formats code blocks with Markdown Python fences. The result is a Markdown string suitable for HTML conversion.
     """
     with open(file_path, 'r', encoding='utf-8') as f:
         file_content = f.read()
@@ -644,18 +624,9 @@ def process_c_file(file_path: Path, literate_c_script: Path) -> str:
 
 def prepare_pandoc_input(file_path: Path, literate_c_script: Path) -> str:
     """
-    Prepare file content for Pandoc conversion.
+    Prepares source file content for Pandoc conversion based on file type.
     
-    Determines the processing function to use based on the file extension. Markdown (.md), Python (.py),
-    shell (.sh), and Jupyter notebook (.ipynb) files are handled using their specialized functions,
-    while C/C++ files are processed with a provided literate-C script to generate a Markdown representation.
-    
-    Args:
-        file_path: Path of the source file to process.
-        literate_c_script: Path to the script for processing C/C++ files via literate programming.
-    
-    Returns:
-        The processed content as a string, ready for Pandoc conversion.
+    Selects the appropriate processing function for Markdown, Python, shell, Jupyter notebook, or C/C++ files, returning the content as a string suitable for Pandoc conversion.
     """
     file_suffix = file_path.suffix.lower()
     
@@ -1278,31 +1249,10 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
                                      basilisk_dir: Path, darcsit_dir: Path, template_path: Path, 
                                      base_url: str, wiki_title: str, literate_c_script: Path, docs_dir: Path) -> bool:
     """
-    Converts a source file to HTML and applies file-type-specific post processing.
-    
-    The function prepares input for Pandoc conversion based on the file type and then
-    applies additional steps tailored to the source file. For Python, shell, and Markdown
-    files, it post-processes the output HTML to enhance code block presentation. For C/C++
-    files, it uses awk-based post processing followed by further cleanup. For Jupyter notebooks,
-    it also copies the original .ipynb file to the docs directory. CSS and JavaScript
-    are then inserted to improve styling and interactive functionality. Any errors during
-    processing are caught, and the function returns a success flag.
-    
-    Args:
-        file_path: Path to the source file.
-        output_html_path: Path where the generated HTML will be saved.
-        repo_root: Repository root directory used for computing relative paths.
-        basilisk_dir: Directory containing resources for Basilisk.
-        darcsit_dir: Directory containing darcsit scripts.
-        template_path: Path to the HTML template for conversion.
-        base_url: Base URL for constructing links within the documentation.
-        wiki_title: Title for the documentation or wiki.
-        literate_c_script: Path to the literate-c script for processing C/C++ files.
-        docs_dir: Directory where documentation files are stored.
-    
-    Returns:
-        True if the HTML was generated and post-processed successfully, False otherwise.
-    """
+                                     Converts a source file to HTML and applies file-type-specific post-processing.
+                                     
+                                     Prepares the source file for Pandoc conversion based on its type, generates HTML output, and applies enhancements tailored to the file format. For Python, shell, Markdown, and Jupyter notebook files, it post-processes the HTML to improve code block presentation and interactivity; for Jupyter notebooks, it also copies the original `.ipynb` file to the documentation directory. For C/C++ files, it applies awk-based processing and further HTML cleanup. Inserts JavaScript for code block copy buttons. Returns True if processing succeeds, otherwise False.
+                                     """
     print(f"  Processing {file_path.relative_to(repo_root)} -> {output_html_path.relative_to(repo_root / 'docs')}")
 
     try:
@@ -1519,7 +1469,7 @@ def generate_directory_index(directory_name: str, directory_path: Path, generate
     """
     Generates an index.html page for a documentation directory listing all generated HTML files.
     
-    Creates a landing page for a given source directory using a custom template, displaying a table of contents with links to each documentation file and their descriptions. Extracts file descriptions from meta tags in the HTML files and formats the directory name for display. Returns True if the index page is generated successfully, otherwise False.
+    Creates a landing page for the specified directory using a custom template, displaying a table of contents with links to each documentation file and their descriptions (extracted from meta tags). Assigns CSS classes to file types for styling, formats the directory name for display, and writes the resulting HTML index page. Returns True if the index page is generated successfully, otherwise False.
     """
     try:
         index_path = directory_path / "index.html"
