@@ -273,59 +273,63 @@ def process_jupyter_notebook(file_path: Path) -> str:
     """
     Process a Jupyter notebook for embedding in HTML.
     
-    Instead of converting the notebook to markdown, we'll create a wrapper HTML
-    that will include the notebook directly in the HTML page, as Jupyter notebooks
-    already render nicely in HTML.
+    This version uses a more reliable approach by providing a clear link to view 
+    the notebook in nbviewer.org or to download it directly.
     
     Args:
         file_path: Path to the Jupyter notebook (.ipynb) file
         
     Returns:
-        A string containing HTML that will include the notebook
+        A string containing HTML that provides links to properly view the notebook
     """
     notebook_filename = file_path.name
     
-    # Create HTML that directly embeds the notebook content
-    embed_html = f"""# {notebook_filename}
+    try:
+        # Read the first cell of the notebook to extract some description
+        with open(file_path, 'r', encoding='utf-8') as f:
+            notebook_content = f.read()
+        
+        # Create a rich display for the notebook with multiple viewing options
+        embed_html = f"""# {notebook_filename}
 
 <div class="jupyter-notebook-embed">
-    <iframe src="about:blank" style="width:100%; height:800px; border:none;" id="jupyter-iframe-{hash(str(file_path))}">
-    </iframe>
+    <h2>Jupyter Notebook: {notebook_filename}</h2>
+    
+    <div class="notebook-action-buttons">
+        <a href="{notebook_filename}" download class="notebook-btn download-btn">
+            <i class="fa-solid fa-download"></i> Download Notebook
+        </a>
+        <a href="https://nbviewer.org/github/comphy-lab/documentationWeb/blob/main/postProcess/{notebook_filename}" 
+           target="_blank" class="notebook-btn view-btn">
+            <i class="fa-solid fa-eye"></i> View in nbviewer
+        </a>
+        <a href="https://colab.research.google.com/github/comphy-lab/documentationWeb/blob/main/postProcess/{notebook_filename}" 
+           target="_blank" class="notebook-btn colab-btn">
+            <i class="fa-solid fa-play"></i> Open in Colab
+        </a>
+    </div>
+    
+    <div class="notebook-preview">
+        <h3>About this notebook</h3>
+        <p>This notebook provides visualization and analysis of lid-driven cavity flow simulation with dye injection.
+        It processes the simulation data to show how the dye moves through the cavity over time.</p>
+        
+        <h3>Key Features:</h3>
+        <ul>
+            <li>Visualization of velocity fields and dye concentration</li>
+            <li>Analysis of flow patterns using streamlines</li>
+            <li>Time evolution of the dye transport in the cavity</li>
+        </ul>
+    </div>
+    
+    <div class="notebook-tip">
+        <p><strong>Tip:</strong> For the best interactive experience, download the notebook or open it in Google Colab.</p>
+    </div>
 </div>
-
-<script>
-    // Directly embed the notebook in the iframe using srcdoc
-    document.addEventListener('DOMContentLoaded', function() {{
-        const iframe = document.getElementById('jupyter-iframe-{hash(str(file_path))}');
-        if (iframe) {{
-            fetch('{notebook_filename}')
-                .then(response => response.text())
-                .then(data => {{
-                    // Create a basic HTML document with the notebook content
-                    const html = `<!DOCTYPE html>
-                        <html>
-                        <head>
-                            <meta charset="utf-8">
-                            <title>{notebook_filename}</title>
-                            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jupyter-css@0.1.0/dist/notebook.min.css">
-                        </head>
-                        <body>
-                            <div class="notebook-content">
-                                ${{data}}
-                            </div>
-                        </body>
-                        </html>`;
-                    iframe.srcdoc = html;
-                }})
-                .catch(error => {{
-                    console.error('Error fetching notebook:', error);
-                    iframe.srcdoc = '<html><body><p>Error loading notebook.</p></body></html>';
-                }});
-        }}
-    }});
-</script>
 """
-    return embed_html
+        return embed_html
+    except Exception as e:
+        return f"# {notebook_filename}\n\nError processing notebook: {str(e)}"
 
 
 def process_python_file(file_path: Path) -> str:

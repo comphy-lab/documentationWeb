@@ -206,95 +206,39 @@
                 <h1
                 id="liddrivencavity-newtonian-dyeinjection.ipynb">LidDrivenCavity-Newtonian-dyeInjection.ipynb</h1>
                 <div class="jupyter-notebook-embed">
-                <div class="code-block-container"><pre><code>&lt;iframe src=&quot;about:blank&quot; style=&quot;width:100%; height:800px; border:none;&quot; id=&quot;jupyter-iframe--4622759039408725101&quot;&gt;
-&lt;/iframe&gt;</code></pre></div>
-                </div>
-                <script>
-                    // Directly embed the notebook in the iframe using srcdoc
-                    document.addEventListener('DOMContentLoaded', function() {
-                        const iframe = document.getElementById('jupyter-iframe--4622759039408725101');
-                        if (iframe) {
-                            fetch('LidDrivenCavity-Newtonian-dyeInjection.ipynb')
-                                .then(response => response.text())
-                                .then(data => {
-                                    // Create a basic HTML document with the notebook content
-                                    const html = `<!DOCTYPE html>
-                                        <html>
-                                        <head>
-                                            <meta charset="utf-8">
-                                            <title>LidDrivenCavity-Newtonian-dyeInjection.ipynb</title>
-                                            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jupyter-css@0.1.0/dist/notebook.min.css">
-                                        </head>
-                                        <body>
-<script>window.repoName = "documentationWeb";</script>
+                <div class="code-block-container"><pre><code>&lt;h2&gt;Jupyter Notebook: LidDrivenCavity-Newtonian-dyeInjection.ipynb&lt;/h2&gt;
 
-                                            <div class="notebook-content">
-                                                ${data}
-                                            </div>
-                                        
-    <script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add copy button to each code block container
-        const codeBlocks = document.querySelectorAll('.code-block-container pre');
-        codeBlocks.forEach(function(codeBlock, index) {
-            // Create button element
-            const button = document.createElement('button');
-            button.className = 'copy-button';
-            button.textContent = 'Copy';
-            button.setAttribute('aria-label', 'Copy code to clipboard');
-            button.setAttribute('data-copy-state', 'copy');
-            
-            // Get the code block container (parent of the pre)
-            const container = codeBlock.parentNode;
-            
-            // Add the button to the container
-            container.appendChild(button);
-            
-            // Set up click event
-            button.addEventListener('click', function() {
-                // Create a textarea element to copy from
-                const textarea = document.createElement('textarea');
-                // Get the text content from the pre element (the actual code)
-                textarea.value = codeBlock.textContent;
-                document.body.appendChild(textarea);
-                textarea.select();
-                
-                try {
-                    // Execute copy command
-                    document.execCommand('copy');
-                    // Update button state
-                    button.textContent = 'Copied!';
-                    button.classList.add('copied');
-                    
-                    // Reset button state after 2 seconds
-                    setTimeout(function() {
-                        button.textContent = 'Copy';
-                        button.classList.remove('copied');
-                    }, 2000);
-                } catch (err) {
-                    console.error('Copy failed:', err);
-                    button.textContent = 'Error!';
-                }
-                
-                // Clean up
-                document.body.removeChild(textarea);
-            });
-        });
-    });
-    </script>
-        </body>
-                                        </html>`;
-                                    iframe.srcdoc = html;
-                                })
-                                .catch(error => {
-                                    console.error('Error fetching notebook:', error);
-                                    iframe.srcdoc = '<html><body>
-<script>window.repoName = "documentationWeb";</script>
-<p>Error loading notebook.</p></body></html>';
-                                });
-                        }
-                    });
-                </script>
+&lt;div class=&quot;notebook-action-buttons&quot;&gt;
+    &lt;a href=&quot;LidDrivenCavity-Newtonian-dyeInjection.ipynb&quot; download class=&quot;notebook-btn download-btn&quot;&gt;
+        &lt;i class=&quot;fa-solid fa-download&quot;&gt;&lt;/i&gt; Download Notebook
+    &lt;/a&gt;
+    &lt;a href=&quot;https://nbviewer.org/github/comphy-lab/documentationWeb/blob/main/postProcess/LidDrivenCavity-Newtonian-dyeInjection.ipynb&quot; 
+       target=&quot;_blank&quot; class=&quot;notebook-btn view-btn&quot;&gt;
+        &lt;i class=&quot;fa-solid fa-eye&quot;&gt;&lt;/i&gt; View in nbviewer
+    &lt;/a&gt;
+    &lt;a href=&quot;https://colab.research.google.com/github/comphy-lab/documentationWeb/blob/main/postProcess/LidDrivenCavity-Newtonian-dyeInjection.ipynb&quot; 
+       target=&quot;_blank&quot; class=&quot;notebook-btn colab-btn&quot;&gt;
+        &lt;i class=&quot;fa-solid fa-play&quot;&gt;&lt;/i&gt; Open in Colab
+    &lt;/a&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;notebook-preview&quot;&gt;
+    &lt;h3&gt;About this notebook&lt;/h3&gt;
+    &lt;p&gt;This notebook provides visualization and analysis of lid-driven cavity flow simulation with dye injection.
+    It processes the simulation data to show how the dye moves through the cavity over time.&lt;/p&gt;
+    
+    &lt;h3&gt;Key Features:&lt;/h3&gt;
+    &lt;ul&gt;
+        &lt;li&gt;Visualization of velocity fields and dye concentration&lt;/li&gt;
+        &lt;li&gt;Analysis of flow patterns using streamlines&lt;/li&gt;
+        &lt;li&gt;Time evolution of the dye transport in the cavity&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;notebook-tip&quot;&gt;
+    &lt;p&gt;&lt;strong&gt;Tip:&lt;/strong&gt; For the best interactive experience, download the notebook or open it in Google Colab.&lt;/p&gt;
+&lt;/div&gt;</code></pre></div>
+                </div>
             </div>
         </main>
 
@@ -356,5 +300,56 @@
         </div>
     </div>
 
-</body>
+
+    <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add copy button to each code block container
+        const codeBlocks = document.querySelectorAll('.code-block-container pre');
+        codeBlocks.forEach(function(codeBlock, index) {
+            // Create button element
+            const button = document.createElement('button');
+            button.className = 'copy-button';
+            button.textContent = 'Copy';
+            button.setAttribute('aria-label', 'Copy code to clipboard');
+            button.setAttribute('data-copy-state', 'copy');
+            
+            // Get the code block container (parent of the pre)
+            const container = codeBlock.parentNode;
+            
+            // Add the button to the container
+            container.appendChild(button);
+            
+            // Set up click event
+            button.addEventListener('click', function() {
+                // Create a textarea element to copy from
+                const textarea = document.createElement('textarea');
+                // Get the text content from the pre element (the actual code)
+                textarea.value = codeBlock.textContent;
+                document.body.appendChild(textarea);
+                textarea.select();
+                
+                try {
+                    // Execute copy command
+                    document.execCommand('copy');
+                    // Update button state
+                    button.textContent = 'Copied!';
+                    button.classList.add('copied');
+                    
+                    // Reset button state after 2 seconds
+                    setTimeout(function() {
+                        button.textContent = 'Copy';
+                        button.classList.remove('copied');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Copy failed:', err);
+                    button.textContent = 'Error!';
+                }
+                
+                // Clean up
+                document.body.removeChild(textarea);
+            });
+        });
+    });
+    </script>
+        </body>
 </html>
