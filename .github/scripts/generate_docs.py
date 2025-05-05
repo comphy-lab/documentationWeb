@@ -273,8 +273,9 @@ def process_jupyter_notebook(file_path: Path) -> str:
     """
     Process a Jupyter notebook for embedding in HTML.
     
-    This version uses a more reliable approach by providing a clear link to view 
-    the notebook in nbviewer.org or to download it directly.
+    This version creates HTML that works reliably in the documentation website,
+    providing clear links to view the notebook in nbviewer.org, download it directly,
+    or open it in Google Colab.
     
     Args:
         file_path: Path to the Jupyter notebook (.ipynb) file
@@ -285,25 +286,78 @@ def process_jupyter_notebook(file_path: Path) -> str:
     notebook_filename = file_path.name
     
     try:
-        # Read the first cell of the notebook to extract some description
+        # Read the notebook to extract basic information
         with open(file_path, 'r', encoding='utf-8') as f:
             notebook_content = f.read()
         
-        # Create a rich display for the notebook with multiple viewing options
-        embed_html = f"""# {notebook_filename}
+        # Get the notebook's directory within the repository
+        rel_path = file_path.relative_to(REPO_ROOT).parent
+        if rel_path.as_posix() == '.':
+            notebook_path = notebook_filename
+        else:
+            notebook_path = f"{rel_path}/{notebook_filename}"
+            
+        # Extract title and description if available
+        import json
+        notebook_title = notebook_filename
+        notebook_description = ""
+        notebook_features = []
+        
+        try:
+            notebook_data = json.loads(notebook_content)
+            # Try to get a better title from the notebook
+            for cell in notebook_data.get('cells', []):
+                if cell.get('cell_type') == 'markdown':
+                    source = ''.join(cell.get('source', []))
+                    # Look for a title in the first cell
+                    title_match = re.search(r'^#\s+(.+)$', source, re.MULTILINE)
+                    if title_match:
+                        notebook_title = title_match.group(1).strip()
+                        # Look for description text after the title
+                        desc_match = re.search(r'^#\s+.+\n\n(.+?)(?=\n\n|\Z)', source, re.DOTALL | re.MULTILINE)
+                        if desc_match:
+                            notebook_description = desc_match.group(1).strip()
+                            # Look for bullet points that might be features
+                            features_match = re.findall(r'^\s*[\*\-\+]\s+(.+)$', source, re.MULTILINE)
+                            if features_match:
+                                notebook_features = [f.strip() for f in features_match[:3]]  # Limit to 3 features
+                        break
+        except:
+            # If parsing fails, use defaults
+            pass
+            
+        # Set default description if none found
+        if not notebook_description:
+            notebook_description = f"This notebook provides visualization and analysis related to {notebook_filename.split('.')[0].replace('-', ' ').replace('_', ' ')}."
+            
+        # Set default features if none found
+        if not notebook_features:
+            notebook_features = [
+                "Visualization of data and results",
+                "Analysis of simulation outputs",
+                "Interactive exploration of parameters"
+            ]
+            
+        # Create feature list HTML
+        features_html = "\n".join([f'<li>{feature}</li>' for feature in notebook_features])
+        
+        # Create raw HTML output that won't get escaped by pandoc
+        # This is key - we use triple backticks with {=html} to tell pandoc to interpret this as raw HTML
+        embed_html = f"""# {notebook_title}
 
+```{{=html}}
 <div class="jupyter-notebook-embed">
-    <h2>Jupyter Notebook: {notebook_filename}</h2>
+    <h2>Jupyter Notebook: {notebook_title}</h2>
     
     <div class="notebook-action-buttons">
         <a href="{notebook_filename}" download class="notebook-btn download-btn">
             <i class="fa-solid fa-download"></i> Download Notebook
         </a>
-        <a href="https://nbviewer.org/github/comphy-lab/documentationWeb/blob/main/postProcess/{notebook_filename}" 
+        <a href="https://nbviewer.org/github/{REPO_NAME}/{REPO_ROOT.name}/blob/main/{notebook_path}" 
            target="_blank" class="notebook-btn view-btn">
             <i class="fa-solid fa-eye"></i> View in nbviewer
         </a>
-        <a href="https://colab.research.google.com/github/comphy-lab/documentationWeb/blob/main/postProcess/{notebook_filename}" 
+        <a href="https://colab.research.google.com/github/{REPO_NAME}/{REPO_ROOT.name}/blob/main/{notebook_path}" 
            target="_blank" class="notebook-btn colab-btn">
             <i class="fa-solid fa-play"></i> Open in Colab
         </a>
@@ -311,14 +365,11 @@ def process_jupyter_notebook(file_path: Path) -> str:
     
     <div class="notebook-preview">
         <h3>About this notebook</h3>
-        <p>This notebook provides visualization and analysis of lid-driven cavity flow simulation with dye injection.
-        It processes the simulation data to show how the dye moves through the cavity over time.</p>
+        <p>{notebook_description}</p>
         
         <h3>Key Features:</h3>
         <ul>
-            <li>Visualization of velocity fields and dye concentration</li>
-            <li>Analysis of flow patterns using streamlines</li>
-            <li>Time evolution of the dye transport in the cavity</li>
+            {features_html}
         </ul>
     </div>
     
@@ -326,6 +377,7 @@ def process_jupyter_notebook(file_path: Path) -> str:
         <p><strong>Tip:</strong> For the best interactive experience, download the notebook or open it in Google Colab.</p>
     </div>
 </div>
+```
 """
         return embed_html
     except Exception as e:
