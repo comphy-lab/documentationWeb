@@ -275,13 +275,14 @@ def process_jupyter_notebook(file_path: Path) -> str:
     
     This version creates HTML that works reliably in the documentation website,
     providing clear links to view the notebook in nbviewer.org, download it directly,
-    or open it in Google Colab.
+    or open it in Google Colab. It also embeds the notebook directly in the page.
     
     Args:
         file_path: Path to the Jupyter notebook (.ipynb) file
         
     Returns:
         A string containing HTML that provides links to properly view the notebook
+        and embeds the notebook itself
     """
     notebook_filename = file_path.name
     
@@ -376,7 +377,111 @@ def process_jupyter_notebook(file_path: Path) -> str:
     <div class="notebook-tip">
         <p><strong>Tip:</strong> For the best interactive experience, download the notebook or open it in Google Colab.</p>
     </div>
+
+    <!-- Embedded Jupyter Notebook -->
+    <div class="embedded-notebook">
+        <h3>Notebook Preview</h3>
+        <div id="notebook-container-{notebook_filename.replace('.', '-')}" >
+            <iframe id="notebook-iframe-{notebook_filename.replace('.', '-')}" 
+                    src="https://nbviewer.org/github/{REPO_NAME}/{REPO_ROOT.name}/blob/main/{notebook_path}" 
+                    width="100%" height="800px" frameborder="0"
+                    onload="checkIframeLoaded('{notebook_filename.replace('.', '-')}')"
+                    onerror="handleIframeError('{notebook_filename.replace('.', '-')}')"></iframe>
+            <div id="notebook-error-{notebook_filename.replace('.', '-')}" 
+                 class="notebook-error-message" style="display: none;">
+                <div class="error-container">
+                    <i class="fa-solid fa-exclamation-triangle"></i>
+                    <h4>Notebook Preview Unavailable</h4>
+                    <p>The notebook preview could not be loaded. This may be because:</p>
+                    <ul>
+                        <li>The notebook file is not yet available in the repository</li>
+                        <li>The nbviewer service is temporarily unavailable</li>
+                        <li>The repository is private or has access restrictions</li>
+                    </ul>
+                    <p>You can still download the notebook using the button above or view it directly through one of the external services.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .notebook-error-message {{
+        padding: 20px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        margin: 20px 0;
+        text-align: center;
+    }}
+    
+    .error-container {{
+        max-width: 600px;
+        margin: 0 auto;
+    }}
+    
+    .notebook-error-message i {{
+        font-size: 2em;
+        color: #dc3545;
+        margin-bottom: 10px;
+    }}
+    
+    .notebook-error-message h4 {{
+        color: #dc3545;
+        margin-bottom: 15px;
+    }}
+    
+    .notebook-error-message ul {{
+        text-align: left;
+        display: inline-block;
+        margin: 10px 0;
+    }}
+</style>
+
+<script>
+    function checkIframeLoaded(id) {{
+        try {{
+            const iframe = document.getElementById('notebook-iframe-' + id);
+            // Check if we can access the iframe content
+            const iframeContent = iframe.contentWindow || iframe.contentDocument;
+            
+            // Try to check if iframe contains a 404 or error message
+            // This may fail due to cross-origin policies, which is itself a sign the iframe is not working properly
+            try {{
+                if (iframeContent.document.title.includes('404') || 
+                    iframeContent.document.body.textContent.includes('404 Not Found')) {{
+                    handleIframeError(id);
+                }}
+            }} catch (e) {{
+                // Cross-origin error might occur, but that's expected for successful loading too
+                // So we don't trigger the error handling here
+            }}
+        }} catch (e) {{
+            handleIframeError(id);
+        }}
+    }}
+    
+    function handleIframeError(id) {{
+        const iframe = document.getElementById('notebook-iframe-' + id);
+        const errorDiv = document.getElementById('notebook-error-' + id);
+        
+        if (iframe && errorDiv) {{
+            iframe.style.display = 'none';
+            errorDiv.style.display = 'block';
+        }}
+    }}
+    
+    // Additional check - try to detect 404 page after the iframe has fully loaded
+    document.addEventListener('DOMContentLoaded', function() {{
+        const iframes = document.querySelectorAll('iframe[id^="notebook-iframe-"]');
+        iframes.forEach(iframe => {{
+            iframe.addEventListener('load', function() {{
+                const id = iframe.id.replace('notebook-iframe-', '');
+                setTimeout(() => checkIframeLoaded(id), 1000); // Check after a slight delay
+            }});
+        }});
+    }});
+</script>
 ```
 """
         return embed_html
