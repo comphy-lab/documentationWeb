@@ -571,7 +571,107 @@ code, pre {
   filter: brightness(0.95);
 }
 
+[data-theme="dark"] .page-content {
+  background-color: #181f2a;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  border-radius: 8px;
+}
+
+[data-theme="dark"] .page-content h1 {
+  color: #e3eafe;
+  border-bottom: 2px solid #334155;
+}
+
+[data-theme="dark"] .page-content h3 {
+  color: #b6cdfd;
+}
+
+[data-theme="dark"] .jupyter-notebook-embed {
+  background-color: #232b3a;
+  color: #e3eafe;
+}
+
 [data-theme="dark"] .notebook-preview {
+
+[data-theme="dark"] .jupyter-notebook-embed {
+  background-color: #232b3a !important;
+  color: #e3eafe !important;
+  border-radius: 8px;
+}
+
+[data-theme="dark"] .notebook-action-buttons {
+  background: transparent;
+}
+
+[data-theme="dark"] .notebook-btn,
+[data-theme="dark"] .download-btn,
+[data-theme="dark"] .view-btn,
+[data-theme="dark"] .colab-btn {
+  background-color: #1b2330 !important;
+  color: #e3eafe !important;
+  border: 1px solid #334155 !important;
+}
+
+[data-theme="dark"] .notebook-btn:hover,
+[data-theme="dark"] .download-btn:hover,
+[data-theme="dark"] .view-btn:hover,
+[data-theme="dark"] .colab-btn:hover {
+  background-color: #232d3f !important;
+  color: #a5c7ff !important;
+  border-color: #4462a6 !important;
+}
+
+[data-theme="dark"] .notebook-btn i,
+[data-theme="dark"] .download-btn i,
+[data-theme="dark"] .view-btn i,
+[data-theme="dark"] .colab-btn i {
+  color: #b6cdfd !important;
+}
+
+  background-color: #232b3a;
+}
+
+[data-theme="dark"] .notebook-preview h3 {
+  color: #b6cdfd !important;
+}
+
+[data-theme="dark"] .notebook-preview {
+
+[data-theme="dark"] .jupyter-notebook-embed {
+  background-color: #232b3a !important;
+  color: #e3eafe !important;
+  border-radius: 8px;
+}
+
+[data-theme="dark"] .notebook-action-buttons {
+  background: transparent;
+}
+
+[data-theme="dark"] .notebook-btn,
+[data-theme="dark"] .download-btn,
+[data-theme="dark"] .view-btn,
+[data-theme="dark"] .colab-btn {
+  background-color: #1b2330 !important;
+  color: #e3eafe !important;
+  border: 1px solid #334155 !important;
+}
+
+[data-theme="dark"] .notebook-btn:hover,
+[data-theme="dark"] .download-btn:hover,
+[data-theme="dark"] .view-btn:hover,
+[data-theme="dark"] .colab-btn:hover {
+  background-color: #232d3f !important;
+  color: #a5c7ff !important;
+  border-color: #4462a6 !important;
+}
+
+[data-theme="dark"] .notebook-btn i,
+[data-theme="dark"] .download-btn i,
+[data-theme="dark"] .view-btn i,
+[data-theme="dark"] .colab-btn i {
+  color: #b6cdfd !important;
+}
+
   background-color: #f0f4f8;
 }
 
@@ -580,6 +680,72 @@ code, pre {
 }
 
 /* Styling for file icons in directory listings */
+
+/* Modern dark theme improvements for notebook UI */
+[data-theme="dark"] .jupyter-notebook-embed,
+[data-theme="dark"] .notebook-preview {
+  background: #181f2a !important;
+  color: #e3eafe !important;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  border: 1px solid #232b3a;
+}
+
+[data-theme="dark"] .notebook-preview > *:not(.notebook-tip):not(h3) {
+  background: #20283a !important;
+  color: #cfdcff !important;
+  border-radius: 6px;
+  padding: 1em 1.5em;
+  margin-bottom: 1.2em;
+  border: 1px solid #28314a;
+}
+
+[data-theme="dark"] .notebook-preview h3,
+[data-theme="dark"] .jupyter-notebook-embed h2,
+[data-theme="dark"] .page-content h1,
+[data-theme="dark"] .page-content h2 {
+  color: #b6cdfd !important;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+[data-theme="dark"] .notebook-preview ul {
+  color: #cfdcff !important;
+}
+
+[data-theme="dark"] .notebook-tip {
+  background: #193c34 !important;
+  border-left: 4px solid #10b981 !important;
+  color: #b6f5d5 !important;
+}
+
+[data-theme="dark"] .notebook-btn,
+[data-theme="dark"] .download-btn,
+[data-theme="dark"] .view-btn,
+[data-theme="dark"] .colab-btn {
+  background: linear-gradient(90deg, #22304a 60%, #1b2330 100%) !important;
+  color: #e3eafe !important;
+  border: 1.5px solid #334155 !important;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+
+[data-theme="dark"] .notebook-btn:hover,
+[data-theme="dark"] .download-btn:hover,
+[data-theme="dark"] .view-btn:hover,
+[data-theme="dark"] .colab-btn:hover {
+  background: #2a3b5a !important;
+  color: #a5c7ff !important;
+  border-color: #4462a6 !important;
+}
+
+[data-theme="dark"] .notebook-btn i,
+[data-theme="dark"] .download-btn i,
+[data-theme="dark"] .view-btn i,
+[data-theme="dark"] .colab-btn i {
+  color: #b6cdfd !important;
+}
+
 .file-icon {
   width: 24px;
   text-align: center;
