@@ -201,10 +201,10 @@ def validate_config() -> bool:
 
 def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
     """
-    Recursively searches for C, header, Python, and shell script files in specified directories.
+    Recursively searches for C, header, Python, shell script, and Jupyter notebook files in specified directories.
     
     This function scans each directory listed in `source_dirs` (relative to `root_dir`)
-    using a recursive search for files with extensions .c, .h, .py, and .sh. It also
+    using a recursive search for files with extensions .c, .h, .py, .sh, and .ipynb. It also
     identifies .sh files that are directly located in the `root_dir`.
     
     Args:
@@ -223,6 +223,7 @@ def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
             files.extend(src_path.rglob('*.h'))
             files.extend(src_path.rglob('*.py'))
             files.extend(src_path.rglob('*.sh'))
+            files.extend(src_path.rglob('*.ipynb'))
     
     # Also search for .sh files directly in the root directory
     for sh_file in root_dir.glob('*.sh'):
@@ -266,6 +267,65 @@ def process_shell_file(file_path: Path) -> str:
     with open(file_path, 'r', encoding='utf-8') as f:
         file_content = f.read()
     return f"```bash\n{file_content}\n```"
+
+
+def process_jupyter_notebook(file_path: Path) -> str:
+    """
+    Process a Jupyter notebook for embedding in HTML.
+    
+    Instead of converting the notebook to markdown, we'll create a wrapper HTML
+    that will include the notebook directly in the HTML page, as Jupyter notebooks
+    already render nicely in HTML.
+    
+    Args:
+        file_path: Path to the Jupyter notebook (.ipynb) file
+        
+    Returns:
+        A string containing HTML that will include the notebook
+    """
+    notebook_filename = file_path.name
+    
+    # Create HTML that directly embeds the notebook content
+    embed_html = f"""# {notebook_filename}
+
+<div class="jupyter-notebook-embed">
+    <iframe src="about:blank" style="width:100%; height:800px; border:none;" id="jupyter-iframe-{hash(str(file_path))}">
+    </iframe>
+</div>
+
+<script>
+    // Directly embed the notebook in the iframe using srcdoc
+    document.addEventListener('DOMContentLoaded', function() {{
+        const iframe = document.getElementById('jupyter-iframe-{hash(str(file_path))}');
+        if (iframe) {{
+            fetch('{notebook_filename}')
+                .then(response => response.text())
+                .then(data => {{
+                    // Create a basic HTML document with the notebook content
+                    const html = `<!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="utf-8">
+                            <title>{notebook_filename}</title>
+                            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jupyter-css@0.1.0/dist/notebook.min.css">
+                        </head>
+                        <body>
+                            <div class="notebook-content">
+                                ${{data}}
+                            </div>
+                        </body>
+                        </html>`;
+                    iframe.srcdoc = html;
+                }})
+                .catch(error => {{
+                    console.error('Error fetching notebook:', error);
+                    iframe.srcdoc = '<html><body><p>Error loading notebook.</p></body></html>';
+                }});
+        }}
+    }});
+</script>
+"""
+    return embed_html
 
 
 def process_python_file(file_path: Path) -> str:
@@ -425,7 +485,9 @@ def prepare_pandoc_input(file_path: Path, literate_c_script: Path) -> str:
     """
     Prepare file content for Pandoc conversion.
     
-    Determines the processing function to use based on the file extension. Markdown (.md), Python (.py), and shell (.sh) files are handled using their specialized functions, while C/C++ files are processed with a provided literate-C script to generate a Markdown representation.
+    Determines the processing function to use based on the file extension. Markdown (.md), Python (.py),
+    shell (.sh), and Jupyter notebook (.ipynb) files are handled using their specialized functions,
+    while C/C++ files are processed with a provided literate-C script to generate a Markdown representation.
     
     Args:
         file_path: Path of the source file to process.
@@ -442,6 +504,8 @@ def prepare_pandoc_input(file_path: Path, literate_c_script: Path) -> str:
         return process_python_file(file_path)
     elif file_suffix == '.sh':
         return process_shell_file(file_path)
+    elif file_suffix == '.ipynb':
+        return process_jupyter_notebook(file_path)
     else:  # C/C++ files
         return process_c_file(file_path, literate_c_script)
 
@@ -1058,7 +1122,8 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
     The function prepares input for Pandoc conversion based on the file type and then
     applies additional steps tailored to the source file. For Python, shell, and Markdown
     files, it post-processes the output HTML to enhance code block presentation. For C/C++
-    files, it uses awk-based post processing followed by further cleanup. CSS and JavaScript
+    files, it uses awk-based post processing followed by further cleanup. For Jupyter notebooks,
+    it also copies the original .ipynb file to the docs directory. CSS and JavaScript
     are then inserted to improve styling and interactive functionality. Any errors during
     processing are caught, and the function returns a success flag.
     
@@ -1080,6 +1145,21 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
     print(f"  Processing {file_path.relative_to(repo_root)} -> {output_html_path.relative_to(repo_root / 'docs')}")
 
     try:
+        # Check if we're processing a Jupyter notebook
+        is_jupyter_notebook = file_path.suffix.lower() == '.ipynb'
+        
+        # For Jupyter notebooks, copy the original .ipynb file to the docs directory
+        if is_jupyter_notebook:
+            # The destination should be in the same directory as the HTML file
+            notebook_dest = output_html_path.parent / file_path.name
+            # Copy the notebook file
+            try:
+                import shutil
+                shutil.copy2(file_path, notebook_dest)
+                print(f"  Copied notebook {file_path.name} to {notebook_dest.relative_to(repo_root / 'docs')}")
+            except Exception as e:
+                print(f"  Warning: Failed to copy notebook file: {e}")
+        
         # Prepare pandoc input based on file type
         pandoc_input_content = prepare_pandoc_input(file_path, literate_c_script)
         
@@ -1118,8 +1198,8 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
         is_markdown_file = file_path.suffix.lower() == '.md'
         
         # Apply appropriate post-processing based on file type
-        if is_python_file or is_shell_file or is_markdown_file:
-            # For Python, Shell, and Markdown files
+        if is_python_file or is_shell_file or is_markdown_file or is_jupyter_notebook:
+            # For Python, Shell, Markdown, and Jupyter notebook files
             # Read the generated HTML file
             with open(output_html_path, 'r', encoding='utf-8') as f:
                 html_content = f.read()
@@ -1349,6 +1429,8 @@ def generate_directory_index(directory_name: str, directory_path: Path, generate
                     file_type_class = "file-c"  # C/header files
                 elif file_extension in [".py"]:
                     file_type_class = "file-python"  # Python files
+                elif file_extension in [".ipynb"]:
+                    file_type_class = "file-jupyter"  # Jupyter notebook files
                     
                 file_name = info["name"]  # Use the full filename with extension
                 

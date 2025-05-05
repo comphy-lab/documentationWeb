@@ -450,3 +450,89 @@ code, pre {
   display: block;
   clear: both;
 }
+
+/* Jupyter notebook styling */
+.jupyter-notebook-embed {
+  margin: 2em 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.jupyter-notebook-embed iframe {
+  border: 1px solid #e1e4e8;
+  border-radius: 8px;
+  transition: height 0.3s ease;
+  background-color: white;
+}
+
+[data-theme="dark"] .jupyter-notebook-embed iframe {
+  border-color: #2d2d2d;
+  background-color: white; /* Keep background white for notebook content */
+}
+
+/* Styling for file icons in directory listings */
+.file-icon {
+  width: 24px;
+  text-align: center;
+}
+
+.file-icon .file-c::before {
+  content: "C";
+  background-color: #555555;
+  color: white;
+  font-weight: bold;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+.file-icon .file-python::before {
+  content: "py";
+  background-color: #3776ab;
+  color: white;
+  font-weight: bold;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+.file-icon .file-jupyter::before {
+  content: "nb";
+  background-color: #F37626;
+  color: white;
+  font-weight: bold;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+/* Table styling for documentation file listings */
+.documentation-files {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+.documentation-files td {
+  padding: 0.75em;
+  border-bottom: 1px solid #e1e4e8;
+  vertical-align: top;
+}
+
+.documentation-files tr:last-child td {
+  border-bottom: none;
+}
+
+.documentation-files .file-desc {
+  color: #57606a;
+  font-size: 0.9em;
+}
+
+[data-theme="dark"] .documentation-files td {
+  border-color: #2d2d2d;
+}
+
+[data-theme="dark"] .documentation-files .file-desc {
+  color: #8b949e;
+}

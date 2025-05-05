@@ -149,3 +149,5 @@ deps/
 !*.sbatch
 **/getData-generic
 **/getData-Line
+
+**/.claude/settings.local.json
