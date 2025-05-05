@@ -5,6 +5,7 @@ import shutil
 import argparse
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Set, Any, Union
+import html
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Generate documentation from source files.')
@@ -327,17 +328,22 @@ def process_jupyter_notebook(file_path: Path) -> str:
                 "Analysis of simulation outputs",
                 "Interactive exploration of parameters"
             ]
-            
+        
+        # Escape user-supplied metadata to prevent XSS
+        safe_notebook_title = html.escape(notebook_title)
+        safe_notebook_description = html.escape(notebook_description)
+        safe_notebook_features = [html.escape(f) for f in notebook_features]
+        
         # Create feature list HTML
-        features_html = "\n".join([f'<li>{feature}</li>' for feature in notebook_features])
+        features_html = "\n".join([f'<li>{feature}</li>' for feature in safe_notebook_features])
         
         # Create raw HTML output that won't get escaped by pandoc
         # This is key - we use triple backticks with {=html} to tell pandoc to interpret this as raw HTML
-        embed_html = f"""# {notebook_title}
+        embed_html = f"""# {safe_notebook_title}
 
 ```{{=html}}
 <div class="jupyter-notebook-embed">
-    <h2>Jupyter Notebook: {notebook_title}</h2>
+    <h2>Jupyter Notebook: {safe_notebook_title}</h2>
     
     <div class="notebook-action-buttons">
         <a href="{notebook_filename}" download class="notebook-btn download-btn">
@@ -355,7 +361,7 @@ def process_jupyter_notebook(file_path: Path) -> str:
     
     <div class="notebook-preview">
         <h3>About this notebook</h3>
-        <p>{notebook_description}</p>
+        <p>{safe_notebook_description}</p>
         
         <h3>Key Features:</h3>
         <ul>
