@@ -1,6 +1,133 @@
-/* Custom styles for documentation */
+/* 
+ * Documentation Website Stylesheet
+ * Organized and optimized for readability and maintainability
+ */
 
-/* Modern button style for file links */
+/* -----------------------------------------------------------------------------
+ * 1. CSS Variables and Base Styles
+ * ----------------------------------------------------------------------------- */
+
+ :root {
+  /* Light theme variables */
+  --color-background: #ffffff;
+  --color-text: #24292e;
+  --subtle-bg: #f8f9fa;
+  --code-block-bg: #f5f7f9;
+  --code-block-border: #e3e8ee;
+  --link-color: #1a73e8;
+  --link-hover: #0d47a1;
+  --heading-color: #2c3e50;
+  --border-color: #e9ecef;
+  --nav-item-bg: rgba(255, 255, 255, 0.25);
+  --nav-item-color: #1a1a1a;
+  --nav-item-shadow: rgba(0, 0, 0, 0.1);
+  --nav-item-hover-bg: rgba(255, 255, 255, 0.35);
+  --nav-item-hover-shadow: rgba(0, 0, 0, 0.4);
+  --notebook-bg: #f8fafc;
+  --notebook-border: #e3e8ee;
+  --notebook-fg: #1e293b;
+  --accent: #2563eb;
+}
+
+/* Dark theme variables */
+[data-theme="dark"] {
+  --color-background: #181f2a;
+  --color-text: #e3eafe;
+  --subtle-bg: #1e1e1e;
+  --code-block-bg: #1e1e1e;
+  --code-block-border: #2d2d2d;
+  --link-color: #7ea6ff;
+  --link-hover: #a5c7ff;
+  --heading-color: #e0e0e0;
+  --border-color: #404040;
+  --nav-item-bg: rgba(30, 30, 30, 0.6);
+  --nav-item-color: #ffffff;
+  --nav-item-shadow: rgba(0, 0, 0, 0.4);
+  --nav-item-hover-bg: rgba(40, 40, 40, 0.8);
+  --nav-item-hover-shadow: rgba(0, 0, 0, 0.6);
+  --notebook-bg: #181f2a;
+  --notebook-border: #22304a;
+  --notebook-fg: #e3eafe;
+  --accent: #60a5fa;
+}
+
+/* Core body styles */
+body {
+  font-family: var(--font-primary);
+  font-size: 1.6rem;
+  line-height: 1.6;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+}
+
+/* -----------------------------------------------------------------------------
+ * 2. Layout and Content Containers
+ * ----------------------------------------------------------------------------- */
+
+/* Main content spacing */
+main.content {
+  padding-top: 100px; /* Account for fixed header */
+}
+
+.page-content {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto 3rem auto;
+}
+
+/* Light mode background pattern */
+:root:not([data-theme="dark"]) .page-content {
+  background-color: #ffffff;
+  background-image: linear-gradient(to bottom, rgba(248, 249, 250, 0.5) 1px, transparent 1px);
+  background-size: 100% 32px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  padding: 2.5rem;
+}
+
+/* Dark mode page container */
+[data-theme="dark"] .page-content {
+  background-color: #181f2a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+}
+
+/* -----------------------------------------------------------------------------
+ * 3. Typography and Headings
+ * ----------------------------------------------------------------------------- */
+
+.page-content h1 {
+  margin-top: 0;
+  padding-top: 1rem;
+  font-size: 2.8rem;
+  color: var(--heading-color);
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.page-content h2 {
+  margin-top: 2rem;
+  font-size: 2.4rem;
+  color: var(--heading-color);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.3rem;
+  text-shadow: none;
+}
+
+.page-content h3 {
+  margin-top: 1.5rem;
+  font-size: 2rem;
+  color: var(--heading-color);
+}
+
+/* -----------------------------------------------------------------------------
+ * 4. Documentation Link Buttons
+ * ----------------------------------------------------------------------------- */
+
 .doc-link-button {
   display: block;
   width: 100%;
@@ -19,6 +146,7 @@
   cursor: pointer;
   margin-top: 0.5em;
 }
+
 .doc-link-button::before {
   content: "\1F4C4"; /* 📄 document icon */
   position: absolute;
@@ -28,126 +156,54 @@
   font-size: 1.4em;
   opacity: 0.83;
 }
-.doc-link-button:hover, .doc-link-button:focus {
+
+.doc-link-button:hover, 
+.doc-link-button:focus {
   background: #f3f6fb;
   border-color: #b6c5e1;
   color: #174ea6;
   box-shadow: 0 4px 18px rgba(26, 115, 232, 0.13);
   outline: none;
 }
+
 .doc-link-button:active {
   background: #e3eaf6;
   border-color: #90a4c8;
   color: #0d47a1;
 }
+
+/* Dark mode button styles */
 [data-theme="dark"] .doc-link-button {
   background: #1b2330;
   color: #e3eafe;
   border: 1.5px solid #334155;
   box-shadow: 0 2px 10px rgba(45, 114, 233, 0.10);
 }
+
 [data-theme="dark"] .doc-link-button::before {
   color: #7ea6ff;
 }
-[data-theme="dark"] .doc-link-button:hover, [data-theme="dark"] .doc-link-button:focus {
+
+[data-theme="dark"] .doc-link-button:hover, 
+[data-theme="dark"] .doc-link-button:focus {
   background: #232d3f;
   border-color: #4462a6;
   color: #a5c7ff;
   box-shadow: 0 4px 18px rgba(45, 114, 233, 0.22);
 }
+
 [data-theme="dark"] .doc-link-button:active {
   background: #16203a;
   border-color: #233a6a;
   color: #7ea6ff;
 }
 
+/* -----------------------------------------------------------------------------
+ * 5. Code Block Styling
+ * ----------------------------------------------------------------------------- */
 
-/* Override body styles while preserving core layout */
-body {
-  font-family: var(--font-primary);
-  font-size: 1.6rem;
-  line-height: 1.6;
-  color: var(--color-text);
-  background-color: var(--color-background);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  margin: 0;
-  padding: 0;
-}
-
-/* Light mode specific styles */
-:root:not([data-theme="dark"]) {
-  --subtle-bg: #f8f9fa;
-  --code-block-bg: #f5f7f9;
-  --code-block-border: #e3e8ee;
-  --link-color: #1a73e8;
-  --link-hover: #0d47a1;
-  --heading-color: #2c3e50;
-}
-
-/* Dark mode specific styles */
-[data-theme="dark"] {
-  --heading-color: #e0e0e0;
-  --border-color: #404040;
-}
-
-/* Main content spacing */
-main.content {
-  padding-top: 100px; /* Add padding to account for fixed header (80px height + 20px buffer) */
-}
-
-.page-content {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  margin-bottom: 3rem; /* Add space between content and footer */
-}
-
-/* Add subtle pattern to light mode background */
-:root:not([data-theme="dark"]) .page-content {
-  background-color: #ffffff;
-  background-image: linear-gradient(to bottom, rgba(248, 249, 250, 0.5) 1px, transparent 1px);
-  background-size: 100% 32px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-  padding: 2.5rem;
-}
-
-/* Documentation specific headings */
-.page-content h1 {
-  margin-top: 0;
-  padding-top: 1rem;
-  font-size: 2.8rem;
-  color: var(--heading-color, #2c3e50);
-  border-bottom: 2px solid #e9ecef;
-  padding-bottom: 0.5rem;
-}
-
-.page-content h2 {
-  margin-top: 2rem;
-  font-size: 2.4rem;
-  color: var(--heading-color, #2c3e50);
-  border-bottom: 1px solid var(--border-color, #e9ecef);
-  padding-bottom: 0.3rem;
-  text-shadow: none;
-}
-
-/* Dark theme heading overrides */
-[data-theme="dark"] .page-content h2 {
-  color: var(--heading-color);
-  border-bottom-color: var(--border-color);
-  text-shadow: none;
-}
-
-.page-content h3 {
-  margin-top: 1.5rem;
-  font-size: 2rem;
-  color: var(--heading-color, #2c3e50);
-}
-
-/* Style for fenced code blocks generated by Pandoc */
-/* Light theme for code blocks */
-div#content pre.sourceCode, 
+/* Base code block styles */
+pre.sourceCode, 
 .sourceCode pre, 
 pre.sourceCode,
 .markdown-body .sourceCode pre,
@@ -156,59 +212,53 @@ pre code.sourceCode,
 .sourceCode,
 div.sourceCode,
 pre.highlight {
-  background-color: var(--code-block-bg, #f5f7f9) !important; /* Light background with blue tint */
-  color: #333333 !important;            /* Dark text */
-  border: 1px solid var(--code-block-border, #e3e8ee) !important; /* Light blue-grey border */
+  background-color: var(--code-block-bg) !important;
+  color: #333333 !important;
+  border: 1px solid var(--code-block-border) !important;
   border-radius: 6px !important;
   padding: 1em !important;
   margin: 1.5em 0 !important;
   overflow-x: auto !important;
   line-height: 1.4 !important;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.03) !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03) !important;
 }
 
-/* Style for the code itself inside the block */
+/* Code within blocks */
 pre.sourceCode code, 
 .sourceCode code, 
 pre code.sourceCode,
 div.sourceCode code,
 .highlight code,
 pre.highlight code {
-  background-color: transparent !important; /* Inherit background from pre */
-  color: inherit !important;                /* Inherit text color from pre */
+  background-color: transparent !important;
+  color: inherit !important;
   border: none !important;
   padding: 0 !important;
   font-size: 0.9em !important;
 }
 
-/* Ensure consistent font for code */
+/* Font for all code */
 code, pre {
   font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace !important;
 }
 
-/* Optional: Style for inline code if needed */
+/* Inline code */
 :not(pre) > code {
-  background-color: rgba(175, 184, 193, 0.2) !important; /* Light subtle background for inline code */
-  color: #0550ae !important;               /* Blue text for inline code for better contrast */
+  background-color: rgba(175, 184, 193, 0.2) !important;
+  color: #0550ae !important;
   padding: 0.2em 0.4em !important;
   border-radius: 3px !important;
   font-size: 0.85em !important;
   font-weight: 500 !important;
 }
 
-/* Common syntax highlighting classes with light theme colors - improved GitHub-inspired palette */
-.sourceCode .kw { color: #cf222e !important; } /* Keyword - bright red */
-.sourceCode .dt { color: #8250df !important; } /* DataType - rich purple */
-.sourceCode .dv, .sourceCode .bn, .sourceCode .fl { color: #0550ae !important; } /* Numbers - rich blue */
-.sourceCode .ch, .sourceCode .st { color: #0a3069 !important; } /* String - darker blue */
-.sourceCode .co { color: #57606a !important; font-style: italic !important; } /* Comment - medium grey */
-.sourceCode .fu { color: #8250df !important; } /* Function - rich purple */
-.sourceCode .im { color: #0550ae !important; } /* Import - rich blue */
-.sourceCode .op { color: #0550ae !important; } /* Operator - rich blue */
-.sourceCode .cf { color: #cf222e !important; } /* ControlFlow - bright red */
-.sourceCode .pp { color: #953800 !important; } /* Preprocessor - burnt orange */
+/* Dark mode inline code */
+[data-theme="dark"] :not(pre) > code {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+}
 
-/* Dark theme overrides */
+/* Dark mode code blocks */
 [data-theme="dark"] pre.sourceCode,
 [data-theme="dark"] .sourceCode pre,
 [data-theme="dark"] pre.sourceCode,
@@ -223,27 +273,44 @@ code, pre {
   border-color: #2d2d2d !important;
 }
 
-[data-theme="dark"] :not(pre) > code {
-  background-color: #2d2d2d !important;
-  color: #e0e0e0 !important;
-}
+/* -----------------------------------------------------------------------------
+ * 6. Syntax Highlighting
+ * ----------------------------------------------------------------------------- */
+
+/* Light theme syntax highlighting */
+.sourceCode .kw { color: #cf222e !important; } /* Keyword - bright red */
+.sourceCode .dt { color: #8250df !important; } /* DataType - rich purple */
+.sourceCode .dv, 
+.sourceCode .bn, 
+.sourceCode .fl { color: #0550ae !important; } /* Numbers - rich blue */
+.sourceCode .ch, 
+.sourceCode .st { color: #0a3069 !important; } /* String - darker blue */
+.sourceCode .co { color: #57606a !important; font-style: italic !important; } /* Comment - medium grey */
+.sourceCode .fu { color: #8250df !important; } /* Function - rich purple */
+.sourceCode .im { color: #0550ae !important; } /* Import - rich blue */
+.sourceCode .op { color: #0550ae !important; } /* Operator - rich blue */
+.sourceCode .cf { color: #cf222e !important; } /* ControlFlow - bright red */
+.sourceCode .pp { color: #953800 !important; } /* Preprocessor - burnt orange */
 
 /* Dark theme syntax highlighting overrides */
-[data-theme="dark"] .sourceCode .im { color: #7ccdfd !important; } /* Import/Include - light blue for dark mode */
-[data-theme="dark"] .sourceCode .st { color: #ce9178 !important; } /* String - light orange/pink for dark mode */
-[data-theme="dark"] .sourceCode .kw { color: #569cd6 !important; } /* Keyword - blue for dark mode */
-[data-theme="dark"] .sourceCode .dt { color: #4ec9b0 !important; } /* DataType - teal for dark mode */
+[data-theme="dark"] .sourceCode .im { color: #7ccdfd !important; } /* Import/Include - light blue */
+[data-theme="dark"] .sourceCode .st { color: #ce9178 !important; } /* String - light orange/pink */
+[data-theme="dark"] .sourceCode .kw { color: #569cd6 !important; } /* Keyword - blue */
+[data-theme="dark"] .sourceCode .dt { color: #4ec9b0 !important; } /* DataType - teal */
 [data-theme="dark"] .sourceCode .dv, 
 [data-theme="dark"] .sourceCode .bn, 
-[data-theme="dark"] .sourceCode .fl { color: #b5cea8 !important; } /* Numbers - light green for dark mode */
+[data-theme="dark"] .sourceCode .fl { color: #b5cea8 !important; } /* Numbers - light green */
 [data-theme="dark"] .sourceCode .ch { color: #ce9178 !important; } /* Char - same as string */
-[data-theme="dark"] .sourceCode .co { color: #6a9955 !important; } /* Comment - green for dark mode */
-[data-theme="dark"] .sourceCode .fu { color: #dcdcaa !important; } /* Function - yellow for dark mode */
-[data-theme="dark"] .sourceCode .op { color: #d4d4d4 !important; } /* Operator - light grey for dark mode */
-[data-theme="dark"] .sourceCode .cf { color: #c586c0 !important; } /* ControlFlow - purple for dark mode */
-[data-theme="dark"] .sourceCode .pp { color: #c586c0 !important; } /* Preprocessor - purple for dark mode */
+[data-theme="dark"] .sourceCode .co { color: #6a9955 !important; } /* Comment - green */
+[data-theme="dark"] .sourceCode .fu { color: #dcdcaa !important; } /* Function - yellow */
+[data-theme="dark"] .sourceCode .op { color: #d4d4d4 !important; } /* Operator - light grey */
+[data-theme="dark"] .sourceCode .cf { color: #c586c0 !important; } /* ControlFlow - purple */
+[data-theme="dark"] .sourceCode .pp { color: #c586c0 !important; } /* Preprocessor - purple */
 
-/* Copy button container for code blocks */
+/* -----------------------------------------------------------------------------
+ * 7. Copy Button for Code Blocks
+ * ----------------------------------------------------------------------------- */
+
 .code-block-container {
   position: relative;
 }
@@ -281,19 +348,22 @@ code, pre {
   background-color: #404040;
 }
 
-/* CSS for the logo and documentation button container */
+/* -----------------------------------------------------------------------------
+ * 8. Header and Navigation
+ * ----------------------------------------------------------------------------- */
+
 .s-header__logo {
   display: flex;
   align-items: center;
   justify-content: flex-start;
 }
 
-/* Documentation button styling - matches nav bar links */
+/* Documentation button styling */
 .documentation-button {
   display: flex;
   align-items: center;
-  background: var(--nav-item-bg, rgba(255, 255, 255, 0.25));
-  color: var(--nav-item-color, #1a1a1a);
+  background: var(--nav-item-bg);
+  color: var(--nav-item-color);
   padding: 0.8rem 1.6rem;
   height: 40px;
   border-radius: 5px;
@@ -303,7 +373,7 @@ code, pre {
   font-size: 1.6rem;
   transition: all 0.3s ease;
   backdrop-filter: blur(8px);
-  box-shadow: 0 2px 10px var(--nav-item-shadow, rgba(0, 0, 0, 0.1));
+  box-shadow: 0 2px 10px var(--nav-item-shadow);
 }
 
 .documentation-button i {
@@ -319,25 +389,12 @@ code, pre {
 }
 
 .documentation-button:hover {
-  background: var(--nav-item-hover-bg, rgba(255, 255, 255, 0.35));
+  background: var(--nav-item-hover-bg);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--nav-item-hover-shadow, rgba(0, 0, 0, 0.4));
+  box-shadow: 0 4px 12px var(--nav-item-hover-shadow);
 }
 
-[data-theme="dark"] .documentation-button {
-  background: var(--nav-item-bg, rgba(30, 30, 30, 0.6));
-  color: #ffffff !important;
-}
-
-[data-theme="dark"] .documentation-button span {
-  color: #ffffff !important;
-}
-
-[data-theme="dark"] .documentation-button:hover {
-  background: var(--nav-item-hover-bg, rgba(40, 40, 40, 0.8));
-}
-
-/* Make sure all header nav links are white in dark mode */
+/* Dark mode nav links */
 [data-theme="dark"] .s-header__nav-list a,
 [data-theme="dark"] .s-header__nav-list a:visited,
 [data-theme="dark"] .s-header__nav-list a:link {
@@ -346,27 +403,25 @@ code, pre {
 
 [data-theme="dark"] .s-header__nav-list a:hover {
   color: #ffffff !important;
-  background: var(--nav-item-hover-bg, rgba(40, 40, 40, 0.8));
+  background: var(--nav-item-hover-bg);
 }
 
-/* Repository Structure Sitemap Styling */
+/* -----------------------------------------------------------------------------
+ * 9. Repository Structure Sitemap
+ * ----------------------------------------------------------------------------- */
+
 .repository-structure {
   font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
   line-height: 1.5;
   margin: 30px 0;
   padding: 20px;
-  background-color: var(--subtle-bg, #f8f9fa);
+  background-color: var(--subtle-bg);
   border: 1px solid #e1e4e8;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-[data-theme="dark"] .repository-structure {
-  background-color: #1e1e1e;
-  border-color: #2d2d2d;
-}
-
-/* Style the markdown lists inside the repository structure */
+/* Repository structure lists */
 .repository-structure ul,
 .repository-structure ol {
   list-style-type: none;
@@ -378,6 +433,7 @@ code, pre {
   position: relative;
   padding: 2px 0 2px 24px;
   margin: 4px 0;
+  color: var(--color-text);
 }
 
 .repository-structure li::before {
@@ -387,15 +443,11 @@ code, pre {
   left: 0;
 }
 
-[data-theme="dark"] .repository-structure li::before {
-  color: #8b949e;
-}
-
 .repository-structure li:last-child::before {
   content: "└── ";
 }
 
-/* Style nested lists */
+/* Nested lists indentation */
 .repository-structure li li {
   padding-left: 40px;
 }
@@ -404,27 +456,29 @@ code, pre {
   left: 16px;
 }
 
-/* Style folder and file links */
-.repository-structure strong {
+/* Folder styling */
+.repository-structure li > strong {
+  color: #0366d6; /* Blue color for folders */
   font-weight: bold;
 }
 
-/* Style folder names with a different color */
-.repository-structure li > strong {
-  color: #0366d6; /* Blue color for folders */
+/* File styling */
+.repository-structure li li > strong {
+  color: var(--color-text);
+  font-weight: bold;
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .repository-structure {
+  border-color: #2d2d2d;
+}
+
+[data-theme="dark"] .repository-structure li::before {
+  color: #8b949e;
 }
 
 [data-theme="dark"] .repository-structure li > strong {
   color: #58a6ff;
-}
-
-/* Style file names */
-.repository-structure li li > strong {
-  color: #24292e; /* Dark color for files */
-}
-
-[data-theme="dark"] .repository-structure li li > strong {
-  color: #c9d1d9;
 }
 
 .repository-structure a {
@@ -436,92 +490,106 @@ code, pre {
   text-decoration: underline;
 }
 
-/* Style the description part */
-.repository-structure li {
-  color: #24292e;
-}
+/* -----------------------------------------------------------------------------
+ * 10. Jupyter Notebook Styling
+ * ----------------------------------------------------------------------------- */
 
-[data-theme="dark"] .repository-structure li {
-  color: #c9d1d9;
-}
-
-.repository-structure li::after {
-  content: "";
-  display: block;
-  clear: both;
-}
-
-/* Jupyter notebook styling */
-.jupyter-notebook-embed {
+.jupyter-notebook-embed,
+.notebook-preview {
   margin: 2em 0;
   padding: 1.5em;
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  background-color: #fff;
+  background-color: var(--notebook-bg);
+  border: 1.5px solid var(--notebook-border);
+  color: var(--notebook-fg);
+  margin-bottom: 2em;
 }
 
-[data-theme="dark"] .jupyter-notebook-embed {
-  background-color: #fff; /* Keep background white even in dark mode */
-  color: #333; /* Keep text dark */
-}
-
-.jupyter-notebook-embed h2 {
+.jupyter-notebook-embed h2,
+.notebook-preview h3 {
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.01em;
   margin-top: 0.5em !important;
-  color: #333 !important;
   text-shadow: none !important;
-  border-bottom: 1px solid #ddd !important;
+  border-bottom: 1px solid var(--border-color) !important;
   padding-bottom: 0.5em !important;
 }
 
-/* Action buttons for notebooks */
+/* Notebook action buttons */
 .notebook-action-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin: 1.5em 0;
+  margin: 1.5em 0 1em 0;
 }
 
-.notebook-btn {
+.notebook-btn,
+.download-btn,
+.view-btn,
+.colab-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: 600;
   text-decoration: none;
   transition: all 0.2s ease;
-  font-size: 14px;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
 }
 
+/* Button base styles */
 .download-btn {
-  background-color: #f1f5f9;
-  color: #0f172a;
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(90deg, #2563eb 60%, #3b82f6 100%);
+  color: #fff;
 }
 
-.download-btn:hover {
-  background-color: #e2e8f0;
+.download-btn i { 
+  color: #e0eaff; 
+}
+
+.download-btn:hover, 
+.download-btn:focus {
+  background: #174ea6;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.13);
 }
 
 .view-btn {
-  background-color: #f0f4ff;
-  color: #1e40af;
-  border: 1px solid #bfdbfe;
+  background: linear-gradient(90deg, #7c3aed 60%, #a78bfa 100%);
+  color: #fff;
 }
 
-.view-btn:hover {
-  background-color: #dbeafe;
+.view-btn i { 
+  color: #ede9fe; 
+}
+
+.view-btn:hover, 
+.view-btn:focus {
+  background: #5b21b6;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.13);
 }
 
 .colab-btn {
-  background-color: #fffbeb;
-  color: #b45309;
-  border: 1px solid #fde68a;
+  background: linear-gradient(90deg, #059669 60%, #34d399 100%);
+  color: #fff;
 }
 
-.colab-btn:hover {
-  background-color: #fef3c7;
+.colab-btn i { 
+  color: #d1fae5; 
+}
+
+.colab-btn:hover, 
+.colab-btn:focus {
+  background: #047857;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.13);
 }
 
 /* Notebook preview section */
@@ -566,20 +634,152 @@ code, pre {
   color: #047857;
 }
 
-/* Dark theme adjustments */
-[data-theme="dark"] .notebook-action-buttons {
-  filter: brightness(0.95);
+/* Dark mode notebook styles - vibrant buttons */
+[data-theme="dark"] .notebook-preview,
+[data-theme="dark"] .jupyter-notebook-embed {
+  background-color: #1e1e2d !important;
+  color: #e3eafe !important;
+  border: 1.5px solid #2d3a53 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
 }
 
-[data-theme="dark"] .notebook-preview {
-  background-color: #f0f4f8;
+[data-theme="dark"] .notebook-preview > *:not(.notebook-tip):not(h3):not(.notebook-action-buttons) {
+  background: #232d3f !important;
+  color: #e3eafe !important;
+  border-radius: 8px;
+  border: 1.5px solid #2d3a53;
+  margin-bottom: 1.2em;
+  box-shadow: 0 1px 8px 0 rgba(35, 43, 58, 0.27);
+  padding: 1em 1.5em;
+}
+
+[data-theme="dark"] .notebook-preview h3,
+[data-theme="dark"] .jupyter-notebook-embed h2 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(59, 130, 246, 0.13);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border-bottom: 1px solid #3b4a63 !important;
+}
+
+[data-theme="dark"] .notebook-preview strong,
+[data-theme="dark"] .notebook-preview b {
+  color: #ffffff !important;
+  font-weight: 700;
+}
+
+/* Fix button styling in dark mode */
+[data-theme="dark"] .notebook-btn {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .download-btn {
+  background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%) !important;
+  color: #ffffff !important;
+  border: 1.5px solid #3b82f6 !important;
+  box-shadow: 0 2px 10px 0 rgba(37, 99, 235, 0.2) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .download-btn span, 
+[data-theme="dark"] .download-btn i { 
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .download-btn:hover, 
+[data-theme="dark"] .download-btn:focus {
+  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%) !important;
+  color: #fff !important;
+  border-color: #60a5fa !important;
+  box-shadow: 0 4px 20px 0 rgba(37, 99, 235, 0.33) !important;
+}
+
+[data-theme="dark"] .view-btn {
+  background: linear-gradient(90deg, #7c3aed 0%, #a78bfa 100%) !important;
+  color: #ffffff !important;
+  border: 1.5px solid #a78bfa !important;
+  box-shadow: 0 2px 10px 0 rgba(124, 58, 237, 0.2) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .view-btn span, 
+[data-theme="dark"] .view-btn i { 
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .view-btn:hover, 
+[data-theme="dark"] .view-btn:focus {
+  background: linear-gradient(90deg, #a78bfa 0%, #7c3aed 100%) !important;
+  color: #fff !important;
+  border-color: #c4b5fd !important;
+  box-shadow: 0 4px 20px 0 rgba(124, 58, 237, 0.33) !important;
+}
+
+[data-theme="dark"] .colab-btn {
+  background: linear-gradient(90deg, #047857 0%, #10b981 100%) !important;
+  color: #ffffff !important;
+  border: 2px solid #34d399 !important;
+  box-shadow: 0 2px 10px 0 rgba(5, 150, 105, 0.4) !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+[data-theme="dark"] .colab-btn span, 
+[data-theme="dark"] .colab-btn i { 
+  color: #ffffff !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
+}
+
+[data-theme="dark"] .colab-btn:hover, 
+[data-theme="dark"] .colab-btn:focus {
+  background: linear-gradient(90deg, #10b981 0%, #047857 100%) !important;
+  color: #fff !important;
+  border-color: #6ee7b7 !important;
+  box-shadow: 0 4px 20px 0 rgba(5, 150, 105, 0.5) !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9) !important;
 }
 
 [data-theme="dark"] .notebook-tip {
-  background-color: #d1fae5;
+  background: #193c34 !important;
+  border-left: 4px solid #10b981 !important;
+  color: #d1fae5 !important;
 }
 
-/* Styling for file icons in directory listings */
+[data-theme="dark"] .notebook-tip strong {
+  color: #6ee7b7 !important;
+}
+
+/* Fix iframe background in dark mode */
+[data-theme="dark"] .embedded-notebook iframe {
+  background-color: #181f2a !important;
+  border: 1px solid #2d3a53 !important;
+}
+
+/* Fix error message colors in dark mode */
+[data-theme="dark"] .notebook-error-message {
+  background-color: #1e1e2d !important;
+  border-color: #2d3a53 !important;
+  color: #e3eafe !important;
+}
+
+[data-theme="dark"] .notebook-error-message i {
+  color: #f87171 !important;
+}
+
+[data-theme="dark"] .notebook-error-message h4 {
+  color: #f9fafb !important;
+}
+
+/* -----------------------------------------------------------------------------
+ * 11. File Icons and Tables
+ * ----------------------------------------------------------------------------- */
+
 .file-icon {
   width: 24px;
   text-align: center;
@@ -615,7 +815,7 @@ code, pre {
   font-size: 0.85em;
 }
 
-/* Table styling for documentation file listings */
+/* Documentation file tables */
 .documentation-files {
   width: 100%;
   border-collapse: collapse;
