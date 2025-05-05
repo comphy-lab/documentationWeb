@@ -5,6 +5,10 @@ endif
 
 BASILISK := $(shell . ../.project_config && echo $$BASILISK)
 
+ifeq ($(strip $(BASILISK)),)
+  $(error "BASILISK not set in .project_config")
+endif
+
 CFLAGS += -O2 -disable-dimensions
 CFLAGS += -I$(PWD)/src-local -I$(PWD)/../src-local
 

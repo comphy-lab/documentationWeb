@@ -343,11 +343,11 @@ def process_jupyter_notebook(file_path: Path) -> str:
         <a href="{notebook_filename}" download class="notebook-btn download-btn">
             <i class="fa-solid fa-download"></i> Download Notebook
         </a>
-        <a href="https://nbviewer.org/github/{REPO_NAME}/{REPO_ROOT.name}/blob/main/{notebook_path}" 
+        <a href="https://nbviewer.org/github/comphy-lab/{REPO_ROOT.name}/blob/main/{notebook_path}" 
            target="_blank" class="notebook-btn view-btn">
             <i class="fa-solid fa-eye"></i> View in nbviewer
         </a>
-        <a href="https://colab.research.google.com/github/{REPO_NAME}/{REPO_ROOT.name}/blob/main/{notebook_path}" 
+        <a href="https://colab.research.google.com/github/comphy-lab/{REPO_ROOT.name}/blob/main/{notebook_path}" 
            target="_blank" class="notebook-btn colab-btn">
             <i class="fa-solid fa-play"></i> Open in Colab
         </a>
@@ -372,7 +372,7 @@ def process_jupyter_notebook(file_path: Path) -> str:
         <h3>Notebook Preview</h3>
         <div id="notebook-container-{notebook_filename.replace('.', '-')}" >
             <iframe id="notebook-iframe-{notebook_filename.replace('.', '-')}" 
-                    src="https://nbviewer.org/github/{REPO_NAME}/{REPO_ROOT.name}/blob/main/{notebook_path}" 
+                    src="https://nbviewer.org/github/comphy-lab/{REPO_ROOT.name}/blob/main/{notebook_path}" 
                     width="100%" height="800px" frameborder="0"
                     onload="checkIframeLoaded('{notebook_filename.replace('.', '-')}')"
                     onerror="handleIframeError('{notebook_filename.replace('.', '-')}')"></iframe>
