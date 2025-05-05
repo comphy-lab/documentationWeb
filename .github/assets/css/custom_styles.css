@@ -635,6 +635,14 @@ code, pre {
 }
 
 /* Dark mode notebook styles - vibrant buttons */
+[data-theme="dark"] .notebook-preview,
+[data-theme="dark"] .jupyter-notebook-embed {
+  background-color: #1e1e2d !important;
+  color: #e3eafe !important;
+  border: 1.5px solid #2d3a53 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
 [data-theme="dark"] .notebook-preview > *:not(.notebook-tip):not(h3):not(.notebook-action-buttons) {
   background: #232d3f !important;
   color: #e3eafe !important;
@@ -647,27 +655,40 @@ code, pre {
 
 [data-theme="dark"] .notebook-preview h3,
 [data-theme="dark"] .jupyter-notebook-embed h2 {
-  color: #7dd3fc !important;
+  color: #ffffff !important;
   text-shadow: 0 2px 8px rgba(59, 130, 246, 0.13);
   font-weight: 700;
   letter-spacing: 0.01em;
+  border-bottom: 1px solid #3b4a63 !important;
 }
 
 [data-theme="dark"] .notebook-preview strong,
 [data-theme="dark"] .notebook-preview b {
-  color: #93c5fd;
+  color: #ffffff !important;
   font-weight: 700;
+}
+
+/* Fix button styling in dark mode */
+[data-theme="dark"] .notebook-btn {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5) !important;
 }
 
 [data-theme="dark"] .download-btn {
   background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%) !important;
-  color: #e3eafe !important;
+  color: #ffffff !important;
   border: 1.5px solid #3b82f6 !important;
   box-shadow: 0 2px 10px 0 rgba(37, 99, 235, 0.2) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
 }
 
+[data-theme="dark"] .download-btn span, 
 [data-theme="dark"] .download-btn i { 
-  color: #bae6fd; 
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
 }
 
 [data-theme="dark"] .download-btn:hover, 
@@ -680,13 +701,17 @@ code, pre {
 
 [data-theme="dark"] .view-btn {
   background: linear-gradient(90deg, #7c3aed 0%, #a78bfa 100%) !important;
-  color: #e3eafe !important;
+  color: #ffffff !important;
   border: 1.5px solid #a78bfa !important;
   box-shadow: 0 2px 10px 0 rgba(124, 58, 237, 0.2) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
 }
 
+[data-theme="dark"] .view-btn span, 
 [data-theme="dark"] .view-btn i { 
-  color: #c4b5fd; 
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
 }
 
 [data-theme="dark"] .view-btn:hover, 
@@ -698,28 +723,57 @@ code, pre {
 }
 
 [data-theme="dark"] .colab-btn {
-  background: linear-gradient(90deg, #059669 0%, #34d399 100%) !important;
-  color: #e3eafe !important;
-  border: 1.5px solid #34d399 !important;
-  box-shadow: 0 2px 10px 0 rgba(5, 150, 105, 0.2) !important;
+  background: linear-gradient(90deg, #047857 0%, #10b981 100%) !important;
+  color: #ffffff !important;
+  border: 2px solid #34d399 !important;
+  box-shadow: 0 2px 10px 0 rgba(5, 150, 105, 0.4) !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9) !important;
 }
 
+[data-theme="dark"] .colab-btn span, 
 [data-theme="dark"] .colab-btn i { 
-  color: #6ee7b7; 
+  color: #ffffff !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
 }
 
 [data-theme="dark"] .colab-btn:hover, 
 [data-theme="dark"] .colab-btn:focus {
-  background: linear-gradient(90deg, #34d399 0%, #059669 100%) !important;
+  background: linear-gradient(90deg, #10b981 0%, #047857 100%) !important;
   color: #fff !important;
   border-color: #6ee7b7 !important;
-  box-shadow: 0 4px 20px 0 rgba(5, 150, 105, 0.33) !important;
+  box-shadow: 0 4px 20px 0 rgba(5, 150, 105, 0.5) !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9) !important;
 }
 
 [data-theme="dark"] .notebook-tip {
   background: #193c34 !important;
   border-left: 4px solid #10b981 !important;
-  color: #b6f5d5 !important;
+  color: #d1fae5 !important;
+}
+
+[data-theme="dark"] .notebook-tip strong {
+  color: #6ee7b7 !important;
+}
+
+/* Fix iframe background in dark mode */
+[data-theme="dark"] .embedded-notebook iframe {
+  background-color: #181f2a !important;
+  border: 1px solid #2d3a53 !important;
+}
+
+/* Fix error message colors in dark mode */
+[data-theme="dark"] .notebook-error-message {
+  background-color: #1e1e2d !important;
+  border-color: #2d3a53 !important;
+  color: #e3eafe !important;
+}
+
+[data-theme="dark"] .notebook-error-message i {
+  color: #f87171 !important;
+}
+
+[data-theme="dark"] .notebook-error-message h4 {
+  color: #f9fafb !important;
 }
 
 /* -----------------------------------------------------------------------------
