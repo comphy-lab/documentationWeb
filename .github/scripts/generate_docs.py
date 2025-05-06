@@ -609,7 +609,11 @@ def run_awk_post_processing(html_content: str, file_path: Path,
     if not decl_anchors_script.is_file():
         raise FileNotFoundError(f"decl_anchors.awk script not found at {decl_anchors_script}")
     
-    relative_tags_path = file_path.relative_to(repo_root).with_suffix(file_path.suffix + '.tags')
+    try:
+        relative_tags_path = file_path.relative_to(repo_root).with_suffix(file_path.suffix + '.tags')
+    except ValueError:
+        print(f"Error: {file_path} is not under repository root {repo_root}")
+        return html_content
     temp_output_path = Path(f"{file_path}.temp.html")
     
     try:
