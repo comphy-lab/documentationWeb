@@ -339,7 +339,7 @@ def process_jupyter_notebook(file_path: Path) -> str:
         iframes.forEach(iframe => {{
             iframe.addEventListener('load', function() {{
                 const id = iframe.id.replace('notebook-iframe-', '');
-                setTimeout(() => checkIframeLoaded(id), 1000);
+                setTimeout(function() {{ checkIframeLoaded(id); }}, 1000);
             }});
         }});
     }});
@@ -494,8 +494,9 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
         '-V', f'source_path={source_path if source_path else ""}',
     ]
     
-    # For shell scripts, explicitly set mathjax to null to avoid template variable conflicts
-    if is_shell_script:
+    # For shell scripts and Jupyter notebooks, explicitly set mathjax to null to avoid template variable conflicts
+    is_jupyter_html = output_html_path.name.endswith('.ipynb.html')
+    if is_shell_script or is_jupyter_html:
         pandoc_cmd.extend(['-V', 'mathjax=null'])
         
     pandoc_cmd.extend(['-o', str(output_html_path)])

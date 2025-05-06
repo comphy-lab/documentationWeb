@@ -298,9 +298,7 @@
           }, 100); // Short delay to ensure DOM is ready
       });
   </script>
-
-    true
-  </head>
+</head>
 <body id="top">
 <script>window.repoName = "documentationWeb";</script>
 
@@ -484,7 +482,7 @@
                         iframes.forEach(iframe => {
                             iframe.addEventListener('load', function() {
                                 const id = iframe.id.replace('notebook-iframe-', '');
-                                setTimeout(() => checkIframeLoaded(id), 1000);
+                                setTimeout(function() { checkIframeLoaded(id); }, 1000);
                             });
                         });
                     });
