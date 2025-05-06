@@ -192,7 +192,13 @@ def process_markdown_file(file_path: Path) -> str:
 def process_shell_file(file_path: Path) -> str:
     """Read a shell script file and return as Markdown bash code block."""
     with open(file_path, 'r', encoding='utf-8') as f:
-        return f"```bash\n{f.read()}\n```"
+        content = f.read()
+        # Escape any potential variables that could conflict with Pandoc
+        content = content.replace("$", "\\$")
+        # Escape variable assignments with true/false values
+        content = content.replace("=true", "=\\true")
+        content = content.replace("=false", "=\\false")
+        return f"# {file_path.name}\n\n```bash\n{content}\n```"
 
 def process_jupyter_notebook(file_path: Path) -> str:
     """Generate HTML for embedding a Jupyter notebook with preview and links."""
@@ -465,6 +471,9 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
     if seo_metadata is None:
         seo_metadata = {}
     
+    # Determine if this is for a shell script file
+    is_shell_script = output_html_path.name.endswith('.sh.html') or output_html_path.name == 'Makefile.html'
+    
     pandoc_cmd = [
         'pandoc',
         '-f', 'markdown+smart+raw_html+tex_math_dollars',
@@ -483,8 +492,13 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
         '-V', f'asset_path_prefix={asset_path_prefix}',
         '-V', f'repo_name={REPO_NAME}',
         '-V', f'source_path={source_path if source_path else ""}',
-        '-o', str(output_html_path)
     ]
+    
+    # For shell scripts, explicitly set mathjax to null to avoid template variable conflicts
+    if is_shell_script:
+        pandoc_cmd.extend(['-V', 'mathjax=null'])
+        
+    pandoc_cmd.extend(['-o', str(output_html_path)])
     
     debug_print(f"  [Debug Pandoc] Command: {' '.join(pandoc_cmd)}")
     debug_print(f"  [Debug Pandoc] Input content length: {len(pandoc_input)} chars")

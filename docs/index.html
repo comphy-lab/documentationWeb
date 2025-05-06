@@ -168,39 +168,29 @@
       }
   </style>
 
-  <!-- Preload critical resources -->
-  <link rel="preload" href="./assets/js/main.js" as="script">
-  <link rel="preload" href="./assets/css/fontello/css/fontello.css" as="style">
-  <link rel="preload" href="./assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
-  
-  <!-- Base stylesheet with proper path resolution for local deployment -->
-  <link rel="stylesheet" href="./assets/css/styles.css">
-  <link rel="stylesheet" href="./assets/css/custom_styles.css">
-  <link rel="stylesheet" href="./assets/css/fontello/css/fontello.css">
-  <link rel="stylesheet" href="./assets/css/academicons-1.7.0/css/academicons.min.css">
-  <link rel="stylesheet" href="./assets/css/command-palette.css">
-  <!-- Font Awesome for icons on all documentation pages -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-  <!-- Favicon -->
-  <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png">
-  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="./assets/favicon/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="./assets/favicon/favicon-96x96.png">
-  <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg">
-  <link rel="manifest" href="./assets/favicon/site.webmanifest">
-  <link rel="shortcut icon" href="./assets/favicon/favicon.ico">
-  <link rel="icon" href="./assets/favicon/favicon.ico">
-  <meta name="msapplication-TileColor" content="#da532c">
-  <meta name="theme-color" content="#ffffff">
-  <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
-  
-  <!-- SEO Meta Tags -->
+  <!-- Critical Meta Tags -->
   <meta name="description" content="Computational fluid dynamics simulations using Basilisk C framework.">
   <meta name="author" content="CoMPhy Lab">
   <meta name="robots" content="index, follow">
   <meta name="keywords" content="fluid dynamics, CFD, Basilisk, multiphase flow, computational physics">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
 
-  <!-- Font dependencies with font-display: swap -->
+  <!-- Preload critical resources -->
+  <link rel="preload" href="./assets/js/main.js" as="script">
+  <link rel="preload" href="./assets/css/fontello/css/fontello.css" as="style">
+  <link rel="preload" href="./assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
+
+  <!-- Base stylesheets -->
+  <link rel="stylesheet" href="./assets/css/styles.css">
+  <link rel="stylesheet" href="./assets/css/custom_styles.css">
+  <link rel="stylesheet" href="./assets/css/command-palette.css">
+  <link rel="stylesheet" href="./assets/css/fontello/css/fontello.css">
+  <link rel="stylesheet" href="./assets/css/academicons-1.7.0/css/academicons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+  <!-- Font optimization -->
   <style>
       @font-face {
           font-display: swap;
@@ -208,32 +198,24 @@
           src: local('system-ui');
       }
   </style>
-  <link rel="stylesheet" href="./assets/css/fontello/css/fontello.css" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="./assets/css/academicons-1.7.0/css/academicons.min.css" media="print" onload="this.media='all'">
-  <noscript>
-      <link rel="stylesheet" href="./assets/css/fontello/css/fontello.css">
-      <link rel="stylesheet" href="./assets/css/academicons-1.7.0/css/academicons.min.css">
-  </noscript>
 
-  <!-- Site styles -->
-  <link rel="stylesheet" href="./assets/css/vendor.css">
-  <link rel="stylesheet" href="./assets/css/styles.css">
-  <link rel="stylesheet" href="./assets/css/custom_styles.css">
-  <link rel="stylesheet" href="./assets/css/command-palette.css" media="print" onload="this.media='all'">
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>   
-  <!-- Fuse.js for search functionality -->
-  <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
-  
-  <!-- jQuery and UI -->
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="./assets/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg">
+  <link rel="shortcut icon" href="./assets/favicon/favicon.ico">
+  <link rel="manifest" href="./assets/favicon/site.webmanifest">
+
+  <!-- Scripts with proper loading attributes -->
   <script src="./assets/js/jquery.min.js"></script>
   <script src="./assets/js/jquery-ui.packed.js"></script>
   <script src="./assets/js/plots.js"></script>
-  
-  <!-- Command palette -->
+  <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
   <script defer src="./assets/js/command-palette.js"></script>
   <script defer src="./assets/js/command-data.js"></script>
   <script defer src="./assets/js/main.js"></script>
   <script defer src="./assets/js/theme-toggle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
   
   <!-- Optimize page load performance -->
   <script>

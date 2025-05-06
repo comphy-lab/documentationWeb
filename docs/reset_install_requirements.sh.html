@@ -168,39 +168,29 @@
       }
   </style>
 
+  <!-- Critical Meta Tags -->
+  <meta name="description" content="HARDRESET=\false if [[ "\$1" == "--hard" ]]; then HARDRESET=\true fi">
+  <meta name="author" content="CoMPhy Lab">
+  <meta name="robots" content="index, follow">
+  <meta name="keywords" content="install, requirements, reset">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
+
   <!-- Preload critical resources -->
   <link rel="preload" href="./assets/js/main.js" as="script">
   <link rel="preload" href="./assets/css/fontello/css/fontello.css" as="style">
   <link rel="preload" href="./assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
-  
-  <!-- Base stylesheet with proper path resolution for local deployment -->
+
+  <!-- Base stylesheets -->
   <link rel="stylesheet" href="./assets/css/styles.css">
   <link rel="stylesheet" href="./assets/css/custom_styles.css">
+  <link rel="stylesheet" href="./assets/css/command-palette.css">
   <link rel="stylesheet" href="./assets/css/fontello/css/fontello.css">
   <link rel="stylesheet" href="./assets/css/academicons-1.7.0/css/academicons.min.css">
-  <link rel="stylesheet" href="./assets/css/command-palette.css">
-  <!-- Font Awesome for icons on all documentation pages -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
-  <!-- Favicon -->
-  <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png">
-  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="./assets/favicon/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="./assets/favicon/favicon-96x96.png">
-  <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg">
-  <link rel="manifest" href="./assets/favicon/site.webmanifest">
-  <link rel="shortcut icon" href="./assets/favicon/favicon.ico">
-  <link rel="icon" href="./assets/favicon/favicon.ico">
-  <meta name="msapplication-TileColor" content="#da532c">
-  <meta name="theme-color" content="#ffffff">
-  <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
-  
-  <!-- SEO Meta Tags -->
-  <meta name="description" content="HARDRESET=false if [[ "$1" == "--hard" ]]; then HARDRESET=true fi">
-  <meta name="author" content="CoMPhy Lab">
-  <meta name="robots" content="index, follow">
-  <meta name="keywords" content="install, requirements, reset">
-
-  <!-- Font dependencies with font-display: swap -->
+  <!-- Font optimization -->
   <style>
       @font-face {
           font-display: swap;
@@ -208,32 +198,24 @@
           src: local('system-ui');
       }
   </style>
-  <link rel="stylesheet" href="./assets/css/fontello/css/fontello.css" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="./assets/css/academicons-1.7.0/css/academicons.min.css" media="print" onload="this.media='all'">
-  <noscript>
-      <link rel="stylesheet" href="./assets/css/fontello/css/fontello.css">
-      <link rel="stylesheet" href="./assets/css/academicons-1.7.0/css/academicons.min.css">
-  </noscript>
 
-  <!-- Site styles -->
-  <link rel="stylesheet" href="./assets/css/vendor.css">
-  <link rel="stylesheet" href="./assets/css/styles.css">
-  <link rel="stylesheet" href="./assets/css/custom_styles.css">
-  <link rel="stylesheet" href="./assets/css/command-palette.css" media="print" onload="this.media='all'">
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>   
-  <!-- Fuse.js for search functionality -->
-  <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
-  
-  <!-- jQuery and UI -->
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="./assets/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg">
+  <link rel="shortcut icon" href="./assets/favicon/favicon.ico">
+  <link rel="manifest" href="./assets/favicon/site.webmanifest">
+
+  <!-- Scripts with proper loading attributes -->
   <script src="./assets/js/jquery.min.js"></script>
   <script src="./assets/js/jquery-ui.packed.js"></script>
   <script src="./assets/js/plots.js"></script>
-  
-  <!-- Command palette -->
+  <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
   <script defer src="./assets/js/command-palette.js"></script>
   <script defer src="./assets/js/command-data.js"></script>
   <script defer src="./assets/js/main.js"></script>
   <script defer src="./assets/js/theme-toggle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
   
   <!-- Optimize page load performance -->
   <script>
@@ -317,7 +299,7 @@
       });
   </script>
 
-    true
+    null
   </head>
 <body id="top">
 <script>window.repoName = "documentationWeb";</script>
@@ -408,6 +390,8 @@
                     </a>
                 </div>
                 
+                <h1
+                id="reset_install_requirements.sh">reset_install_requirements.sh</h1>
                 <div class="code-block-container"><div class="code-block-container"><pre
                 class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><span class="co">#!/bin/zsh</span></span>
 <span id="cb1-2"><span class="co"># tested on MacOS only. Let us know if you find issues running with Linux by opening an issue. </span></span>
@@ -415,9 +399,9 @@
 <span id="cb1-4"><span class="co"># ensures that we are always using the latest version of basilisk</span></span>
 <span id="cb1-5"></span>
 <span id="cb1-6"><span class="co"># Check if --hard flag is passed</span></span>
-<span id="cb1-7"><span class="va">HARD_RESET</span><span class="op">=</span>false</span>
-<span id="cb1-8"><span class="cf">if</span> <span class="kw">[[</span> <span class="st">&quot;</span><span class="va">$1</span><span class="st">&quot;</span> <span class="ot">==</span> <span class="st">&quot;--hard&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
-<span id="cb1-9">    <span class="va">HARD_RESET</span><span class="op">=</span>true</span>
+<span id="cb1-7"><span class="va">HARD_RESET</span><span class="op">=</span><span class="dt">\f</span>alse</span>
+<span id="cb1-8"><span class="cf">if</span> <span class="kw">[[</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">1&quot;</span> <span class="ot">==</span> <span class="st">&quot;--hard&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-9">    <span class="va">HARD_RESET</span><span class="op">=</span><span class="dt">\t</span>rue</span>
 <span id="cb1-10"><span class="cf">fi</span></span>
 <span id="cb1-11"></span>
 <span id="cb1-12"><span class="co"># Function to install basilisk</span></span>
@@ -425,7 +409,7 @@
 <span id="cb1-14">    <span class="ex">darcs</span> clone http://basilisk.fr/basilisk</span>
 <span id="cb1-15">    <span class="bu">cd</span> basilisk/src</span>
 <span id="cb1-16"></span>
-<span id="cb1-17">    <span class="cf">if</span> <span class="kw">[[</span> <span class="st">&quot;</span><span class="va">$OSTYPE</span><span class="st">&quot;</span> <span class="ot">==</span> <span class="st">&quot;darwin&quot;</span><span class="pp">*</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-17">    <span class="cf">if</span> <span class="kw">[[</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">OSTYPE&quot;</span> <span class="ot">==</span> <span class="st">&quot;darwin&quot;</span><span class="pp">*</span> <span class="kw">]];</span> <span class="cf">then</span></span>
 <span id="cb1-18">        <span class="bu">echo</span> <span class="st">&quot;Using MacOS&quot;</span></span>
 <span id="cb1-19">        <span class="fu">ln</span> <span class="at">-s</span> config.osx config</span>
 <span id="cb1-20">    <span class="cf">else</span></span>
@@ -440,7 +424,7 @@
 <span id="cb1-29"><span class="fu">rm</span> <span class="at">-rf</span> .project_config</span>
 <span id="cb1-30"></span>
 <span id="cb1-31"><span class="co"># Check if basilisk needs to be installed</span></span>
-<span id="cb1-32"><span class="cf">if</span> <span class="kw">[[</span> <span class="st">&quot;</span><span class="va">$HARD_RESET</span><span class="st">&quot;</span> <span class="ot">==</span> true <span class="kw">]]</span> <span class="kw">||</span> <span class="kw">[[</span> <span class="ot">!</span> <span class="ot">-d</span> <span class="st">&quot;basilisk&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-32"><span class="cf">if</span> <span class="kw">[[</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">HARD_RESET&quot;</span> <span class="ot">==</span> true <span class="kw">]]</span> <span class="kw">||</span> <span class="kw">[[</span> <span class="ot">!</span> <span class="ot">-d</span> <span class="st">&quot;basilisk&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
 <span id="cb1-33">    <span class="bu">echo</span> <span class="st">&quot;Installing basilisk...&quot;</span></span>
 <span id="cb1-34">    <span class="fu">rm</span> <span class="at">-rf</span> basilisk</span>
 <span id="cb1-35">    <span class="ex">install_basilisk</span></span>
@@ -450,8 +434,8 @@
 <span id="cb1-39"><span class="cf">fi</span></span>
 <span id="cb1-40"></span>
 <span id="cb1-41"><span class="co"># Setup environment variables</span></span>
-<span id="cb1-42"><span class="bu">echo</span> <span class="st">&quot;export BASILISK=</span><span class="va">$PWD</span><span class="st">&quot;</span> <span class="op">&gt;&gt;</span> ../../.project_config</span>
-<span id="cb1-43"><span class="bu">echo</span> <span class="st">&quot;export PATH=</span><span class="dt">\$</span><span class="st">PATH:</span><span class="dt">\$</span><span class="st">BASILISK&quot;</span> <span class="op">&gt;&gt;</span> ../../.project_config</span>
+<span id="cb1-42"><span class="bu">echo</span> <span class="st">&quot;export BASILISK=</span><span class="dt">\$</span><span class="st">PWD&quot;</span> <span class="op">&gt;&gt;</span> ../../.project_config</span>
+<span id="cb1-43"><span class="bu">echo</span> <span class="st">&quot;export PATH=</span><span class="dt">\\</span><span class="va">$PATH</span><span class="st">:</span><span class="dt">\\</span><span class="va">$BASILISK</span><span class="st">&quot;</span> <span class="op">&gt;&gt;</span> ../../.project_config</span>
 <span id="cb1-44"></span>
 <span id="cb1-45"><span class="bu">source</span> ../../.project_config</span>
 <span id="cb1-46"></span>
