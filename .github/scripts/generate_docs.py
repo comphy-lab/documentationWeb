@@ -834,8 +834,8 @@ def insert_javascript_in_html(html_file_path: Path) -> bool:
         
         # JS for copy functionality
         copy_js = '''
-    <script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function() {
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
     // Add copy button to each code block container
     const codeBlocks = document.querySelectorAll('.code-block-container pre');
     codeBlocks.forEach(function(codeBlock, index) {
@@ -853,37 +853,56 @@ def insert_javascript_in_html(html_file_path: Path) -> bool:
         container.appendChild(button);
         
         // Set up click event
-        button.addEventListener('click', function() {
-            // Create a textarea element to copy from
-            const textarea = document.createElement('textarea');
-            // Get the text content from the pre element (the actual code)
-            textarea.value = codeBlock.textContent;
-            document.body.appendChild(textarea);
-            textarea.select();
+        button.addEventListener('click', async function() {
+            const codeText = codeBlock.textContent;
             
             try {
-                // Execute copy command
-                document.execCommand('copy');
-                // Update button state
-                button.textContent = 'Copied!';
-                button.classList.add('copied');
-                
-                // Reset button state after 2 seconds
-                setTimeout(function() {
-                    button.textContent = 'Copy';
-                    button.classList.remove('copied');
-                }, 2000);
+                // Try to use the modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(codeText);
+                    updateButtonState(button, 'success');
+                } else {
+                    // Fall back to the deprecated execCommand method
+                    const textarea = document.createElement('textarea');
+                    textarea.value = codeText;
+                    textarea.style.position = 'fixed';  // Prevent scrolling to the bottom
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    
+                    if (successful) {
+                        updateButtonState(button, 'success');
+                    } else {
+                        updateButtonState(button, 'error');
+                    }
+                }
             } catch (err) {
                 console.error('Copy failed:', err);
-                button.textContent = 'Error!';
+                updateButtonState(button, 'error');
             }
-            
-            // Clean up
-            document.body.removeChild(textarea);
         });
     });
+    
+    // Function to update button state
+    function updateButtonState(button, state) {
+        if (state === 'success') {
+            button.textContent = 'Copied!';
+            button.classList.add('copied');
+        } else if (state === 'error') {
+            button.textContent = 'Error!';
+            button.classList.add('error');
+        }
+        
+        // Reset button state after 2 seconds
+        setTimeout(function() {
+            button.textContent = 'Copy';
+            button.classList.remove('copied', 'error');
+        }, 2000);
+    }
 });
-    </script>
+</script>
         '''
         
         if 'class="copy-button"' in content:

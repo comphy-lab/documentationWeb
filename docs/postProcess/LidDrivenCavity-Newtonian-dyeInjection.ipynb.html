@@ -570,32 +570,50 @@
         
         // Set up click event
         button.addEventListener('click', function() {
-            // Create a textarea element to copy from
-            const textarea = document.createElement('textarea');
-            // Get the text content from the pre element (the actual code)
-            textarea.value = codeBlock.textContent;
-            document.body.appendChild(textarea);
-            textarea.select();
-            
-            try {
-                // Execute copy command
-                document.execCommand('copy');
-                // Update button state
-                button.textContent = 'Copied!';
-                button.classList.add('copied');
-                
-                // Reset button state after 2 seconds
-                setTimeout(function() {
+            const codeText = codeBlock.textContent;
+            // Use modern clipboard API if available
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(codeText)
+                .then(function() {
+                  button.textContent = 'Copied!';
+                  button.classList.add('copied');
+                  setTimeout(function() {
                     button.textContent = 'Copy';
                     button.classList.remove('copied');
+                  }, 2000);
+                })
+                .catch(function(err) {
+                  console.error('Copy failed:', err);
+                  button.textContent = 'Error!';
+                  setTimeout(function() {
+                    button.textContent = 'Copy';
+                    button.classList.remove('copied');
+                  }, 2000);
+                });
+            } else {
+              // Fallback to execCommand for older browsers
+              const textarea = document.createElement('textarea');
+              textarea.value = codeText;
+              document.body.appendChild(textarea);
+              textarea.select();
+              try {
+                document.execCommand('copy');
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                setTimeout(function() {
+                  button.textContent = 'Copy';
+                  button.classList.remove('copied');
                 }, 2000);
-            } catch (err) {
+              } catch (err) {
                 console.error('Copy failed:', err);
                 button.textContent = 'Error!';
+                setTimeout(function() {
+                  button.textContent = 'Copy';
+                  button.classList.remove('copied');
+                }, 2000);
+              }
+              document.body.removeChild(textarea);
             }
-            
-            // Clean up
-            document.body.removeChild(textarea);
         });
     });
 });
