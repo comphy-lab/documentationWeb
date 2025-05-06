@@ -11,7 +11,7 @@ globs: [".github/**/*"]
 
 ## Documentation Generation
 
-- Read `.github/README.md` for the website generation process.
+- Read `.github/Website-generator-readme.md` for the website generation process.
 - Do not auto-deploy the website; generating HTML is permitted using `.github/scripts/build.sh`.
 - Avoid editing HTML files directly; they are generated using `.github/scripts/build.sh`, which utilizes `.github/scripts/generate_docs.py`.
 - The website is deployed at `https://comphy-lab.org/repositoryName`; refer to the `CNAME` file for configuration. Update if not done already. 
