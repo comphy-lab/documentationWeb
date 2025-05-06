@@ -6,8 +6,8 @@ constant viscosity and includes dye injection for flow visualization.
 This extends the classic benchmark case with a passive tracer to visualize flow patterns.
 
 ## Parameters
-- Reynolds number: Re = ρUL/μ = 1/μ (with ρ=1, U=1, L=1)
-- We use μ = 1.0 by default (Re = 1)
+- Reynolds number: $Re = \frac{\rho U L}{\mu} = \frac{1}{\mu} \quad \text{(with } \rho=1, U=1, L=1\text{)}$
+- We use $\mu = 1.0$ by default (Re = 1)
 - dye injection at t=0.05 in the upper center of the cavity
 */
 
