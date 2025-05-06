@@ -65,6 +65,16 @@ def extract_seo_metadata(file_path: Path, content: str) -> Dict[str, str]:
     if keywords:
         metadata["keywords"] = ", ".join(sorted(list(keywords)[:10]))
     
+    # Ensure description is safe for HTML attributes
+    if "description" in metadata:
+        # Remove HTML tags and replace quotes
+        metadata["description"] = re.sub(r'<[^>]*>', '', metadata["description"])
+        metadata["description"] = re.sub(r'"', '\'', metadata["description"])
+        
+        # Truncate if still too long
+        if len(metadata["description"]) > 160:
+            metadata["description"] = metadata["description"][:157] + "..."
+    
     return metadata
 
 # Configuration
@@ -242,6 +252,12 @@ def process_jupyter_notebook(file_path: Path) -> str:
                 "Interactive exploration of parameters"
             ]
         
+        # Ensure the description doesn't contain HTML tags or attributes
+        # This is critical to prevent meta tag corruption
+        notebook_description = re.sub(r'<[^>]*>', '', notebook_description)
+        notebook_description = re.sub(r'"', '\'', notebook_description)
+        
+        # Properly escape all content for HTML use
         safe_notebook_title = html.escape(notebook_title)
         safe_notebook_description = html.escape(notebook_description)
         safe_notebook_features = [html.escape(f) for f in notebook_features]
@@ -520,7 +536,21 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
             
         # Remove empty anchor tags
         content = re.sub(r'<a[^>]*>\s*</a>', '', content)
+        
+        # Fix any malformed meta description tags, especially for Jupyter notebooks
+        desc_meta_pattern = r'<meta\s+name="description"\s+content="([^"]*(?:target|href)[^"]*)"[^>]*>'
+        if re.search(desc_meta_pattern, content):
+            # Remove the problematic description meta tags
+            content = re.sub(desc_meta_pattern, '', content)
             
+            # Add a clean description meta tag in the head section if we have a description
+            if seo_metadata and "description" in seo_metadata and seo_metadata["description"]:
+                clean_desc = html.escape(seo_metadata.get("description", ""))
+                head_pos = content.find('</head>')
+                if head_pos > 0:
+                    meta_tag = f'  <meta name="description" content="{clean_desc}">\n  '
+                    content = content[:head_pos] + meta_tag + content[head_pos:]
+        
         # Check if file has proper HTML structure
         if '<!DOCTYPE' not in content or '<html' not in content:
             print(f"Warning: Generated HTML for {output_html_path} is missing DOCTYPE or html tag")
