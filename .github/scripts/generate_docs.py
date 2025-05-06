@@ -719,10 +719,11 @@ def insert_css_link_in_html(html_file_path: Path, css_path: Path, is_root: bool 
         with open(html_file_path, 'r', encoding='utf-8') as f:
             content = f.read()
         
-        css_link = f'<link href="{css_path.name}" rel="stylesheet" type="text/css" />' if is_root else \
-                  f'<link href="../{css_path.name}" rel="stylesheet" type="text/css" />'
+        css_name = str(Path(css_path).name)
+        css_link = f'<link href="{css_name}" rel="stylesheet" type="text/css" />' if is_root else \
+                  f'<link href="../{css_name}" rel="stylesheet" type="text/css" />'
         
-        if 'link href="' + Path(css_path).name + '"' in content or 'link href="../' + Path(css_path).name + '"' in content:
+        if f'link href="{css_name}"' in content or f'link href="../{css_name}"' in content:
             return True
         
         head_end_idx = content.find('</head>')
@@ -762,54 +763,54 @@ def insert_javascript_in_html(html_file_path: Path) -> bool:
         # JS for copy functionality
         copy_js = '''
     <script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function() {{
-        // Add copy button to each code block container
-        const codeBlocks = document.querySelectorAll('.code-block-container pre');
-        codeBlocks.forEach(function(codeBlock, index) {{
-            // Create button element
-            const button = document.createElement('button');
-            button.className = 'copy-button';
-            button.textContent = 'Copy';
-            button.setAttribute('aria-label', 'Copy code to clipboard');
-            button.setAttribute('data-copy-state', 'copy');
+    document.addEventListener('DOMContentLoaded', function() {
+    // Add copy button to each code block container
+    const codeBlocks = document.querySelectorAll('.code-block-container pre');
+    codeBlocks.forEach(function(codeBlock, index) {
+        // Create button element
+        const button = document.createElement('button');
+        button.className = 'copy-button';
+        button.textContent = 'Copy';
+        button.setAttribute('aria-label', 'Copy code to clipboard');
+        button.setAttribute('data-copy-state', 'copy');
+        
+        // Get the code block container (parent of the pre)
+        const container = codeBlock.parentNode;
+        
+        // Add the button to the container
+        container.appendChild(button);
+        
+        // Set up click event
+        button.addEventListener('click', function() {
+            // Create a textarea element to copy from
+            const textarea = document.createElement('textarea');
+            // Get the text content from the pre element (the actual code)
+            textarea.value = codeBlock.textContent;
+            document.body.appendChild(textarea);
+            textarea.select();
             
-            // Get the code block container (parent of the pre)
-            const container = codeBlock.parentNode;
-            
-            // Add the button to the container
-            container.appendChild(button);
-            
-            // Set up click event
-            button.addEventListener('click', function() {{
-                // Create a textarea element to copy from
-                const textarea = document.createElement('textarea');
-                // Get the text content from the pre element (the actual code)
-                textarea.value = codeBlock.textContent;
-                document.body.appendChild(textarea);
-                textarea.select();
+            try {
+                // Execute copy command
+                document.execCommand('copy');
+                // Update button state
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
                 
-                try {{
-                    // Execute copy command
-                    document.execCommand('copy');
-                    // Update button state
-                    button.textContent = 'Copied!';
-                    button.classList.add('copied');
-                    
-                    // Reset button state after 2 seconds
-                    setTimeout(function() {{
-                        button.textContent = 'Copy';
-                        button.classList.remove('copied');
-                    }}, 2000);
-                }} catch (err) {{
-                    console.error('Copy failed:', err);
-                    button.textContent = 'Error!';
-                }}
-                
-                // Clean up
-                document.body.removeChild(textarea);
-            }});
-        }});
-    }});
+                // Reset button state after 2 seconds
+                setTimeout(function() {
+                    button.textContent = 'Copy';
+                    button.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                console.error('Copy failed:', err);
+                button.textContent = 'Error!';
+            }
+            
+            // Clean up
+            document.body.removeChild(textarea);
+        });
+    });
+});
     </script>
         '''
         
