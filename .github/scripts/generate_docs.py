@@ -656,7 +656,8 @@ def prepare_pandoc_input(file_path: Path, literate_c_script: Path) -> str:
 def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path, 
                base_url: str, wiki_title: str, page_url: str, page_title: str,
                asset_path_prefix: str, # Added asset prefix
-               seo_metadata: Dict[str, str] = None) -> str:
+               seo_metadata: Dict[str, str] = None,
+               source_path: str = None) -> str:
     """Converts Markdown content to a standalone HTML document using Pandoc.
     
     This function runs Pandoc to transform the provided Markdown input into HTML using a specified
@@ -700,6 +701,8 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
         '-V', f'keywords={seo_metadata.get("keywords", "")}',
         '-V', f'image={seo_metadata.get("image", "")}',
         '-V', f'asset_path_prefix={asset_path_prefix}', # Pass prefix to template
+        '-V', f'repo_name={REPO_NAME}', # Pass repo name for the raw file link
+        '-V', f'source_path={source_path if source_path else ""}', # Pass source path for the raw file link
         '-o', str(output_html_path)
     ]
     
@@ -1303,6 +1306,9 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
         # Calculate asset path prefix based on output file depth
         asset_path_prefix = calculate_asset_prefix(output_html_path, docs_dir)
         
+        # Get the source path relative to the repo root
+        source_path = file_path.relative_to(repo_root).as_posix()
+        
         pandoc_stdout = run_pandoc(
             pandoc_input_content, 
             output_html_path, 
@@ -1312,7 +1318,8 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
             page_url, 
             page_title,
             asset_path_prefix, # Pass the calculated prefix
-            seo_metadata
+            seo_metadata,
+            source_path # Pass the source path for the raw file link
         )
         
         # Determine file type for post-processing
