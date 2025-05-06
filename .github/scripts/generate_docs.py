@@ -28,7 +28,24 @@ def calculate_asset_prefix(output_path: Path, docs_dir: Path) -> str:
 def extract_seo_metadata(file_path: Path, content: str) -> Dict[str, str]:
     """Extract SEO metadata from file content."""
     metadata = {}
-    # Extract first paragraph as description
+    
+    # Check for embedded SEO metadata (used by Jupyter notebooks)
+    seo_match = re.search(r'<!--SEO_METADATA:(.*?)-->', content)
+    if seo_match:
+        try:
+            debug_print(f"Found embedded SEO metadata in {file_path}")
+            embedded_metadata = json.loads(seo_match.group(1))
+            if isinstance(embedded_metadata, dict):
+                metadata.update(embedded_metadata)
+                # Extra sanitization of description to be absolutely safe
+                if "description" in metadata:
+                    metadata["description"] = re.sub(r'<[^>]*>', '', metadata["description"])
+                    metadata["description"] = re.sub(r'["\'\\\<>]', '', metadata["description"])
+                return metadata
+        except Exception as e:
+            debug_print(f"Error parsing embedded SEO metadata: {e}")
+    
+    # Extract first paragraph as description (fallback for non-notebook files)
     desc_match = re.search(r'^\s*#\s*(.*?)\s*$\s*([a-zA-Z].*?)(?=^\s*#|\Z)', 
                           content, re.MULTILINE | re.DOTALL)
     if desc_match:
@@ -252,16 +269,33 @@ def process_jupyter_notebook(file_path: Path) -> str:
                 "Interactive exploration of parameters"
             ]
         
-        # Ensure the description doesn't contain HTML tags or attributes
+        # Clean all strings to prevent HTML injection and attribute issues
         # This is critical to prevent meta tag corruption
+        
+        # Step 1: Remove all HTML tags from the description
         notebook_description = re.sub(r'<[^>]*>', '', notebook_description)
-        notebook_description = re.sub(r'"', '\'', notebook_description)
+        
+        # Step 2: Remove any potential content that might break attributes
+        notebook_description = re.sub(r'["\'>]', '', notebook_description)
+        
+        # Step 3: Create a highly sanitized version for use in meta tags
+        meta_safe_description = re.sub(r'[^\w\s.,;:!?()-]', '', notebook_description)
+        meta_safe_description = meta_safe_description.strip()
+        if len(meta_safe_description) > 160:
+            meta_safe_description = meta_safe_description[:157] + "..."
         
         # Properly escape all content for HTML use
         safe_notebook_title = html.escape(notebook_title)
         safe_notebook_description = html.escape(notebook_description)
         safe_notebook_features = [html.escape(f) for f in notebook_features]
         features_html = "\n".join([f'<li>{feature}</li>' for feature in safe_notebook_features])
+        
+        # Store meta description for later use in SEO metadata
+        seo_metadata = {
+            "title": notebook_title,
+            "description": meta_safe_description,
+            "meta_tags": f'<meta name="description" content="{meta_safe_description}">\n'
+        }
         
         embed_html = f"""# {safe_notebook_title}
 
@@ -362,6 +396,8 @@ def process_jupyter_notebook(file_path: Path) -> str:
 </script>
 ```
 """
+        # Add metadata to the embed_html for extraction later
+        embed_html = f"<!--SEO_METADATA:{json.dumps(seo_metadata)}-->\n" + embed_html
         return embed_html
     except Exception as e:
         return f"# {notebook_filename}\n\nError processing notebook: {str(e)}"
@@ -538,14 +574,19 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
         content = re.sub(r'<a[^>]*>\s*</a>', '', content)
         
         # Fix any malformed meta description tags, especially for Jupyter notebooks
-        desc_meta_pattern = r'<meta\s+name="description"\s+content="([^"]*(?:target|href)[^"]*)"[^>]*>'
+        desc_meta_pattern = r'<meta\s+name="description"\s+content="([^"]*(?:target|href|class|style|onclick)[^"]*)"[^>]*>'
         if re.search(desc_meta_pattern, content):
+            print(f"  Fixing malformed meta description tag in {output_html_path.name}")
             # Remove the problematic description meta tags
             content = re.sub(desc_meta_pattern, '', content)
             
             # Add a clean description meta tag in the head section if we have a description
             if seo_metadata and "description" in seo_metadata and seo_metadata["description"]:
-                clean_desc = html.escape(seo_metadata.get("description", ""))
+                # Extra sanitization to be absolutely safe
+                clean_desc = re.sub(r'<[^>]*>', '', seo_metadata.get("description", ""))
+                clean_desc = re.sub(r'["\'<>\\\]', '', clean_desc)
+                clean_desc = html.escape(clean_desc)
+                
                 head_pos = content.find('</head>')
                 if head_pos > 0:
                     meta_tag = f'  <meta name="description" content="{clean_desc}">\n  '
