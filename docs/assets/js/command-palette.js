@@ -171,7 +171,7 @@ function renderSections(sections, container) {
       const iconEl = document.createElement('div');
       iconEl.className = 'command-palette-icon';
       
-      // Render Font-Awesome & other inline-HTML icons with validation
+      // Render Font-Awesome & other inline-HTML icons -> sanitize to prevent XSS risks
       if (cmd.icon && typeof cmd.icon === 'string') {
         // Strict validation: only allow Font Awesome icons that match the expected pattern
         const iconStr = cmd.icon.trim();
@@ -183,7 +183,7 @@ function renderSections(sections, container) {
           // Adding extra validation for classes
           const validIconPattern = /^<i class=\"(fa|fas|far|fal|fab|ai)[ -][\w\d -]+"><\/i>$/;
           if (validIconPattern.test(iconStr)) {
-            iconEl.innerHTML = iconStr;
+            iconEl.innerHTML = sanitizeHTML(iconStr);
           } else {
             // Fallback to displaying as text if pattern doesn't match exactly
             iconEl.textContent = '🔍'; // Default search icon as fallback
