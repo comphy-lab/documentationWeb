@@ -1,6 +1,11 @@
 // Command data for website command palette
 (function() {
-  console.log('Loading command data');
+  // Debug flag - set to false in production
+  const DEBUG = false;
+  
+  if (DEBUG) {
+    console.log('Loading command data');
+  }
   
   // Define the command data
   window.commandData = [
@@ -125,11 +130,15 @@
     }
   ];
   
-  console.log('Command data loaded with ' + window.commandData.length + ' commands');
+  if (DEBUG) {
+    console.log('Command data loaded with ' + window.commandData.length + ' commands');
+  }
   
   // Define the displayShortcutsHelp function globally
   window.displayShortcutsHelp = function() {
-    console.log('Displaying shortcut help');
+    if (DEBUG) {
+      console.log('Displaying shortcut help');
+    }
     // Create a modal to show all available shortcuts
     const modal = document.createElement('div');
     modal.style.position = 'fixed';

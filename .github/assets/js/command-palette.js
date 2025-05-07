@@ -3,6 +3,9 @@
  * This file contains all the functionality for the command palette
  */
 
+// Debug flag - set to false in production
+const DEBUG = false;
+
 // Make the command palette opening function globally available
 window.openCommandPalette = function() {
   const palette = document.getElementById('simple-command-palette');
@@ -66,7 +69,9 @@ function renderCommandResults(query) {
         renderSections(sections, resultsContainer);
       }
     }).catch(err => {
-      console.error('Error searching database:', err);
+      if (DEBUG) {
+        console.error('Error searching database:', err);
+      }
     });
   }
   
@@ -207,7 +212,9 @@ function initCommandPalette() {
     }
     throw new Error('Search database not found');
   }).then(data => {
-    console.log('Search database prefetched for command palette');
+    if (DEBUG) {
+      console.log('Search database prefetched for command palette');
+    }
     window.searchData = data;
     
     // Initialize Fuse.js with weighted keys
@@ -222,7 +229,9 @@ function initCommandPalette() {
       threshold: 0.4
     });
   }).catch(err => {
-    console.warn('Could not prefetch search database for command palette:', err.message);
+    if (DEBUG) {
+      console.warn('Could not prefetch search database for command palette:', err.message);
+    }
   });
 
   // Set up backdrop click to close
@@ -327,7 +336,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // Ensure command palette button works correctly
   const commandPaletteBtn = document.getElementById('command-palette-btn');
   if (commandPaletteBtn) {
-    console.log('Command palette button initialized with new styling');
+    if (DEBUG) {
+      console.log('Command palette button initialized with new styling');
+    }
     
     // Make sure the button retains focus styles
     commandPaletteBtn.addEventListener('focus', function() {
