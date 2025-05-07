@@ -13,7 +13,12 @@
     {
       id: "home",
       title: "Go to Home (this wiki)",
-      handler: () => { window.location.href = `/${window.repoName || ''}`; },
+      handler: () => { 
+        // Get base URL from meta tag to support GitHub Pages subfolders
+        const baseUrlMeta = document.querySelector('meta[name="base-url"]');
+        const baseUrl = baseUrlMeta ? baseUrlMeta.getAttribute('content') : ''; 
+        window.location.href = baseUrl || `/${window.repoName || ''}`;
+      },
       section: "Navigation",
       icon: '<i class="fa-solid fa-brain"></i>'
     },
@@ -134,12 +139,13 @@
     console.log('Command data loaded with ' + window.commandData.length + ' commands');
   }
   
-  // Define the displayShortcutsHelp function globally
-  window.displayShortcutsHelp = function() {
+  // Reusable function to create modal and content elements
+  window.createModal = function(makeContentFocusable = false) {
     if (DEBUG) {
-      console.log('Displaying shortcut help');
+      console.log('Creating modal');
     }
-    // Create a modal to show all available shortcuts
+    
+    // Create a modal
     const modal = document.createElement('div');
     modal.style.position = 'fixed';
     modal.style.top = '0';
@@ -161,11 +167,27 @@
     content.style.overflow = 'auto';
     content.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.3)';
     
+    if (makeContentFocusable) {
+      content.setAttribute('tabindex', '-1'); // Make the content focusable for keyboard events
+    }
+    
     // Media query for dark mode
     if (window?.matchMedia?.('(prefers-color-scheme: dark)')?.matches) {
       content.style.backgroundColor = '#333';
       content.style.color = '#fff';
     }
+    
+    return { modal, content };
+  };
+
+  // Define the displayShortcutsHelp function globally
+  window.displayShortcutsHelp = function() {
+    if (DEBUG) {
+      console.log('Displaying shortcut help');
+    }
+    
+    // Create modal using the reusable function
+    const { modal, content } = window.createModal();
     
     // Group commands by section
     const sections = {};
@@ -232,34 +254,8 @@
           id: "filter-research",
           title: "Filter Research by Tag",
           handler: () => { 
-            // Create and display a modal showing all available tags
-            const modal = document.createElement('div');
-            modal.style.position = 'fixed';
-            modal.style.top = '0';
-            modal.style.left = '0';
-            modal.style.width = '100%';
-            modal.style.height = '100%';
-            modal.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-            modal.style.zIndex = '2000';
-            modal.style.display = 'flex';
-            modal.style.justifyContent = 'center';
-            modal.style.alignItems = 'center';
-            
-            const content = document.createElement('div');
-            content.style.backgroundColor = 'white';
-            content.style.borderRadius = '8px';
-            content.style.padding = '20px';
-            content.style.maxWidth = '600px';
-            content.style.maxHeight = '80vh';
-            content.style.overflow = 'auto';
-            content.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.3)';
-            content.setAttribute('tabindex', '-1'); // Make the content focusable for keyboard events
-            
-            // Media query for dark mode
-            if (window?.matchMedia?.('prefers-color-scheme: dark')?.matches) {
-              content.style.backgroundColor = '#333';
-              content.style.color = '#fff';
-            }
+            // Create modal using the reusable function
+            const { modal, content } = window.createModal(true); // true to make content focusable for keyboard events
             
             // Collect all unique tags from the page
             const tagElements = document.querySelectorAll('tags span');
@@ -441,4 +437,4 @@
   document.addEventListener('DOMContentLoaded', function() {
     window.addContextCommands();
   });
-})(); 
+})();
