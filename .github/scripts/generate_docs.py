@@ -1,7 +1,22 @@
 #!/usr/bin/env python3
-import os, subprocess, re, shutil, argparse, html, json
+import os
+import subprocess
+import re
+import shutil
+import argparse
+import html
+import json
+import logging
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Union
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
 # Parse args
 parser = argparse.ArgumentParser(description='Generate docs from source files')
@@ -11,9 +26,14 @@ args = parser.parse_args()
 DEBUG = args.debug
 FORCE_REBUILD = args.force_rebuild
 
+# Set log level based on debug flag
+if DEBUG:
+    logger.setLevel(logging.DEBUG)
+
 def debug_print(msg):
-    """Print debug messages only if debug mode is enabled."""
-    if DEBUG: print(msg)
+    """Log debug messages using the logging module."""
+    if DEBUG:
+        logger.debug(msg)
 
 def calculate_asset_prefix(output_path: Path, docs_dir: Path) -> str:
     """Calculate relative path prefix for assets based on HTML file depth."""
@@ -563,15 +583,16 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
     if process.stderr: debug_print(f"  [Debug Pandoc] STDERR:\n{process.stderr}")
     
     if process.returncode != 0:
-        print(f"Error running pandoc: {process.stderr}")
-        return ""
+        error_msg = f"Error running pandoc: {process.stderr}"
+        print(error_msg)
+        raise RuntimeError(error_msg)
     
     try:
         with open(output_html_path, 'r', encoding='utf-8') as f:
             content = f.read()
             
-        # Remove empty anchor tags
-        content = re.sub(r'<a[^>]*>\s*</a>', '', content)
+        # Remove empty anchor tags (updated pattern to catch all variations)
+        content = re.sub(r'<a[^>]*?>(?:\s*)</a>', '', content)
         
         # Fix any malformed meta description tags, especially for Jupyter notebooks
         desc_meta_pattern = r'<meta\s+name="description"\s+content="([^"]*(?:target|href|class|style|onclick)[^"]*)"[^>]*>'
