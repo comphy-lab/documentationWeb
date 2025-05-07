@@ -5,6 +5,69 @@
 (function(html) {
 
     'use strict';
+    
+    /* Reusable Helper Functions
+    * -------------------------------------------------- */
+    function copyToClipboard(text, button) {
+        // Try to use modern Clipboard API first
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text)
+                .then(() => updateButtonState(button, true))
+                .catch(err => {
+                    console.error('Clipboard API failed:', err);
+                    fallbackCopyToClipboard(text, button);
+                });
+        } else {
+            // Fall back to deprecated execCommand method for older browsers
+            fallbackCopyToClipboard(text, button);
+        }
+    }
+    
+    function fallbackCopyToClipboard(text, button) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        // Add to body temporarily
+        document.body.appendChild(textarea);
+        
+        try {
+            textarea.select();
+            const success = document.execCommand('copy');
+            if (success) {
+                updateButtonState(button, true);
+            } else {
+                console.error('Copy command failed');
+                updateButtonState(button, false);
+            }
+        } catch (err) {
+            console.error('Fallback copy failed:', err);
+            updateButtonState(button, false);
+        } finally {
+            document.body.removeChild(textarea);
+        }
+    }
+    
+    function updateButtonState(button, success) {
+        if (success) {
+            const icon = button.querySelector('i');
+            button.classList.add('copied');
+            
+            if (icon) {
+                icon.classList.remove('fa-copy');
+                icon.classList.add('fa-check');
+            }
+            
+            // Reset button state after 2 seconds
+            setTimeout(() => {
+                button.classList.remove('copied');
+                if (icon) {
+                    icon.classList.remove('fa-check');
+                    icon.classList.add('fa-copy');
+                }
+            }, 2000);
+        }
+    }
 
     /* Preloader
     * -------------------------------------------------- */
@@ -19,10 +82,13 @@
     
     // No need for a resize event handler as the CSS will handle everything
 
-    // Load about content when page loads
-    window.addEventListener('load', loadAboutContent);
-    // Load news content when page loads
-    window.addEventListener('load', loadNewsContent);
+    // Only load content if the functions exist
+    if (typeof loadAboutContent === 'function') {
+        window.addEventListener('load', loadAboutContent);
+    }
+    if (typeof loadNewsContent === 'function') {
+        window.addEventListener('load', loadNewsContent);
+    }
 
     /* Load Featured Papers - Only on main page
     * -------------------------------------------------- */
@@ -170,13 +236,24 @@
     const nav = document.querySelector('.s-header__nav');
     const closeBtn = document.querySelector('.s-header__nav-close-btn');
     const menuLinks = document.querySelectorAll('.s-header__nav-list a');
+    
+    // Debug elements
+    console.log('Menu elements found:', { 
+        menuToggle: menuToggle !== null, 
+        nav: nav !== null, 
+        closeBtn: closeBtn !== null,
+        menuLinksCount: menuLinks ? menuLinks.length : 0
+    });
 
     // Handle click outside
     document.addEventListener('click', function(e) {
         if (nav && nav.classList.contains('is-active')) {
             // Check if click is outside nav and not on menu toggle
-            if (!nav.contains(e.target) && !menuToggle.contains(e.target)) {
+            if ((!nav.contains(e.target) && menuToggle && !menuToggle.contains(e.target))) {
+                console.log('Click outside detected');
                 nav.classList.remove('is-active');
+                // Reset the style
+                nav.style.right = '-300px';
             }
         }
     });
@@ -185,29 +262,65 @@
         menuToggle.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation(); // Prevent document click from immediately closing
-            nav.classList.add('is-active');
+            console.log('Menu toggle clicked');
+            if (nav) {
+                console.log('Adding is-active class to nav');
+                nav.classList.add('is-active');
+                
+                // Make sure the style change is applied
+                nav.style.right = '0';
+            } else {
+                console.error('Nav element not found when toggle clicked');
+            }
         });
+    } else {
+        console.error('Menu toggle element not found');
     }
 
     if (closeBtn) {
         closeBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            nav.classList.remove('is-active');
+            console.log('Close button clicked');
+            if (nav) {
+                console.log('Removing is-active class from nav');
+                nav.classList.remove('is-active');
+                // Reset the style
+                nav.style.right = '-300px';
+            } else {
+                console.error('Nav element not found when close clicked');
+            }
         });
+    } else {
+        console.error('Close button element not found');
     }
 
-    menuLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            nav.classList.remove('is-active');
+    if (menuLinks && menuLinks.length > 0) {
+        menuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                console.log('Menu link clicked');
+                if (nav) {
+                    console.log('Removing is-active class from nav');
+                    nav.classList.remove('is-active');
+                    // Reset the style
+                    nav.style.right = '-300px';
+                }
+            });
         });
-    });
+    }
 
     /* Smooth Scrolling
     * -------------------------------------------------- */
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
+            const href = this.getAttribute('href');
+            
+            // Skip navigation placeholders like #0
+            if (href === '#0' || href === '#') {
+                return;
+            }
+            
+            const target = document.querySelector(href);
             if (target) {
                 target.scrollIntoView({
                     behavior: 'smooth'
@@ -248,30 +361,7 @@
         copyButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const textToCopy = this.getAttribute('data-clipboard-text');
-                const textarea = document.createElement('textarea');
-                textarea.value = textToCopy;
-                textarea.style.position = 'fixed';
-                textarea.style.left = '-9999px';
-                document.body.appendChild(textarea);
-                
-                try {
-                    textarea.select();
-                    document.execCommand('copy');
-                    this.classList.add('copied');
-                    const icon = this.querySelector('i');
-                    icon.classList.remove('fa-copy');
-                    icon.classList.add('fa-check');
-                    
-                    setTimeout(() => {
-                        this.classList.remove('copied');
-                        icon.classList.remove('fa-check');
-                        icon.classList.add('fa-copy');
-                    }, 2000);
-                } catch (err) {
-                    console.error('Copy failed:', err);
-                } finally {
-                    document.body.removeChild(textarea);
-                }
+                copyToClipboard(textToCopy, this);
             });
         });
 
@@ -290,43 +380,7 @@
     * -------------------------------------------------- */
     window.copyEmail = function(button) {
         const text = button.getAttribute('data-text') || button.getAttribute('data-clipboard-text');
-        navigator.clipboard.writeText(text).then(() => {
-            const icon = button.querySelector('i');
-            button.classList.add('copied');
-            icon.classList.remove('fa-copy');
-            icon.classList.add('fa-check');
-            
-            setTimeout(() => {
-                button.classList.remove('copied');
-                icon.classList.remove('fa-check');
-                icon.classList.add('fa-copy');
-            }, 2000);
-        }).catch(err => {
-            console.error('Copy failed:', err);
-            // Fallback for older browsers
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.position = 'fixed';
-            textarea.style.opacity = '0';
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                button.classList.add('copied');
-                const icon = button.querySelector('i');
-                icon.classList.remove('fa-copy');
-                icon.classList.add('fa-check');
-                
-                setTimeout(() => {
-                    button.classList.remove('copied');
-                    icon.classList.remove('fa-check');
-                    icon.classList.add('fa-copy');
-                }, 2000);
-            } catch (err) {
-                console.error('Fallback failed:', err);
-            }
-            document.body.removeChild(textarea);
-        });
+        copyToClipboard(text, button);
     };
 
 })(document.documentElement);
