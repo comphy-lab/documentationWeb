@@ -49,9 +49,16 @@ function renderCommandResults(query) {
   
   // If query is at least 3 characters, search the database as well
   if (query && query.length >= 3 && typeof window.searchDatabaseForCommandPalette === 'function') {
+    // Capture the current query to avoid stale updates
+    const capturedQuery = query;
+    
     // We'll use a promise to handle the async search
-    window.searchDatabaseForCommandPalette(query).then(searchResults => {
-      if (searchResults && searchResults.length > 0) {
+    window.searchDatabaseForCommandPalette(capturedQuery).then(searchResults => {
+      // Get the current input value
+      const currentInputValue = document.getElementById('command-palette-input')?.value || '';
+      
+      // Only update UI if the captured query matches the current input value
+      if (capturedQuery === currentInputValue && searchResults && searchResults.length > 0) {
         // Add search results to sections
         sections['Search Results'] = searchResults;
         

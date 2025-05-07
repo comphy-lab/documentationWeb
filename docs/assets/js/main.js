@@ -9,8 +9,8 @@
     /* Reusable Helper Functions
     * -------------------------------------------------- */
     function copyToClipboard(text, button) {
-        // Try to use modern Clipboard API first
-        if (navigator.clipboard && navigator.clipboard.writeText) {
+        // Try to use modern Clipboard API first with optional chaining
+        if (navigator.clipboard?.writeText) {
             navigator.clipboard.writeText(text)
                 .then(() => updateButtonState(button, true))
                 .catch(err => {

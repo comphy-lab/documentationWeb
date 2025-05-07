@@ -554,31 +554,31 @@
                 <ol type="1">
                 <li><p>Clone this repository:</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/username/comphy-lab.git</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> comphy-lab</span></code></pre></div></div></li>
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><span class="fu">git</span> clone https://github.com/username/comphy-lab.git</span>
+<span id="cb1-2"><span class="bu">cd</span> comphy-lab</span></code></pre></div></div></li>
                 <li><p>Make sure Basilisk is properly installed and the
                 BASILISK environment variable is set.</p></li>
                 <li><p>Compile a test case to verify the setup:</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> simulationCases</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> test_name.tst</span></code></pre></div></div></li>
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><span class="bu">cd</span> simulationCases</span>
+<span id="cb2-2"><span class="fu">make</span> test_name.tst</span></code></pre></div></div></li>
                 </ol>
                 <h2 id="usage">Usage</h2>
                 <h3 id="compiling-simulation-files">Compiling Simulation
                 Files</h3>
                 <p>Basic compilation:</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qcc</span> <span class="at">-autolink</span> file.c <span class="at">-o</span> executable <span class="at">-lm</span></span></code></pre></div></div>
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><span class="ex">qcc</span> <span class="at">-autolink</span> file.c <span class="at">-o</span> executable <span class="at">-lm</span></span></code></pre></div></div>
                 <p>Compilation with custom headers:</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qcc</span> <span class="at">-I</span><span class="va">$PWD</span>/src-local <span class="at">-autolink</span> file.c <span class="at">-o</span> executable <span class="at">-lm</span></span></code></pre></div></div>
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><span class="ex">qcc</span> <span class="at">-I</span><span class="va">$PWD</span>/src-local <span class="at">-autolink</span> file.c <span class="at">-o</span> executable <span class="at">-lm</span></span></code></pre></div></div>
                 <h3 id="running-simulations">Running Simulations</h3>
                 <p>Run a compiled executable:</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./executable</span></span></code></pre></div></div>
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><span class="ex">./executable</span></span></code></pre></div></div>
                 <p>Execute a specific test case:</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> simulationCases <span class="kw">&amp;&amp;</span> <span class="fu">make</span> test_name.tst</span></code></pre></div></div>
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><span class="bu">cd</span> simulationCases <span class="kw">&amp;&amp;</span> <span class="fu">make</span> test_name.tst</span></code></pre></div></div>
                 <h3 id="post-processing">Post-Processing</h3>
                 <p>The <code>postProcess/</code> directory contains
                 tools for post-processing simulation results:</p>
@@ -622,87 +622,87 @@
                 <p>Here’s the actual lid-driven cavity flow with dye
                 injection implementation:</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&quot;navier-stokes/centered.h&quot;</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&quot;dye-injection.h&quot;</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Constants</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LEVEL   </span><span class="dv">8</span><span class="pp">       </span><span class="co">// Grid refinement level</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#define MAXDT   </span><span class="op">(</span><span class="fl">1e-4</span><span class="op">)</span><span class="pp">  </span><span class="co">// Maximum timestep</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">// Global variables</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> imax <span class="op">=</span> <span class="fl">1e5</span><span class="op">;</span>                   <span class="co">// Maximum iterations</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> tmax <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span>                <span class="co">// Maximum simulation time</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> tsnap <span class="op">=</span> <span class="fl">0.01</span><span class="op">;</span>              <span class="co">// Time interval between snapshots</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> end <span class="op">=</span> <span class="fl">2.0</span><span class="op">;</span>                 <span class="co">// End time for simulation</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co">// Scalar field for convergence check</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>scalar un<span class="op">[];</span>  <span class="co">// Previous x-velocity</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> face vector muv<span class="op">[]</span> <span class="op">=</span> <span class="op">{</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">};</span>      <span class="co">// Face-centered viscosity field</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co">## Boundary Conditions</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co">*/</span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co">// Top moving wall (lid)</span></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>u<span class="op">.</span>t<span class="op">[</span>top<span class="op">]</span> <span class="op">=</span> dirichlet<span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="co">// Other no-slip boundaries</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>u<span class="op">.</span>t<span class="op">[</span>bottom<span class="op">]</span> <span class="op">=</span> dirichlet<span class="op">(</span><span class="dv">0</span><span class="op">);</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>u<span class="op">.</span>t<span class="op">[</span>left<span class="op">]</span>   <span class="op">=</span> dirichlet<span class="op">(</span><span class="dv">0</span><span class="op">);</span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>u<span class="op">.</span>t<span class="op">[</span>right<span class="op">]</span>  <span class="op">=</span> dirichlet<span class="op">(</span><span class="dv">0</span><span class="op">);</span></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="co">## Initialization</span></span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="co">*/</span></span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>event init <span class="op">(</span>t <span class="op">=</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Set constant viscosity for Newtonian fluid</span></span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>  mu <span class="op">=</span> muv<span class="op">;</span></span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Initialize velocity field</span></span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>  foreach<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>    u<span class="op">.</span>x<span class="op">[]</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>    u<span class="op">.</span>y<span class="op">[]</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>    un<span class="op">[]</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>  dump <span class="op">(</span>file <span class="op">=</span> <span class="st">&quot;start&quot;</span><span class="op">);</span></span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
-<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a><span class="co">## Snapshot Generation</span></span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a><span class="co">Save snapshots at regular intervals for flow visualization</span></span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a><span class="co">*/</span></span>
-<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>event writingFiles <span class="op">(</span>t<span class="op">=</span><span class="fl">0.</span><span class="op">;</span> t <span class="op">+=</span> tsnap<span class="op">;</span> t <span class="op">&lt;</span> tmax<span class="op">+</span>tsnap<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>  <span class="dt">char</span> filename<span class="op">[</span><span class="dv">100</span><span class="op">];</span></span>
-<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>  sprintf<span class="op">(</span>filename<span class="op">,</span> <span class="st">&quot;intermediate/snapshot-</span><span class="sc">%5.4f</span><span class="st">&quot;</span><span class="op">,</span> t<span class="op">);</span>  </span>
-<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>  dump<span class="op">(</span>file<span class="op">=</span>filename<span class="op">);</span></span>
-<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Initialize grid and parameters</span></span>
-<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>  init_grid<span class="op">(</span><span class="dv">1</span><span class="op">&lt;&lt;</span>LEVEL<span class="op">);</span></span>
-<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>  L0 <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
-<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>  origin<span class="op">(-</span><span class="fl">0.5</span><span class="op">,</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">);</span></span>
-<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>  DT <span class="op">=</span> MAXDT<span class="op">;</span></span>
-<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a>  TOLERANCE <span class="op">=</span> <span class="fl">1e-5</span><span class="op">;</span></span>
-<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a>  CFL <span class="op">=</span> <span class="fl">0.25</span><span class="op">;</span></span>
-<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Store current velocity for convergence check</span></span>
-<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a>  foreach<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>    un<span class="op">[]</span> <span class="op">=</span> u<span class="op">.</span>x<span class="op">[];</span></span>
-<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
-<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a>  <span class="co">// dye injection parameters</span></span>
-<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a>  tInjection <span class="op">=</span> <span class="fl">0.05</span><span class="op">;</span>        <span class="co">// Inject the dye after flow is established</span></span>
-<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a>  xInjection <span class="op">=</span> <span class="fl">0.00</span><span class="op">;</span>        <span class="co">// X position (center of cavity)</span></span>
-<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a>  yInjection <span class="op">=</span> <span class="fl">0.40</span><span class="op">;</span>        <span class="co">// Y position (upper center of cavity)</span></span>
-<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Create a folder for simulation snapshots</span></span>
-<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a>  <span class="dt">char</span> comm<span class="op">[</span><span class="dv">80</span><span class="op">];</span></span>
-<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>  sprintf <span class="op">(</span>comm<span class="op">,</span> <span class="st">&quot;mkdir -p intermediate&quot;</span><span class="op">);</span></span>
-<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a>  system<span class="op">(</span>comm<span class="op">);</span></span>
-<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Run simulation</span></span>
-<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a>  run<span class="op">();</span></span>
-<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+                class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><span class="pp">#include </span><span class="im">&quot;navier-stokes/centered.h&quot;</span></span>
+<span id="cb7-2"><span class="pp">#include </span><span class="im">&quot;dye-injection.h&quot;</span></span>
+<span id="cb7-3"></span>
+<span id="cb7-4"><span class="co">// Constants</span></span>
+<span id="cb7-5"><span class="pp">#define LEVEL   </span><span class="dv">8</span><span class="pp">       </span><span class="co">// Grid refinement level</span></span>
+<span id="cb7-6"><span class="pp">#define MAXDT   </span><span class="op">(</span><span class="fl">1e-4</span><span class="op">)</span><span class="pp">  </span><span class="co">// Maximum timestep</span></span>
+<span id="cb7-7"></span>
+<span id="cb7-8"><span class="co">// Global variables</span></span>
+<span id="cb7-9"><span class="dt">int</span> imax <span class="op">=</span> <span class="fl">1e5</span><span class="op">;</span>                   <span class="co">// Maximum iterations</span></span>
+<span id="cb7-10"><span class="dt">double</span> tmax <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span>                <span class="co">// Maximum simulation time</span></span>
+<span id="cb7-11"><span class="dt">double</span> tsnap <span class="op">=</span> <span class="fl">0.01</span><span class="op">;</span>              <span class="co">// Time interval between snapshots</span></span>
+<span id="cb7-12"><span class="dt">double</span> end <span class="op">=</span> <span class="fl">2.0</span><span class="op">;</span>                 <span class="co">// End time for simulation</span></span>
+<span id="cb7-13"></span>
+<span id="cb7-14"><span class="co">// Scalar field for convergence check</span></span>
+<span id="cb7-15">scalar un<span class="op">[];</span>  <span class="co">// Previous x-velocity</span></span>
+<span id="cb7-16"><span class="dt">const</span> face vector muv<span class="op">[]</span> <span class="op">=</span> <span class="op">{</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">};</span>      <span class="co">// Face-centered viscosity field</span></span>
+<span id="cb7-17"></span>
+<span id="cb7-18"><span class="co">/**</span></span>
+<span id="cb7-19"><span class="co">## Boundary Conditions</span></span>
+<span id="cb7-20"><span class="co">*/</span></span>
+<span id="cb7-21"><span class="co">// Top moving wall (lid)</span></span>
+<span id="cb7-22">u<span class="op">.</span>t<span class="op">[</span>top<span class="op">]</span> <span class="op">=</span> dirichlet<span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb7-23"><span class="co">// Other no-slip boundaries</span></span>
+<span id="cb7-24">u<span class="op">.</span>t<span class="op">[</span>bottom<span class="op">]</span> <span class="op">=</span> dirichlet<span class="op">(</span><span class="dv">0</span><span class="op">);</span></span>
+<span id="cb7-25">u<span class="op">.</span>t<span class="op">[</span>left<span class="op">]</span>   <span class="op">=</span> dirichlet<span class="op">(</span><span class="dv">0</span><span class="op">);</span></span>
+<span id="cb7-26">u<span class="op">.</span>t<span class="op">[</span>right<span class="op">]</span>  <span class="op">=</span> dirichlet<span class="op">(</span><span class="dv">0</span><span class="op">);</span></span>
+<span id="cb7-27"></span>
+<span id="cb7-28"><span class="co">/**</span></span>
+<span id="cb7-29"><span class="co">## Initialization</span></span>
+<span id="cb7-30"><span class="co">*/</span></span>
+<span id="cb7-31">event init <span class="op">(</span>t <span class="op">=</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-32">  <span class="co">// Set constant viscosity for Newtonian fluid</span></span>
+<span id="cb7-33">  mu <span class="op">=</span> muv<span class="op">;</span></span>
+<span id="cb7-34">  </span>
+<span id="cb7-35">  <span class="co">// Initialize velocity field</span></span>
+<span id="cb7-36">  foreach<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb7-37">    u<span class="op">.</span>x<span class="op">[]</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb7-38">    u<span class="op">.</span>y<span class="op">[]</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb7-39">    un<span class="op">[]</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb7-40">  <span class="op">}</span></span>
+<span id="cb7-41">  </span>
+<span id="cb7-42">  dump <span class="op">(</span>file <span class="op">=</span> <span class="st">&quot;start&quot;</span><span class="op">);</span></span>
+<span id="cb7-43"><span class="op">}</span></span>
+<span id="cb7-44"></span>
+<span id="cb7-45"><span class="co">/**</span></span>
+<span id="cb7-46"><span class="co">## Snapshot Generation</span></span>
+<span id="cb7-47"><span class="co">Save snapshots at regular intervals for flow visualization</span></span>
+<span id="cb7-48"><span class="co">*/</span></span>
+<span id="cb7-49">event writingFiles <span class="op">(</span>t<span class="op">=</span><span class="fl">0.</span><span class="op">;</span> t <span class="op">+=</span> tsnap<span class="op">;</span> t <span class="op">&lt;</span> tmax<span class="op">+</span>tsnap<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-50">  <span class="dt">char</span> filename<span class="op">[</span><span class="dv">100</span><span class="op">];</span></span>
+<span id="cb7-51">  sprintf<span class="op">(</span>filename<span class="op">,</span> <span class="st">&quot;intermediate/snapshot-</span><span class="sc">%5.4f</span><span class="st">&quot;</span><span class="op">,</span> t<span class="op">);</span>  </span>
+<span id="cb7-52">  dump<span class="op">(</span>file<span class="op">=</span>filename<span class="op">);</span></span>
+<span id="cb7-53"><span class="op">}</span></span>
+<span id="cb7-54"></span>
+<span id="cb7-55"><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb7-56">  <span class="co">// Initialize grid and parameters</span></span>
+<span id="cb7-57">  init_grid<span class="op">(</span><span class="dv">1</span><span class="op">&lt;&lt;</span>LEVEL<span class="op">);</span></span>
+<span id="cb7-58">  L0 <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
+<span id="cb7-59">  origin<span class="op">(-</span><span class="fl">0.5</span><span class="op">,</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">);</span></span>
+<span id="cb7-60">  DT <span class="op">=</span> MAXDT<span class="op">;</span></span>
+<span id="cb7-61">  TOLERANCE <span class="op">=</span> <span class="fl">1e-5</span><span class="op">;</span></span>
+<span id="cb7-62">  CFL <span class="op">=</span> <span class="fl">0.25</span><span class="op">;</span></span>
+<span id="cb7-63">  </span>
+<span id="cb7-64">  <span class="co">// Store current velocity for convergence check</span></span>
+<span id="cb7-65">  foreach<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb7-66">    un<span class="op">[]</span> <span class="op">=</span> u<span class="op">.</span>x<span class="op">[];</span></span>
+<span id="cb7-67">  <span class="op">}</span></span>
+<span id="cb7-68"></span>
+<span id="cb7-69">  <span class="co">// dye injection parameters</span></span>
+<span id="cb7-70">  tInjection <span class="op">=</span> <span class="fl">0.05</span><span class="op">;</span>        <span class="co">// Inject the dye after flow is established</span></span>
+<span id="cb7-71">  xInjection <span class="op">=</span> <span class="fl">0.00</span><span class="op">;</span>        <span class="co">// X position (center of cavity)</span></span>
+<span id="cb7-72">  yInjection <span class="op">=</span> <span class="fl">0.40</span><span class="op">;</span>        <span class="co">// Y position (upper center of cavity)</span></span>
+<span id="cb7-73"></span>
+<span id="cb7-74">  <span class="co">// Create a folder for simulation snapshots</span></span>
+<span id="cb7-75">  <span class="dt">char</span> comm<span class="op">[</span><span class="dv">80</span><span class="op">];</span></span>
+<span id="cb7-76">  sprintf <span class="op">(</span>comm<span class="op">,</span> <span class="st">&quot;mkdir -p intermediate&quot;</span><span class="op">);</span></span>
+<span id="cb7-77">  system<span class="op">(</span>comm<span class="op">);</span></span>
+<span id="cb7-78">  </span>
+<span id="cb7-79">  <span class="co">// Run simulation</span></span>
+<span id="cb7-80">  run<span class="op">();</span></span>
+<span id="cb7-81"><span class="op">}</span></span></code></pre></div></div>
                 <h2 id="contributing">Contributing</h2>
                 <ol type="1">
                 <li>Fork the repository</li>
