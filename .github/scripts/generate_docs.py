@@ -608,9 +608,11 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
                asset_path_prefix: str, seo_metadata: Dict[str, str] = None,
                source_path: str = None) -> str:
     """
-               Converts Markdown input to standalone HTML using Pandoc and applies post-processing.
+               Converts Markdown input to standalone HTML using Pandoc.
                
-               Runs Pandoc with a custom template and variables for SEO metadata, repository info, and asset paths to generate an HTML file from Markdown input. After conversion, cleans up the HTML by removing empty anchors, fixing malformed meta description tags, and ensuring valid HTML structure. Returns Pandoc's standard output as a string.
+               Runs Pandoc with a custom template and variables for SEO metadata, repository info, and asset paths to generate an HTML file from Markdown input. Handles SEO metadata and fixes malformed meta description tags. Returns Pandoc's standard output as a string.
+               
+               Note: HTML cleaning (removal of empty anchor tags) is now handled by the separate clean_html.py script.
                
                Args:
                    pandoc_input: Markdown content to convert.
@@ -676,9 +678,6 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
     try:
         with open(output_html_path, 'r', encoding='utf-8') as f:
             content = f.read()
-            
-        # Remove empty anchor tags
-        content = re.sub(r'<a[^>]*>\s*</a>', '', content)
         
         # Fix any malformed meta description tags, especially for Jupyter notebooks
         desc_meta_pattern = r'<meta\s+name="description"\s+content="([^"]*(?:target|href|class|style|onclick)[^"]*)"[^>]*>'
@@ -729,6 +728,8 @@ def post_process_python_shell_html(html_content: str) -> str:
     Enhances HTML generated from Python or shell files for improved display and navigation.
     
     Wraps code blocks in container divs for styling, updates documentation links to use `.html` extensions, removes dynamic path resolution scripts, and injects a JavaScript variable with the repository name into the HTML body.
+    
+    Note: HTML cleaning (removal of empty anchor tags) is now handled by the separate clean_html.py script.
     
     Args:
         html_content: The HTML content to be post-processed.
@@ -873,6 +874,8 @@ def post_process_c_html(html_content: str, file_path: Path,
                       Post-processes HTML generated from C or C++ source files for enhanced documentation.
                       
                       Removes trailing line numbers, wraps code blocks in container divs for styling, and converts `#include` statements into links to local documentation or the Basilisk source if unavailable locally. Cleans out dynamic path resolution scripts and injects a JavaScript variable with the repository name into the HTML body.
+                      
+                      Note: HTML cleaning (removal of empty anchor tags) is now handled by the separate clean_html.py script.
                       
                       Args:
                           html_content: The HTML content to process.
@@ -1148,6 +1151,34 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
                                      
                                      Handles copying Jupyter notebooks, prepares input for Pandoc conversion, extracts SEO metadata, and applies appropriate post-processing for Python, shell, Markdown, Jupyter, or C/C++ files. Inserts JavaScript for code block copy functionality. Returns True on success, False on error.
                                      """
+    
+    # Function to ensure script tags are properly sanitized during the conversion process
+    def sanitize_pandoc_input(input_content: str) -> str:
+        """
+        Pre-processes Pandoc input to prevent script-related issues in the output HTML.
+        Removes any malformed HTML constructs that could cause problems after conversion.
+        """
+        # Convert self-closing a tags to proper a tags to avoid malformed HTML after conversion
+        input_content = re.sub(r'<a([^>]*)/>',
+                              r'<a\1></a>',
+                              input_content)
+        
+        # Escape or convert script blocks in code examples to avoid JavaScript syntax errors  
+        def escape_script_blocks(match):
+            html_content = match.group(1)
+            # Replace any potential anchor tags in script examples with harmless placeholders
+            html_content = re.sub(r'<a\s+[^>]*>\s*</a>',
+                                '/* anchor tag removed */',
+                                html_content)
+            return f"{html_content}"
+            
+        input_content = re.sub(r'```html(.*?)```',
+                              escape_script_blocks,
+                              input_content,
+                              flags=re.DOTALL)
+                              
+        return input_content
+    
     print(f"  Processing {file_path.relative_to(repo_root)} -> {output_html_path.relative_to(repo_root / 'docs')}")
 
     try:
@@ -1163,6 +1194,9 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
         
         # Prepare pandoc input
         pandoc_input_content = prepare_pandoc_input(file_path, literate_c_script)
+        
+        # Apply additional pre-processing to sanitize input
+        pandoc_input_content = sanitize_pandoc_input(pandoc_input_content)
         
         # Calculate relative URL path
         page_url = (base_url + output_html_path.relative_to(repo_root / 'docs').as_posix()).replace('//', '/')
