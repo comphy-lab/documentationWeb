@@ -9,8 +9,14 @@
     // Debug flag - set to false in production
     const DEBUG = false;
     
-    /* Reusable Helper Functions
-    * -------------------------------------------------- */
+    /**
+     * Copies the specified text to the clipboard, using the Clipboard API if available, with a fallback for older browsers.
+     *
+     * Updates the button state to indicate success or failure.
+     *
+     * @param {string} text - The text to be copied to the clipboard.
+     * @param {HTMLElement} button - The button element to update based on the copy result.
+     */
     function copyToClipboard(text, button) {
         // Try to use modern Clipboard API first with optional chaining
         if (navigator.clipboard?.writeText) {
@@ -28,6 +34,16 @@
         }
     }
     
+    /**
+     * Attempts to copy text to the clipboard using a hidden textarea and the deprecated `execCommand('copy')` method.
+     *
+     * Updates the button state to indicate success or failure.
+     *
+     * @param {string} text - The text to be copied to the clipboard.
+     * @param {HTMLElement} button - The button element to update based on the copy result.
+     *
+     * @remark This function is used as a fallback when the modern Clipboard API is unavailable.
+     */
     function fallbackCopyToClipboard(text, button) {
         const textarea = document.createElement('textarea');
         textarea.value = text;
