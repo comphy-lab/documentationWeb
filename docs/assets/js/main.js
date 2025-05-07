@@ -249,7 +249,7 @@
     document.addEventListener('click', function(e) {
         if (nav && nav.classList.contains('is-active')) {
             // Check if click is outside nav and not on menu toggle
-            if ((!nav.contains(e.target) && menuToggle && !menuToggle.contains(e.target))) {
+            if (!nav.contains(e.target) && !menuToggle?.contains(e.target)) {
                 console.log('Click outside detected');
                 nav.classList.remove('is-active');
                 // Reset the style
