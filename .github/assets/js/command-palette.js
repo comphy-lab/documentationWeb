@@ -3,8 +3,8 @@
  * This file contains all the functionality for the command palette
  */
 
-// Debug flag - set to false in production
-const DEBUG = false;
+// Use centralized DEBUG flag from config
+const DEBUG = window.CONFIG ? window.CONFIG.DEBUG : false;
 
 // Make the command palette opening function globally available
 window.openCommandPalette = function() {
@@ -171,11 +171,33 @@ function renderSections(sections, container) {
       const iconEl = document.createElement('div');
       iconEl.className = 'command-palette-icon';
       
-      // Render Font-Awesome & other inline-HTML icons → safe because source is constant
-      if (cmd.icon && cmd.icon.trim().startsWith('<i')) {
-        iconEl.innerHTML = cmd.icon;
+      // Render Font-Awesome & other inline-HTML icons with validation
+      if (cmd.icon && typeof cmd.icon === 'string') {
+        // Strict validation: only allow Font Awesome icons that match the expected pattern
+        const iconStr = cmd.icon.trim();
+        // Only allow Font Awesome icons with specific classes or SVG paths
+        if (iconStr.startsWith('<i') && 
+            (/class=\"(fa-|ai )/.test(iconStr) || iconStr.includes('fa-solid') ||
+             iconStr.includes('fa-brands') || iconStr.includes('fa-regular') ||
+             iconStr.includes('ai ai-'))) {
+          // Adding extra validation for classes
+          const validIconPattern = /^<i class=\"(fa|fas|far|fal|fab|ai)[ -][\w\d -]+"><\/i>$/;
+          if (validIconPattern.test(iconStr)) {
+            iconEl.innerHTML = iconStr;
+          } else {
+            // Fallback to displaying as text if pattern doesn't match exactly
+            iconEl.textContent = '🔍'; // Default search icon as fallback
+            if (CONFIG && CONFIG.DEBUG) {
+              console.warn('Invalid icon format detected:', iconStr);
+            }
+          }
+        } else {
+          // Just use text for non-icon strings
+          iconEl.textContent = iconStr;
+        }
       } else {
-        iconEl.textContent = cmd.icon ?? '';
+        // Default icon if none provided
+        iconEl.textContent = '';
       }
       
       // Create title element
