@@ -6,8 +6,8 @@
 
     'use strict';
     
-    // Debug flag - set to false in production
-    const DEBUG = false;
+    // Use centralized DEBUG flag from config
+    const DEBUG = window.CONFIG ? window.CONFIG.DEBUG : false;
     
     /**
      * Copies the specified text to the clipboard, using the Clipboard API if available, with a fallback for older browsers.

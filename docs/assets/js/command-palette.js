@@ -22,7 +22,13 @@ window.openCommandPalette = function() {
   }
 };
 
-// Function to render command results based on search
+/**
+ * Renders the command palette results filtered by the provided query.
+ *
+ * Filters available commands by title or section, groups them by section, and displays them in the results container. If the query is at least three characters and an asynchronous search function is available, performs an additional database search and updates the results with any matches. Displays a "No commands found" message if no results are available.
+ *
+ * @param {string} query - The search string used to filter and search commands.
+ */
 function renderCommandResults(query) {
   const resultsContainer = document.getElementById('command-palette-results');
   if (!resultsContainer) return;
@@ -87,7 +93,14 @@ function renderCommandResults(query) {
   }
 }
 
-// Helper function to render sections
+/**
+ * Renders grouped command sections into a container element for the command palette UI.
+ *
+ * Each section is displayed with its title and a list of commands, including icons, titles, and optional excerpts. Command icons that use inline HTML (such as Font-Awesome) are rendered as raw HTML if their source is constant; otherwise, icons are rendered as plain text. Clicking a command triggers its handler and hides the palette.
+ *
+ * @param {Object} sections - An object mapping section titles to arrays of command objects.
+ * @param {HTMLElement} container - The DOM element where the sections will be rendered.
+ */
 function renderSections(sections, container) {
   // Clear container first
   container.innerHTML = '';
@@ -197,7 +210,13 @@ function renderSections(sections, container) {
   });
 }
 
-// Initialization function to set up command palette when DOM is loaded
+/**
+ * Initializes the command palette UI and search functionality on page load.
+ *
+ * Sets up event listeners for keyboard shortcuts, input handling, and UI interactions. Prefetches the search database and initializes fuzzy search if available. Enables keyboard navigation, command execution, and closing the palette via backdrop or Escape key.
+ *
+ * @remark If the search database cannot be fetched, search functionality will be unavailable, but the command palette UI will still operate with local commands.
+ */
 function initCommandPalette() {
   // Ensure search database is preloaded for command palette search functionality
   // Try to prefetch the search database if it exists
