@@ -44,6 +44,7 @@
 })();
   </script>
 
+
   <!-- No-JS fallback for theme and critical theming styles -->
   <style>
     /* Default light theme variables */
@@ -197,7 +198,7 @@
   </style>
 
   <!-- Critical Meta Tags -->
-  <meta name="description" content="Post-processing test for Lid-Driven Cavity flow with dye injection.">
+  <meta name="description" content="Import all relevant libraries.">
   <meta name="author" content="CoMPhy Lab">
   <meta name="robots" content="index, follow">
   <meta name="keywords" content="fluid dynamics, CFD, Basilisk, multiphase flow, computational physics">
@@ -239,6 +240,7 @@
   <script src="../assets/js/jquery-ui.packed.js"></script>
   <script src="../assets/js/plots.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
+  <script defer src="../assets/js/search-helper.js"></script>
   <script defer src="../assets/js/command-palette.js"></script>
   <script defer src="../assets/js/command-data.js"></script>
   <script defer src="../assets/js/main.js"></script>
@@ -416,7 +418,7 @@
                     </a>
                 </div>
                 
-                <!--SEO_METADATA:{"title": "Post-processing test for Lid-Driven Cavity flow with dye injection.", "description": "Post-processing test for Lid-Driven Cavity flow with dye injection.", "meta_tags": "<meta name=\"description\" content=\"Post-processing test for Lid-Driven Cavity flow with dye injection.\">\n"}-->
+                <!--SEO_METADATA:{"title": "Post-processing test for Lid-Driven Cavity flow with dye injection.", "description": "Import all relevant libraries.", "meta_tags": "<meta name=\"description\" content=\"Import all relevant libraries.\">\n"}-->
                 <h1
                 id="post-processing-test-for-lid-driven-cavity-flow-with-dye-injection.">Post-processing
                 test for Lid-Driven Cavity flow with dye injection.</h1>
@@ -578,8 +580,8 @@
     </div>
 
 
-    <script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function() {
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
     // Add copy button to each code block container
     const codeBlocks = document.querySelectorAll('.code-block-container pre');
     codeBlocks.forEach(function(codeBlock, index) {
@@ -597,54 +599,55 @@
         container.appendChild(button);
         
         // Set up click event
-        button.addEventListener('click', function() {
+        button.addEventListener('click', async function() {
             const codeText = codeBlock.textContent;
-            // Use modern clipboard API if available
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-              navigator.clipboard.writeText(codeText)
-                .then(function() {
-                  button.textContent = 'Copied!';
-                  button.classList.add('copied');
-                  setTimeout(function() {
-                    button.textContent = 'Copy';
-                    button.classList.remove('copied');
-                  }, 2000);
-                })
-                .catch(function(err) {
-                  console.error('Copy failed:', err);
-                  button.textContent = 'Error!';
-                  setTimeout(function() {
-                    button.textContent = 'Copy';
-                    button.classList.remove('copied');
-                  }, 2000);
-                });
-            } else {
-              // Fallback to execCommand for older browsers
-              const textarea = document.createElement('textarea');
-              textarea.value = codeText;
-              document.body.appendChild(textarea);
-              textarea.select();
-              try {
-                document.execCommand('copy');
-                button.textContent = 'Copied!';
-                button.classList.add('copied');
-                setTimeout(function() {
-                  button.textContent = 'Copy';
-                  button.classList.remove('copied');
-                }, 2000);
-              } catch (err) {
+            
+            try {
+                // Try to use the modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(codeText);
+                    updateButtonState(button, 'success');
+                } else {
+                    // Fall back to the deprecated execCommand method
+                    const textarea = document.createElement('textarea');
+                    textarea.value = codeText;
+                    textarea.style.position = 'fixed';  // Prevent scrolling to the bottom
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    
+                    if (successful) {
+                        updateButtonState(button, 'success');
+                    } else {
+                        updateButtonState(button, 'error');
+                    }
+                }
+            } catch (err) {
                 console.error('Copy failed:', err);
-                button.textContent = 'Error!';
-                setTimeout(function() {
-                  button.textContent = 'Copy';
-                  button.classList.remove('copied');
-                }, 2000);
-              }
-              document.body.removeChild(textarea);
+                updateButtonState(button, 'error');
             }
         });
     });
+    
+    // Function to update button state
+    function updateButtonState(button, state) {
+        if (state === 'success') {
+            button.textContent = 'Copied!';
+            button.classList.add('copied');
+        } else if (state === 'error') {
+            button.textContent = 'Error!';
+            button.classList.add('error');
+        }
+        
+        // Reset button state after 2 seconds
+        setTimeout(function() {
+            button.textContent = 'Copy';
+            button.classList.remove('copied', 'error');
+        }, 2000);
+    }
 });
-    </script>
+</script>
         </body>
 </html>

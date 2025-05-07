@@ -1,7 +1,22 @@
 #!/usr/bin/env python3
-import os, subprocess, re, shutil, argparse, html, json
+import os
+import subprocess
+import re
+import shutil
+import argparse
+import html
+import json
+import logging
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Union
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
 # Parse args
 parser = argparse.ArgumentParser(description='Generate docs from source files')
@@ -11,9 +26,14 @@ args = parser.parse_args()
 DEBUG = args.debug
 FORCE_REBUILD = args.force_rebuild
 
+# Set log level based on debug flag
+if DEBUG:
+    logger.setLevel(logging.DEBUG)
+
 def debug_print(msg):
-    """Print debug messages only if debug mode is enabled."""
-    if DEBUG: print(msg)
+    """Log debug messages using the logging module."""
+    if DEBUG:
+        logger.debug(msg)
 
 def calculate_asset_prefix(output_path: Path, docs_dir: Path) -> str:
     """Calculate relative path prefix for assets based on HTML file depth."""
@@ -563,15 +583,18 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
     if process.stderr: debug_print(f"  [Debug Pandoc] STDERR:\n{process.stderr}")
     
     if process.returncode != 0:
-        print(f"Error running pandoc: {process.stderr}")
-        return ""
+        error_msg = f"Error running pandoc: {process.stderr}"
+        print(error_msg)
+        raise RuntimeError(error_msg)
     
     try:
         with open(output_html_path, 'r', encoding='utf-8') as f:
             content = f.read()
             
-        # Remove empty anchor tags
-        content = re.sub(r'<a[^>]*>\s*</a>', '', content)
+        # Remove empty anchor tags (improved pattern to catch all variations)
+        content = re.sub(r'<a\s+id=""\s+href="#"\s*>\s*</a>', '', content)
+        # Also catch other variations of empty anchor tags
+        content = re.sub(r'<a[^>]*?>(?:\s*)</a>', '', content)
         
         # Fix any malformed meta description tags, especially for Jupyter notebooks
         desc_meta_pattern = r'<meta\s+name="description"\s+content="([^"]*(?:target|href|class|style|onclick)[^"]*)"[^>]*>'
@@ -671,6 +694,10 @@ def post_process_python_shell_html(html_content: str) -> str:
     # Add repoName variable
     repo_script = f'\n<script>window.repoName = "{REPO_NAME}";</script>\n'
     processed_html = re.sub(r'<body[^>]*>', lambda m: m.group(0) + repo_script, processed_html)
+    
+    # Remove any remaining empty anchor tags (in case they were introduced during post-processing)
+    processed_html = re.sub(r'<a\s+id=""\s+href="#"\s*>\s*</a>', '', processed_html)
+    processed_html = re.sub(r'<a[^>]*?>(?:\s*)</a>', '', processed_html)
 
     return processed_html
 
@@ -1590,6 +1617,57 @@ def copy_assets(assets_dir: Path, docs_dir: Path) -> bool:
         print(f"Error copying assets: {e}")
         return False
 
+def cleanup_empty_anchors_in_html_files(docs_dir: Path) -> int:
+    """Perform a final cleanup of all HTML files to remove empty anchor tags.
+    
+    This is a more aggressive approach to ensure all empty anchor tags are removed.
+    Returns the number of files modified.
+    """
+    print("\nPerforming final cleanup of empty anchor tags in all HTML files...")
+    
+    html_files = list(docs_dir.glob('**/*.html'))
+    modified_count = 0
+    
+    for html_file in html_files:
+        try:
+            with open(html_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # Look for empty anchor tags
+            original_length = len(content)
+            
+            # Try different patterns that might match empty anchors
+            patterns = [
+                r'<a\s+id=""\s+href="#"\s*>\s*</a>',  # <a id="" href="#"></a>
+                r'<a\s+id=""\s+href=""\s*>\s*</a>',   # <a id="" href=""></a>
+                r'<a\s+href="#"\s+id=""\s*>\s*</a>',  # <a href="#" id=""></a>
+                r'<a\s+href=""\s+id=""\s*>\s*</a>',   # <a href="" id=""></a>
+                r'<a\s+id=""\s*>\s*</a>',             # <a id=""></a>
+                r'<a\s+href="#"\s*>\s*</a>',          # <a href="#"></a>
+                r'<a\s+href=""\s*>\s*</a>',           # <a href=""></a>
+                r'<a\s*>\s*</a>'                      # <a></a>
+            ]
+            
+            # Apply each pattern
+            for pattern in patterns:
+                content = re.sub(pattern, '', content)
+            
+            # Also remove any anchor that has no content between tags
+            content = re.sub(r'<a[^>]*?>(?:\s*)</a>', '', content)
+            
+            # Only write the file if changes were made
+            if len(content) != original_length:
+                with open(html_file, 'w', encoding='utf-8') as f:
+                    f.write(content)
+                modified_count += 1
+                debug_print(f"Removed empty anchors from {html_file.relative_to(docs_dir)}")
+        
+        except Exception as e:
+            print(f"Error cleaning up anchors in {html_file}: {e}")
+    
+    print(f"Cleaned up empty anchors in {modified_count} of {len(html_files)} HTML files")
+    return modified_count
+
 def main():
     """Generate HTML documentation for the project."""
     if not validate_config():
@@ -1691,6 +1769,9 @@ def main():
                 print(f"Copied Basilisk JS file {src} to {dst}")
             else:
                 print(f"Warning: Basilisk JS file {src} not found")
+                
+        # Final cleanup of empty anchor tags
+        cleanup_empty_anchors_in_html_files(DOCS_DIR)
         
     finally:
         # Clean up temporary template

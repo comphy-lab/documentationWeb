@@ -49,9 +49,16 @@ function renderCommandResults(query) {
   
   // If query is at least 3 characters, search the database as well
   if (query && query.length >= 3 && typeof window.searchDatabaseForCommandPalette === 'function') {
+    // Capture the current query to avoid stale updates
+    const capturedQuery = query;
+    
     // We'll use a promise to handle the async search
-    window.searchDatabaseForCommandPalette(query).then(searchResults => {
-      if (searchResults && searchResults.length > 0) {
+    window.searchDatabaseForCommandPalette(capturedQuery).then(searchResults => {
+      // Get the current input value
+      const currentInputValue = document.getElementById('command-palette-input')?.value || '';
+      
+      // Only update UI if the captured query matches the current input value
+      if (capturedQuery === currentInputValue && searchResults && searchResults.length > 0) {
         // Add search results to sections
         sections['Search Results'] = searchResults;
         
@@ -93,21 +100,76 @@ function renderSections(sections, container) {
     const commandsList = document.createElement('div');
     commandsList.className = 'command-palette-commands';
     
+    // Simple HTML sanitizer that only allows specific tags and attributes
+    function sanitizeHTML(html) {
+      // Only allow these tags and attributes
+      const allowedTags = ['i', 'span', 'svg', 'path'];
+      const allowedAttrs = ['class', 'viewBox', 'd', 'fill', 'stroke', 'stroke-width', 'xmlns'];
+      
+      // Create a temporary element to parse the HTML
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+      
+      // Function to sanitize a node and its children
+      function sanitizeNode(node) {
+        // For element nodes
+        if (node.nodeType === 1) {
+          // If it's not an allowed tag, replace it with its text content
+          if (!allowedTags.includes(node.tagName.toLowerCase())) {
+            return document.createTextNode(node.textContent);
+          }
+          
+          // Remove any attributes that aren't allowed
+          Array.from(node.attributes).forEach(attr => {
+            if (!allowedAttrs.includes(attr.name.toLowerCase())) {
+              node.removeAttribute(attr.name);
+            }
+          });
+          
+          // Sanitize all child nodes
+          Array.from(node.childNodes).forEach(child => {
+            const sanitizedChild = sanitizeNode(child);
+            if (sanitizedChild !== child) {
+              node.replaceChild(sanitizedChild, child);
+            }
+          });
+        }
+        
+        return node;
+      }
+      
+      // Sanitize the temporary element and all its children
+      sanitizeNode(temp);
+      
+      // Return the sanitized HTML
+      return temp.innerHTML;
+    }
+
     sections[section].forEach(cmd => {
       const cmdEl = document.createElement('div');
       cmdEl.className = 'command-palette-command';
       
-      let cmdContent = `
-        <div class="command-palette-icon">${cmd.icon || ''}</div>
-        <div class="command-palette-title">${cmd.title}</div>
-      `;
+      // Create icon element separately with sanitized HTML
+      const iconEl = document.createElement('div');
+      iconEl.className = 'command-palette-icon';
+      iconEl.innerHTML = cmd.icon ? sanitizeHTML(cmd.icon) : '';
+      
+      // Create title element
+      const titleEl = document.createElement('div');
+      titleEl.className = 'command-palette-title';
+      titleEl.textContent = cmd.title;
+      
+      // Build command element
+      cmdEl.appendChild(iconEl);
+      cmdEl.appendChild(titleEl);
       
       // Add excerpt for search results if available
       if (cmd.excerpt) {
-        cmdContent += `<div class="command-palette-excerpt">${cmd.excerpt.substring(0, 120)}${cmd.excerpt.length > 120 ? '...' : ''}</div>`;
+        const excerptEl = document.createElement('div');
+        excerptEl.className = 'command-palette-excerpt';
+        excerptEl.textContent = cmd.excerpt.substring(0, 120) + (cmd.excerpt.length > 120 ? '...' : '');
+        cmdEl.appendChild(excerptEl);
       }
-      
-      cmdEl.innerHTML = cmdContent;
       
       cmdEl.addEventListener('click', function(e) {
         if (typeof cmd.handler === 'function') {
@@ -128,7 +190,12 @@ function renderSections(sections, container) {
 function initCommandPalette() {
   // Ensure search database is preloaded for command palette search functionality
   // Try to prefetch the search database if it exists
-  fetch('/assets/js/search_db.json').then(response => {
+  // Get base URL from meta tag to support GitHub Pages subfolders
+  const baseUrlMeta = document.querySelector('meta[name="base-url"]');
+  const baseUrl = baseUrlMeta ? baseUrlMeta.getAttribute('content') : '';
+  const searchDbUrl = baseUrl ? `${baseUrl}/assets/js/search_db.json` : '/assets/js/search_db.json';
+  
+  fetch(searchDbUrl).then(response => {
     if (response.ok) {
       return response.json();
     }
@@ -271,45 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
 window.renderCommandResults = renderCommandResults;
 window.renderSections = renderSections;
 
-// Function to search the database with priority sorting
+// Use the shared search database function from search-helper.js
 window.searchDatabaseForCommandPalette = async function(query) {
-  if (!window.searchFuse) {
-    return [];
-  }
-  
-  try {
-    const results = window.searchFuse.search(query);
-    
-    // Sort results by priority first, then by Fuse.js score
-    // Lower priority number = higher priority (1 is highest, 5 is lowest)
-    const sortedResults = results.sort((a, b) => {
-      // First compare by priority
-      const priorityA = a.item.priority || 5; // Default to lowest priority if not specified
-      const priorityB = b.item.priority || 5;
-      
-      if (priorityA !== priorityB) {
-        return priorityA - priorityB; // Lower priority number comes first
-      }
-      
-      // If priorities are equal, use Fuse.js score (lower score = better match)
-      return a.score - b.score;
-    });
-    
-    // Return at most 5 results
-    return sortedResults.slice(0, 5).map(result => ({
-      id: `search-result-${result.refIndex}`,
-      title: result.item.title || 'Untitled',
-      handler: () => { 
-        if (result.item.url) {
-          window.location.href = result.item.url; 
-        }
-      },
-      section: "Search Results",
-      icon: '<i class="fa-solid fa-file-lines"></i>',
-      excerpt: result.item.excerpt || (result.item.content && result.item.content.substring(0, 100) + '...') || ''
-    }));
-  } catch (e) {
-    console.error('Error searching database:', e);
-    return [];
-  }
+  return window.searchHelper.searchDatabaseForCommandPalette(query);
 };
