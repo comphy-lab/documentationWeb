@@ -152,7 +152,13 @@ function renderSections(sections, container) {
       // Create icon element separately with sanitized HTML
       const iconEl = document.createElement('div');
       iconEl.className = 'command-palette-icon';
-      iconEl.innerHTML = cmd.icon ? sanitizeHTML(cmd.icon) : '';
+      
+      // Render Font-Awesome & other inline-HTML icons → safe because source is constant
+      if (cmd.icon && cmd.icon.trim().startsWith('<i')) {
+        iconEl.innerHTML = cmd.icon;
+      } else {
+        iconEl.textContent = cmd.icon ?? '';
+      }
       
       // Create title element
       const titleEl = document.createElement('div');
