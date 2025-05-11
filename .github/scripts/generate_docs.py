@@ -42,13 +42,13 @@ def calculate_asset_prefix(output_path: Path, docs_dir: Path) -> str:
 def extract_seo_metadata(file_path: Path, content: str) -> Dict[str, str]:
     """
     Extracts SEO metadata such as description and keywords from file content.
-    
+
     If embedded SEO metadata is present (as a JSON object in an HTML comment), it is parsed and sanitized. Otherwise, the function generates a description from the first paragraph or header and derives keywords from the filename and code patterns (functions, classes, includes). The resulting metadata is suitable for use in HTML meta tags.
-    
+
     Args:
         file_path: Path to the source file.
         content: The content of the file as a string.
-    
+
     Returns:
         A dictionary containing SEO metadata fields such as 'description' and 'keywords'.
     """
@@ -71,26 +71,26 @@ def extract_seo_metadata(file_path: Path, content: str) -> Dict[str, str]:
             debug_print(f"Error parsing embedded SEO metadata: {e}")
     
     # Extract first paragraph as description (fallback for non-notebook files)
-    desc_match = re.search(r'^\s*#\s*(.*?)\s*$\s*([a-zA-Z].*?)(?=^\s*#|\Z)', 
+    desc_match = re.search(r'^\s*#\s*(.*?)\s*$\s*([a-zA-Z].*?)(?=^\s*#|\Z)',
                           content, re.MULTILINE | re.DOTALL)
     if desc_match:
         description = desc_match.group(2).strip()
         if not description or description.startswith(('```', '`', '#', '//')):
             description = desc_match.group(1).strip()
-        
+
         # Clean up description and truncate to ~160 chars
         description = re.sub(r'[#`*_]', '', description)
         description = re.sub(r'\s+', ' ', description).strip()
         if len(description) > 160:
             description = description[:157] + "..."
         metadata["description"] = description
-    
+
     # Extract keywords by analyzing content
     keywords = set()
     # Add filename-based keywords
     name_parts = file_path.stem.replace('_', ' ').replace('-', ' ').split()
     keywords.update([p.lower() for p in name_parts if len(p) > 3])
-    
+
     # Add common technical terms if found in content
     tech_patterns = [
         r'function\s+([a-zA-Z_][a-zA-Z0-9_]*)',
@@ -102,21 +102,34 @@ def extract_seo_metadata(file_path: Path, content: str) -> Dict[str, str]:
         for match in re.finditer(pattern, content):
             if match.group(1) and len(match.group(1)) > 3:
                 keywords.add(match.group(1).lower())
-    
+
     # Format keywords as comma-separated string
     if keywords:
         metadata["keywords"] = ", ".join(sorted(list(keywords)[:10]))
-    
+    else:
+        # Add default keywords if none were found
+        metadata["keywords"] = "fluid dynamics, CFD, Basilisk, computational physics"
+
+    # If no description was found, add a default one
+    if "description" not in metadata:
+        default_desc = f"Documentation for {file_path.stem.replace('_', ' ').replace('-', ' ')} in the CoMPhy Lab computational fluid dynamics framework."
+        metadata["description"] = default_desc[:160]
+        debug_print(f"Using fallback description for {file_path.name}: {default_desc[:50]}...")
+
     # Ensure description is safe for HTML attributes
     if "description" in metadata:
         # Remove HTML tags and replace quotes
         metadata["description"] = re.sub(r'<[^>]*>', '', metadata["description"])
         metadata["description"] = re.sub(r'"', '\'', metadata["description"])
-        
+
         # Truncate if still too long
         if len(metadata["description"]) > 160:
             metadata["description"] = metadata["description"][:157] + "..."
-    
+
+    debug_print(f"Generated SEO metadata for {file_path.name}:")
+    debug_print(f"  Description: '{metadata.get('description', 'None')}'")
+    debug_print(f"  Keywords: '{metadata.get('keywords', 'None')}'")
+
     return metadata
 
 # Configuration
