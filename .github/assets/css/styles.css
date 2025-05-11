@@ -1284,6 +1284,7 @@ img.youtube-stats-dark {
   color: var(--color-text);
 }
 
+/* Team grid layout - core styles */
 .team-grid {
   display: grid;
   grid-template-columns: repeat(4, 400px);
@@ -1302,6 +1303,11 @@ img.youtube-stats-dark {
   padding: 2rem;
   text-align: justify;
   transition: transform 0.3s ease;
+}
+
+/* Hover effect */
+.team-member:hover {
+  transform: translateY(-5px);
 }
 
 /* Center the name */
@@ -1351,7 +1357,7 @@ img.youtube-stats-dark {
   text-align: justify;
 }
 
-/* Responsive breakpoints */
+/* Responsive breakpoints for team grid */
 @media screen and (max-width: 1700px) {
   .team-grid {
     grid-template-columns: repeat(3, 400px);
@@ -1816,6 +1822,7 @@ img.youtube-stats-dark {
   }
 }
 
+/* Team section styling */
 .team-section {
   margin-bottom: 4rem;
   width: 100%;
@@ -1831,45 +1838,10 @@ img.youtube-stats-dark {
   text-align: center;
 }
 
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 400px);
+/* Variant styles for team grid in team section */
+.team-section .team-grid {
   gap: 2rem;
   margin-bottom: 2rem;
-  justify-content: center;
-}
-
-.team-member {
-  width: 400px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 10px;
-  padding: 2rem;
-  text-align: justify;
-  transition: transform 0.3s ease;
-}
-
-.team-member:hover {
-  transform: translateY(-5px);
-}
-
-/* Responsive breakpoints for team grid */
-@media screen and (max-width: 1700px) {
-  .team-grid {
-    grid-template-columns: repeat(3, 400px);
-  }
-}
-
-@media screen and (max-width: 1300px) {
-  .team-grid {
-    grid-template-columns: repeat(2, 400px);
-  }
-}
-
-@media screen and (max-width: 900px) {
-  .team-grid {
-    grid-template-columns: repeat(1, 400px);
-  }
 }
 
 @media screen and (max-width: 500px) {
