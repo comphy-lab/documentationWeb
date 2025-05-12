@@ -6,20 +6,26 @@
 // Initialize the window.searchHelper namespace if it doesn't exist
 window.searchHelper = window.searchHelper || {};
 
-// Shared search database function for command palette
-window.searchHelper.searchDatabaseForCommandPalette = async function(query) {
-  // Only perform search if query is at least 3 characters long
-  if (!query || query.length < 3) {
-    return [];
+// Store the promise of search database and Fuse creation for memoization
+window.searchHelper.fuseInitPromise = null;
+
+// Initialize the search database and Fuse instance (memoized)
+window.searchHelper.initializeSearchFuse = async function() {
+  // If the initialization is already in progress, return the existing promise
+  if (window.searchHelper.fuseInitPromise) {
+    return window.searchHelper.fuseInitPromise;
   }
-  
-  console.log('Searching database for:', query);
-  
-  try {
-    // Check if we have a searchIndex already loaded in window
-    if (!window.searchFuse && window.searchData) {
+
+  // If Fuse is already initialized, return a resolved promise
+  if (window.searchFuse) {
+    return Promise.resolve();
+  }
+
+  // Create a new initialization promise
+  window.searchHelper.fuseInitPromise = (async () => {
+    try {
       // If we already have search data but no Fuse object
-      try {
+      if (window.searchData) {
         window.searchFuse = new Fuse(window.searchData, {
           keys: [
             { name: 'title', weight: 0.7 },
@@ -30,71 +36,79 @@ window.searchHelper.searchDatabaseForCommandPalette = async function(query) {
           includeScore: true,
           threshold: 0.4
         });
-      } catch (e) {
-        console.error('Error creating Fuse instance:', e);
-        return [];
+        return;
       }
-    } else if (!window.searchFuse) {
-      // Try to fetch search database if it doesn't exist yet
-      try {
-        // Get base URL from meta tag to support GitHub Pages subfolders
-        const baseUrlMeta = document.querySelector('meta[name="base-url"]');
-        const baseUrl = baseUrlMeta ? baseUrlMeta.getAttribute('content') : '';
-        const searchDbUrl = baseUrl ? `${baseUrl}/assets/js/search_db.json` : '/assets/js/search_db.json';
-        
-        const response = await fetch(searchDbUrl);
-        if (response.ok) {
-          try {
-            const searchData = await response.json();
-            if (!searchData || !Array.isArray(searchData)) {
-              console.warn('Search database has invalid format');
-              return [];
-            }
-            window.searchData = searchData;
-            window.searchFuse = new Fuse(searchData, {
-              keys: [
-                { name: 'title', weight: 0.7 },
-                { name: 'content', weight: 0.2 },
-                { name: 'tags', weight: 0.1 },
-                { name: 'categories', weight: 0.1 }
-              ],
-              includeScore: true,
-              threshold: 0.4
-            });
-          } catch (e) {
-            console.error('Error parsing search database JSON:', e);
-            return [];
-          }
-        } else {
-          console.warn(`No search database found (${response.status})`);
-          return [];
-        }
-      } catch (e) {
-        console.error('Error loading search database:', e);
-        return [];
+
+      // Get base URL from meta tag to support GitHub Pages subfolders
+      const baseUrlMeta = document.querySelector('meta[name="base-url"]');
+      const baseUrl = baseUrlMeta ? baseUrlMeta.getAttribute('content') : '';
+      const searchDbUrl = baseUrl ? `${baseUrl}/assets/js/search_db.json` : '/assets/js/search_db.json';
+
+      const response = await fetch(searchDbUrl);
+      if (!response.ok) {
+        console.warn(`No search database found (${response.status})`);
+        throw new Error(`Failed to fetch search database: ${response.status}`);
       }
+
+      const searchData = await response.json();
+      if (!searchData || !Array.isArray(searchData)) {
+        console.warn('Search database has invalid format');
+        throw new Error('Search database has invalid format');
+      }
+
+      window.searchData = searchData;
+      window.searchFuse = new Fuse(searchData, {
+        keys: [
+          { name: 'title', weight: 0.7 },
+          { name: 'content', weight: 0.2 },
+          { name: 'tags', weight: 0.1 },
+          { name: 'categories', weight: 0.1 }
+        ],
+        includeScore: true,
+        threshold: 0.4
+      });
+    } catch (e) {
+      console.error('Error initializing search:', e);
+      throw e;
     }
+  })();
+
+  return window.searchHelper.fuseInitPromise;
+};
+
+// Shared search database function for command palette
+window.searchHelper.searchDatabaseForCommandPalette = async function(query) {
+  // Only perform search if query is at least 3 characters long
+  if (!query || query.length < 3) {
+    return [];
+  }
+
+  console.log('Searching database for:', query);
+
+  try {
+    // Initialize Fuse if not already initialized
+    await window.searchHelper.initializeSearchFuse();
     
-    // Perform the search
+    // Perform the search with the initialized Fuse instance
     if (window.searchFuse) {
       try {
         const results = window.searchFuse.search(query);
-        
+
         // Sort results by priority first, then by Fuse.js score
         // Lower priority number = higher priority (1 is highest, 5 is lowest)
         const sortedResults = results.sort((a, b) => {
           // First compare by priority
           const priorityA = a.item.priority || a.item.priority === 0 ? a.item.priority : 5; // Default to lowest priority if not specified
           const priorityB = b.item.priority || b.item.priority === 0 ? b.item.priority : 5;
-          
+
           if (priorityA !== priorityB) {
             return priorityA - priorityB; // Lower priority number comes first
           }
-          
+
           // If priorities are equal, use Fuse.js score (lower score = better match)
           return a.score - b.score;
         });
-        
+
         // Return at most 5 results to avoid cluttering the command palette
         return sortedResults.slice(0, 5).map(result => {
           // Sanitize title and excerpt before creating the command object
@@ -122,7 +136,9 @@ window.searchHelper.searchDatabaseForCommandPalette = async function(query) {
     }
   } catch (e) {
     console.error('Error searching database:', e);
+    // Reset the fuseInitPromise if there was an error so future calls can try again
+    window.searchHelper.fuseInitPromise = null;
   }
-  
+
   return [];
 };
