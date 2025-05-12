@@ -84,10 +84,14 @@ The [`simulationCases/`](simulationCases) directory contains simulation configur
 
 2. Make sure Basilisk is properly installed and the BASILISK environment variable is set.
 
-3. Install Python dependencies:
+3. Install Python dependencies (uses a virtual environment):
    ```bash
-   # This will automatically install dependencies like BeautifulSoup4
+   # This will automatically set up a virtual environment and install dependencies
+   # like BeautifulSoup4 for HTML processing
    ./reset_install_requirements.sh
+
+   # To activate the virtual environment for manual commands:
+   source .venv/bin/activate
    ```
 
 4. Compile a test case to verify the setup:

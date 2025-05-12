@@ -56,16 +56,3 @@ else
     echo "\033[0;32mqcc is properly installed.\033[0m"
     qcc --version
 fi
-
-# Install Python dependencies needed for documentation generation
-echo "\nInstalling Python dependencies for documentation..."
-if command -v pip3 &> /dev/null; then
-    if [ -f ".github/scripts/requirements.txt" ]; then
-        pip3 install -r .github/scripts/requirements.txt
-        echo "\033[0;32mPython dependencies installed successfully.\033[0m"
-    else
-        echo "\033[0;33mWarning: requirements.txt not found at .github/scripts/requirements.txt\033[0m"
-    fi
-else
-    echo "\033[0;33mWarning: pip3 not found. Please install Python 3 and pip to use documentation features.\033[0m"
-fi
