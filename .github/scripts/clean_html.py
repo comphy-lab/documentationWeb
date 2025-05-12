@@ -11,6 +11,7 @@ Usage:
 """
 
 import os
+import re
 import argparse
 import sys
 from bs4 import BeautifulSoup
@@ -18,64 +19,85 @@ from bs4 import BeautifulSoup
 def clean_html_file(file_path):
     """
     Removes empty anchor tags from an HTML file using BeautifulSoup.
-    
+    Also performs direct string replacement for HTML in script tags that
+    BeautifulSoup might not properly handle.
+
     Args:
         file_path: Path to the HTML file to clean
-        
+
     Returns:
         Tuple (bool, int): Whether file was modified and count of tags removed
     """
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
-            
+
+        # First do a direct string replacement for empty anchor tags in the content
+        # This is more reliable for script tags where BeautifulSoup might struggle
+        initial_content_length = len(content)
+        pattern = r'<a\s+id=[\'"]?[\'"]?\s*href=[\'"]?#[\'"]?\s*>\s*</a>'
+        content = re.sub(pattern, '', content)
+
+        # Also handle empty anchors with newlines between tags
+        pattern = r'<a\s+id=[\'"]?[\'"]?\s*href=[\'"]?#[\'"]?\s*>\s*\n*\s*</a>'
+        content = re.sub(pattern, '', content)
+
+        # Count direct replacements
+        direct_replacements = (initial_content_length - len(content)) // 30  # Approximate count
+
         # Parse the HTML with BeautifulSoup
         soup = BeautifulSoup(content, 'html.parser')
-        
+
         # Find all empty anchor tags
         empty_anchors = [a for a in soup.find_all('a') if not a.contents or (len(a.contents) == 1 and not a.contents[0].strip())]
-        
+
         # Count the empty anchors before removing
         original_count = len(empty_anchors)
-        
-        if original_count == 0:
+
+        if original_count == 0 and direct_replacements == 0:
             return False, 0
-            
-        # Remove the empty anchors
+
+        # Remove the empty anchors found by BeautifulSoup
         for anchor in empty_anchors:
             anchor.decompose()
-        
+
         # Special handling for script tags
         script_tags = soup.find_all('script')
         for script in script_tags:
-            # Find any anchor tags within script content and remove them
+            # Clean script content if it exists
             if script.string:
-                # Keep the original script content as a reference
+                # Apply direct regex replacement within script content
                 script_content = script.string
-                
+                script_content = re.sub(pattern, '', script_content)
+
                 # Create a temporary soup object for the script content
                 # This is a safe way to parse and modify the script content
                 script_soup = BeautifulSoup(f"<div>{script_content}</div>", 'html.parser')
-                
+
                 # Find and remove any anchor tags in the script content
                 for anchor in script_soup.find_all('a'):
                     anchor.decompose()
-                
+
                 # Get the cleaned content (excluding the wrapping div)
                 cleaned_script = script_soup.div.decode_contents() if script_soup.div else ""
-                
+
                 # Update the script content
                 script.string = cleaned_script
-        
+
         # Convert the soup back to HTML
         cleaned_content = str(soup)
-        
+
+        # Perform a final direct replacement to catch any that might still remain
+        # (especially within attributes or other places BeautifulSoup might miss)
+        cleaned_content = re.sub(pattern, '', cleaned_content)
+
         # Write the cleaned content back to the file
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(cleaned_content)
-            
-        return True, original_count
-    
+
+        total_removed = original_count + direct_replacements
+        return True, total_removed
+
     except Exception as e:
         print(f"Error cleaning {file_path}: {e}")
         return False, 0

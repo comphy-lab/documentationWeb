@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
+  <!-- 
+    IMPORTANT: DO NOT place empty anchor tags <a></a> in this template!
+    They cause JavaScript syntax errors when they appear inside script blocks.
+  -->
   <!-- Eliminate FOUC (Flash of Unstyled Content) and FOUT (Flash of Incorrect Theme) -->
   <script>
     (function() {
@@ -13,7 +17,7 @@
       // Handle localStorage access errors (private browsing, cookies disabled)
       console.warn('Unable to access localStorage:', storageError);
     }
-    
+
     let prefersDark = false;
     try {
       prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -21,7 +25,7 @@
       // Handle matchMedia access errors (unsupported browsers)
       console.warn('Unable to check media query:', mediaError);
     }
-    
+
     const theme = saved ? saved : (prefersDark ? 'dark' : 'light');
     document.documentElement.setAttribute('data-theme', theme);
     // Add theme class for CSS targeting
@@ -242,7 +246,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
   <!-- Config script must load before other scripts -->
   <script src="$asset_path_prefix$/assets/js/config.js"></script>
-  <script src="$asset_path_prefix$/assets/js/html-sanitizer.js"></script>
+  <script defer src="$asset_path_prefix$/assets/js/html-sanitizer.js"></script>
   <script defer src="$asset_path_prefix$/assets/js/search-helper.js"></script>
   <script defer src="$asset_path_prefix$/assets/js/command-palette.js"></script>
   <script defer src="$asset_path_prefix$/assets/js/command-data.js"></script>
