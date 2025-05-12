@@ -26,16 +26,23 @@ window.searchHelper.initializeSearchFuse = async function() {
     try {
       // If we already have search data but no Fuse object
       if (window.searchData) {
-        window.searchFuse = new Fuse(window.searchData, {
-          keys: [
-            { name: 'title', weight: 0.7 },
-            { name: 'content', weight: 0.2 },
-            { name: 'tags', weight: 0.1 },
-            { name: 'categories', weight: 0.1 }
-          ],
-          includeScore: true,
-          threshold: 0.4
-        });
+        // Check if Fuse is available before creating a new instance
+        if (typeof Fuse !== 'undefined') {
+          window.searchFuse = new Fuse(window.searchData, {
+            keys: [
+              { name: 'title', weight: 0.7 },
+              { name: 'content', weight: 0.2 },
+              { name: 'tags', weight: 0.1 },
+              { name: 'categories', weight: 0.1 }
+            ],
+            includeScore: true,
+            threshold: 0.4
+          });
+        } else {
+          console.warn('Fuse.js is not loaded. Search functionality will be unavailable.');
+          // Create a flag to indicate Fuse is not available
+          window.searchFuseUnavailable = true;
+        }
         return;
       }
 
@@ -57,16 +64,24 @@ window.searchHelper.initializeSearchFuse = async function() {
       }
 
       window.searchData = searchData;
-      window.searchFuse = new Fuse(searchData, {
-        keys: [
-          { name: 'title', weight: 0.7 },
-          { name: 'content', weight: 0.2 },
-          { name: 'tags', weight: 0.1 },
-          { name: 'categories', weight: 0.1 }
-        ],
-        includeScore: true,
-        threshold: 0.4
-      });
+
+      // Check if Fuse is available before creating a new instance
+      if (typeof Fuse !== 'undefined') {
+        window.searchFuse = new Fuse(searchData, {
+          keys: [
+            { name: 'title', weight: 0.7 },
+            { name: 'content', weight: 0.2 },
+            { name: 'tags', weight: 0.1 },
+            { name: 'categories', weight: 0.1 }
+          ],
+          includeScore: true,
+          threshold: 0.4
+        });
+      } else {
+        console.warn('Fuse.js is not loaded. Search functionality will be unavailable.');
+        // Create a flag to indicate Fuse is not available
+        window.searchFuseUnavailable = true;
+      }
     } catch (e) {
       console.error('Error initializing search:', e);
       throw e;
@@ -89,6 +104,12 @@ window.searchHelper.searchDatabaseForCommandPalette = async function(query) {
     // Initialize Fuse if not already initialized
     await window.searchHelper.initializeSearchFuse();
     
+    // Check if Fuse is unavailable after initialization attempt
+    if (window.searchFuseUnavailable) {
+      console.warn('Search attempted but Fuse.js is not available.');
+      return [];
+    }
+
     // Perform the search with the initialized Fuse instance
     if (window.searchFuse) {
       try {
@@ -109,12 +130,38 @@ window.searchHelper.searchDatabaseForCommandPalette = async function(query) {
           return a.score - b.score;
         });
 
+        // Helper function for basic HTML escaping if htmlSanitizer is not available
+        const escapeHtml = (str) => {
+          if (!str) return '';
+          return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        };
+
+        // Use the appropriate sanitizing function
+        const sanitize = (window.htmlSanitizer && typeof window.htmlSanitizer.escapeHTML === 'function')
+          ? window.htmlSanitizer.escapeHTML
+          : escapeHtml;
+
+        // If htmlSanitizer isn't available, log a warning once
+        if (!window.htmlSanitizer && !window.warnedAboutMissingSanitizer) {
+          console.warn('htmlSanitizer not available. Using basic string escaping for XSS protection.');
+          window.warnedAboutMissingSanitizer = true;
+        }
+
         // Return at most 5 results to avoid cluttering the command palette
         return sortedResults.slice(0, 5).map(result => {
-          // Sanitize title and excerpt before creating the command object
-          const safeTitle = typeof result.item.title === 'string' ? result.item.title : 'Untitled';
+          // Get raw values
+          const rawTitle = typeof result.item.title === 'string' ? result.item.title : 'Untitled';
           const content = result.item.content || '';
-          const originalExcerpt = result.item.excerpt || (content && content.substring(0, 100) + '...') || '';
+          const rawExcerpt = result.item.excerpt || (content && content.substring(0, 100) + '...') || '';
+
+          // Sanitize title and excerpt to prevent XSS
+          const safeTitle = sanitize(rawTitle);
+          const originalExcerpt = sanitize(rawExcerpt);
 
           return {
             id: `search-result-${result.refIndex}`,
