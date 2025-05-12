@@ -96,18 +96,25 @@ window.searchHelper.searchDatabaseForCommandPalette = async function(query) {
         });
         
         // Return at most 5 results to avoid cluttering the command palette
-        return sortedResults.slice(0, 5).map(result => ({
-          id: `search-result-${result.refIndex}`,
-          title: result.item.title || 'Untitled',
-          handler: () => { 
-            if (result.item.url) {
-              window.location.href = result.item.url; 
-            }
-          },
-          section: "Search Results",
-          icon: '<i class="fa-solid fa-file-lines"></i>',
-          excerpt: result.item.excerpt || (result.item.content && result.item.content.substring(0, 100) + '...') || ''
-        }));
+        return sortedResults.slice(0, 5).map(result => {
+          // Sanitize title and excerpt before creating the command object
+          const safeTitle = typeof result.item.title === 'string' ? result.item.title : 'Untitled';
+          const content = result.item.content || '';
+          const originalExcerpt = result.item.excerpt || (content && content.substring(0, 100) + '...') || '';
+
+          return {
+            id: `search-result-${result.refIndex}`,
+            title: safeTitle,
+            handler: () => {
+              if (result.item.url) {
+                window.location.href = result.item.url;
+              }
+            },
+            section: "Search Results",
+            icon: '<i class="fa-solid fa-file-lines"></i>',
+            excerpt: originalExcerpt
+          };
+        });
       } catch (e) {
         console.error('Error performing search with Fuse:', e);
         return [];
