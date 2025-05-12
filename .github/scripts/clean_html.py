@@ -14,7 +14,39 @@ import os
 import re
 import argparse
 import sys
+import html
 from bs4 import BeautifulSoup
+
+def sanitize_html(content):
+    """
+    Sanitize HTML content to prevent XSS vulnerabilities.
+
+    Args:
+        content: HTML content to sanitize
+
+    Returns:
+        str: Sanitized HTML content
+    """
+    if not content:
+        return ""
+
+    # Escape HTML special characters to prevent script execution
+    escaped_content = html.escape(content)
+
+    # Additional sanitization steps
+    # Remove potentially harmful script and iframe tags
+    escaped_content = re.sub(r'<\s*script', '&lt;script', escaped_content, flags=re.IGNORECASE)
+    escaped_content = re.sub(r'<\s*\/\s*script', '&lt;/script', escaped_content, flags=re.IGNORECASE)
+    escaped_content = re.sub(r'<\s*iframe', '&lt;iframe', escaped_content, flags=re.IGNORECASE)
+    escaped_content = re.sub(r'<\s*\/\s*iframe', '&lt;/iframe', escaped_content, flags=re.IGNORECASE)
+
+    # Remove on* event handlers (e.g., onclick, onload)
+    escaped_content = re.sub(r'on\w+\s*=\s*["\'][^"\']*["\']', '', escaped_content, flags=re.IGNORECASE)
+
+    # Remove javascript: URLs
+    escaped_content = re.sub(r'javascript\s*:', 'disabled-javascript:', escaped_content, flags=re.IGNORECASE)
+
+    return escaped_content
 
 def clean_html_file(file_path):
     """
@@ -70,9 +102,13 @@ def clean_html_file(file_path):
                 script_content = script.string
                 script_content = re.sub(pattern, '', script_content)
 
-                # Create a temporary soup object for the script content
-                # This is a safe way to parse and modify the script content
-                script_soup = BeautifulSoup(f"<div>{script_content}</div>", 'html.parser')
+                # Sanitize the script content before parsing to prevent XSS vulnerabilities
+                # This prevents malicious script content from being executed when parsed by BeautifulSoup
+                # and eliminates potential security issues if the HTML content comes from untrusted sources
+                sanitized_content = sanitize_html(script_content)
+
+                # Create a temporary soup object for the sanitized script content
+                script_soup = BeautifulSoup(f"<div>{sanitized_content}</div>", 'html.parser')
 
                 # Find and remove any anchor tags in the script content
                 for anchor in script_soup.find_all('a'):
