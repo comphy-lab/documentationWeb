@@ -70,6 +70,7 @@ build/
 bin/
 obj/
 deps/
+.venv/
 
 # Project specific files
 **/_darcs

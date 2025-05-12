@@ -70,6 +70,8 @@ The [`simulationCases/`](simulationCases) directory contains simulation configur
 - Basilisk C installed ([Installation instructions](http://basilisk.fr/src/INSTALL))
 - C compiler (gcc recommended)
 - Make build system
+- Python 3 with pip for documentation generation
+- BeautifulSoup4 for HTML processing (included in requirements.txt)
 - Scientific visualization tools (optional: ParaView, Gnuplot, etc.)
 
 ### Installation
@@ -82,7 +84,17 @@ The [`simulationCases/`](simulationCases) directory contains simulation configur
 
 2. Make sure Basilisk is properly installed and the BASILISK environment variable is set.
 
-3. Compile a test case to verify the setup:
+3. Install Python dependencies (uses a virtual environment):
+   ```bash
+   # This will automatically set up a virtual environment and install dependencies
+   # like BeautifulSoup4 for HTML processing
+   ./reset_install_requirements.sh
+
+   # To activate the virtual environment for manual commands:
+   source .venv/bin/activate
+   ```
+
+4. Compile a test case to verify the setup:
    ```bash
    cd simulationCases
    make test_name.tst
