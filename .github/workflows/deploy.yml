@@ -49,6 +49,12 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
+      - name: Install dependencies
+        run: |
+          if [ -f ".github/scripts/requirements.txt" ]; then
+            pip install -r .github/scripts/requirements.txt
+          fi
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

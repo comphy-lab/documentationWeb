@@ -11,13 +11,13 @@ Usage:
 """
 
 import os
-import re
 import argparse
 import sys
+from bs4 import BeautifulSoup
 
 def clean_html_file(file_path):
     """
-    Removes empty anchor tags from an HTML file.
+    Removes empty anchor tags from an HTML file using BeautifulSoup.
     
     Args:
         file_path: Path to the HTML file to clean
@@ -29,35 +29,52 @@ def clean_html_file(file_path):
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
             
-        # Count occurrences before cleaning
-        original_count = len(re.findall(r'<a[^>]*>\s*</a>', content))
+        # Parse the HTML with BeautifulSoup
+        soup = BeautifulSoup(content, 'html.parser')
+        
+        # Find all empty anchor tags
+        empty_anchors = [a for a in soup.find_all('a') if not a.contents or (len(a.contents) == 1 and not a.contents[0].strip())]
+        
+        # Count the empty anchors before removing
+        original_count = len(empty_anchors)
         
         if original_count == 0:
             return False, 0
             
-        # Remove empty anchor tags from the entire document
-        cleaned_content = re.sub(r'<a[^>]*>\s*</a>', '', content)
+        # Remove the empty anchors
+        for anchor in empty_anchors:
+            anchor.decompose()
         
-        # Special handling for script blocks
-        script_pattern = r'(<script[^>]*>.*?</script>)'
+        # Special handling for script tags
+        script_tags = soup.find_all('script')
+        for script in script_tags:
+            # Find any anchor tags within script content and remove them
+            if script.string:
+                # Keep the original script content as a reference
+                script_content = script.string
+                
+                # Create a temporary soup object for the script content
+                # This is a safe way to parse and modify the script content
+                script_soup = BeautifulSoup(f"<div>{script_content}</div>", 'html.parser')
+                
+                # Find and remove any anchor tags in the script content
+                for anchor in script_soup.find_all('a'):
+                    anchor.decompose()
+                
+                # Get the cleaned content (excluding the wrapping div)
+                cleaned_script = script_soup.div.decode_contents() if script_soup.div else ""
+                
+                # Update the script content
+                script.string = cleaned_script
         
-        def clean_script_blocks(match):
-            script_content = match.group(1)
-            # Aggressively remove ALL anchor tags from script blocks
-            script_content = re.sub(r'<a[^>]*>.*?</a>', '', script_content)
-            return script_content
-            
-        # Clean script blocks separately
-        cleaned_content = re.sub(script_pattern, clean_script_blocks, cleaned_content, flags=re.DOTALL)
-        
-        # Count occurrences after cleaning
-        final_count = len(re.findall(r'<a[^>]*>\s*</a>', cleaned_content))
+        # Convert the soup back to HTML
+        cleaned_content = str(soup)
         
         # Write the cleaned content back to the file
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(cleaned_content)
             
-        return True, original_count - final_count
+        return True, original_count
     
     except Exception as e:
         print(f"Error cleaning {file_path}: {e}")

@@ -39,6 +39,12 @@ function log_message() {
   echo "$(date +"%Y-%m-%d %H:%M:%S") - $1"
 }
 
+# Install required dependencies
+if [ -f "$PROJECT_ROOT/.github/scripts/requirements.txt" ]; then
+  log_message "Installing Python dependencies..."
+  pip install -r "$PROJECT_ROOT/.github/scripts/requirements.txt"
+fi
+
 # Run the documentation generation script
 log_message "Starting documentation generation..."
 if [ -n "$FORCE_REBUILD" ]; then
