@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test HTML for Escaping</title>
+</head>
+<body>
+    <h1>Test HTML</h1>
+    <p>This is a test HTML file for checking the escaping mechanism.</p>
+    
+    <!-- This script tag should be escaped but not double-escaped -->
+    <script>
+        console.log("This is a script tag that should be escaped");
+    </script>
+    
+    <!-- This iframe tag should be escaped but not double-escaped -->
+    <iframe src="https://example.com"></iframe>
+    
+    <!-- This event handler should be removed -->
+    <button onclick="alert('click')">Click me</button>
+    
+    <!-- This javascript: URL should be disabled -->
+    <a href="javascript:alert('test')">Link</a>
+</body>
+</html>

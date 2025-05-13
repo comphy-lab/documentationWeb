@@ -59,10 +59,8 @@ def sanitize_html(content):
     # Remove javascript: URLs
     sanitized_content = re.sub(r'javascript\s*:', 'disabled-javascript:', sanitized_content, flags=re.IGNORECASE)
 
-    # Unescape first to prevent double-encoding from previous regex replacements
-    sanitized_content = html.unescape(sanitized_content)
-    
     # Finally, escape any remaining HTML special characters
+    # This ensures we preserve the removals we already made
     sanitized_content = html.escape(sanitized_content, quote=False)  # Don't escape quotes again
 
     return sanitized_content
