@@ -253,7 +253,20 @@
       }
       
       sections[section].forEach(command => {
-        const sanitizedTitle = window.htmlSanitizer.escapeHTML(command.title);
+        // Safely escape the title using the sanitizer if available
+        let sanitizedTitle = '';
+        if (window.htmlSanitizer && typeof window.htmlSanitizer.escapeHTML === 'function') {
+          sanitizedTitle = window.htmlSanitizer.escapeHTML(command.title);
+        } else {
+          // Basic HTML escaping fallback
+          sanitizedTitle = (command.title || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        }
+        
         let sanitizedIcon = '';
         
         // Only process icon if it exists
