@@ -74,8 +74,10 @@ else
 fi
 
 # Clean HTML files to remove empty anchor tags
+# Using fix_empty_anchors.py which is more targeted and preserves icons and other content
 log_message "Cleaning HTML files to remove empty anchor tags..."
 python3 "$PROJECT_ROOT/.github/scripts/fix_empty_anchors.py" "$DOCS_DIR"
+
 
 if [ $? -ne 0 ]; then
     log_message "Documentation generation failed."
