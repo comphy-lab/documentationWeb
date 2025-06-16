@@ -186,13 +186,13 @@ function renderSections(sections, container) {
              iconStr.includes('fa-brands') || iconStr.includes('fa-regular') ||
              iconStr.includes('ai ai-'))) {
           // Adding extra validation for classes
-          const validIconPattern = /^<i class=\"(fa|fas|far|fal|fab|ai)[ -][\w\d -]+"><\/i>$/;
+          const validIconPattern = /^<i class=\"(fa|fas|far|fal|fab|ai)[\s-][\w\d\s-]+"><\/i>$/;
           if (validIconPattern.test(iconStr)) {
             iconEl.innerHTML = sanitizeHTML(iconStr);
           } else {
             // Fallback to displaying as text if pattern doesn't match exactly
             iconEl.textContent = '🔍'; // Default search icon as fallback
-            if (CONFIG && CONFIG.DEBUG) {
+            if (DEBUG) {
               console.warn('Invalid icon format detected:', iconStr);
             }
           }
@@ -280,16 +280,20 @@ function initCommandPalette() {
     window.searchData = data;
     
     // Initialize Fuse.js with weighted keys
-    window.searchFuse = new Fuse(data, {
-      keys: [
-        { name: 'title', weight: 0.7 },
-        { name: 'content', weight: 0.2 },
-        { name: 'tags', weight: 0.1 },
-        { name: 'categories', weight: 0.1 }
-      ],
-      includeScore: true,
-      threshold: 0.4
-    });
+    if (typeof Fuse === 'function') {
+      window.searchFuse = new Fuse(data, {
+        keys: [
+          { name: 'title', weight: 0.7 },
+          { name: 'content', weight: 0.2 },
+          { name: 'tags', weight: 0.1 },
+          { name: 'categories', weight: 0.1 }
+        ],
+        includeScore: true,
+        threshold: 0.4
+      });
+    } else {
+      console.warn('Fuse.js not found – command-palette search disabled');
+    }
   }).catch(err => {
     if (DEBUG) {
       console.warn('Could not prefetch search database for command palette:', err.message);
@@ -428,5 +432,8 @@ window.renderSections = renderSections;
 
 // Use the shared search database function from search-helper.js
 window.searchDatabaseForCommandPalette = async function(query) {
-  return window.searchHelper.searchDatabaseForCommandPalette(query);
+  if (window.searchHelper && typeof window.searchHelper.searchDatabaseForCommandPalette === 'function') {
+    return window.searchHelper.searchDatabaseForCommandPalette(query);
+  }
+  return [];
 };
