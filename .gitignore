@@ -143,6 +143,7 @@ deps/
 **/getData-generic-heatEq
 **/getData-generic-one-phase
 **/getData-LidDriven
+**/getFacets3D
 
 # Never exclude these files
 !*.c
