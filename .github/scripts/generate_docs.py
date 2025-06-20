@@ -2,6 +2,14 @@
 import os, subprocess, re, shutil, argparse, html, json
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Union
+try:
+    from nbconvert import HTMLExporter
+    from nbconvert.preprocessors import ExtractOutputPreprocessor
+    import nbformat
+    NBCONVERT_AVAILABLE = True
+except ImportError:
+    NBCONVERT_AVAILABLE = False
+    print("Warning: nbconvert not available. Falling back to nbviewer embedding.")
 
 # Parse args
 parser = argparse.ArgumentParser(description='Generate docs from source files')
@@ -305,7 +313,8 @@ def process_jupyter_notebook(file_path: Path) -> str:
     """
     Generates an HTML snippet to embed a Jupyter notebook with preview, download, and external viewing options.
     
-    Reads the notebook file, extracts the title, description, and up to three key features from the first markdown cell (if present), and sanitizes metadata for safe HTML embedding. The output includes a preview iframe (using nbviewer), download and external links (nbviewer, Colab), and fallback messaging if the preview cannot be loaded. SEO metadata is embedded in an HTML comment for later extraction.
+    Uses nbconvert to render the notebook locally if available, otherwise falls back to nbviewer embedding.
+    Extracts metadata from the first markdown cell and provides interactive elements.
     
     Args:
         file_path: Path to the Jupyter notebook file.
@@ -354,34 +363,187 @@ def process_jupyter_notebook(file_path: Path) -> str:
             ]
         
         # Clean all strings to prevent HTML injection and attribute issues
-        # This is critical to prevent meta tag corruption
-        
-        # Step 1: Remove all HTML tags from the description
         notebook_description = re.sub(r'<[^>]*>', '', notebook_description)
-        
-        # Step 2: Remove any potential content that might break attributes
         notebook_description = re.sub(r'["\'>]', '', notebook_description)
         
-        # Step 3: Create a highly sanitized version for use in meta tags
         meta_safe_description = re.sub(r'[^\w\s.,;:!?()-]', '', notebook_description)
         meta_safe_description = meta_safe_description.strip()
         if len(meta_safe_description) > 160:
             meta_safe_description = meta_safe_description[:157] + "..."
         
-        # Properly escape all content for HTML use
         safe_notebook_title = html.escape(notebook_title)
         safe_notebook_description = html.escape(notebook_description)
         safe_notebook_features = [html.escape(f) for f in notebook_features]
         features_html = "\n".join([f'<li>{feature}</li>' for feature in safe_notebook_features])
         
-        # Store meta description for later use in SEO metadata
         seo_metadata = {
             "title": notebook_title,
             "description": meta_safe_description,
             "meta_tags": f'<meta name="description" content="{meta_safe_description}">\n'
         }
         
-        embed_html = f"""# {safe_notebook_title}
+        # Try to render notebook locally with nbconvert if available
+        notebook_html_content = ""
+        if NBCONVERT_AVAILABLE:
+            try:
+                # Configure the HTML exporter
+                html_exporter = HTMLExporter()
+                html_exporter.template_name = 'classic'
+                
+                # Convert notebook to HTML
+                (body, resources) = html_exporter.from_filename(str(file_path))
+                
+                # Extract just the notebook content (remove full HTML structure)
+                # We'll embed this within our existing page structure
+                from bs4 import BeautifulSoup
+                soup = BeautifulSoup(body, 'html.parser')
+                
+                # Find the main notebook container
+                notebook_container = soup.find('div', {'id': 'notebook-container'})
+                if not notebook_container:
+                    # Fallback to finding the body content
+                    notebook_container = soup.find('body')
+                    if notebook_container:
+                        # Remove script tags from body to avoid conflicts
+                        for script in notebook_container.find_all('script'):
+                            script.decompose()
+                
+                if notebook_container:
+                    notebook_html_content = str(notebook_container)
+                    # Wrap in a div with our custom class for styling
+                    notebook_html_content = f'<div class="nbconvert-rendered">{notebook_html_content}</div>'
+                    debug_print(f"Successfully converted notebook {notebook_filename} with nbconvert")
+                else:
+                    debug_print(f"Could not find notebook container in nbconvert output for {notebook_filename}")
+                    
+            except Exception as e:
+                debug_print(f"Failed to convert notebook {notebook_filename} with nbconvert: {str(e)}")
+                notebook_html_content = ""
+        
+        # Generate the embed HTML
+        if notebook_html_content:
+            # Use locally rendered content
+            embed_html = f"""# {safe_notebook_title}
+
+```{{=html}}
+<div class="jupyter-notebook-embed">
+    <h2>Jupyter Notebook: {safe_notebook_title}</h2>
+    
+    <div class="notebook-action-buttons">
+        <a href="{notebook_filename}" download class="notebook-btn download-btn">
+            <i class="fa-solid fa-download"></i> Download Notebook
+        </a>
+        <a href="https://nbviewer.org/github/comphy-lab/{REPO_NAME}/blob/main/{notebook_path}" 
+           target="_blank" class="notebook-btn view-btn">
+            <i class="fa-solid fa-eye"></i> View in nbviewer
+        </a>
+        <a href="https://colab.research.google.com/github/comphy-lab/{REPO_NAME}/blob/main/{notebook_path}" 
+           target="_blank" class="notebook-btn colab-btn">
+            <i class="fa-solid fa-play"></i> Open in Colab
+        </a>
+    </div>
+    
+    <div class="notebook-preview">
+        <h3>About this notebook</h3>
+        <p>{safe_notebook_description}</p>
+        
+        <h3>Key Features:</h3>
+        <ul>
+            {features_html}
+        </ul>
+    </div>
+    
+    <div class="notebook-tip">
+        <p><strong>Tip:</strong> For the best interactive experience with 3D visualizations and widgets, download the notebook or open it in Google Colab.</p>
+    </div>
+
+    <!-- Locally Rendered Jupyter Notebook -->
+    <div class="embedded-notebook">
+        <h3>Notebook Content</h3>
+        <div class="notebook-content-wrapper">
+            {notebook_html_content}
+        </div>
+    </div>
+</div>
+
+<style>
+/* Additional styles for nbconvert output */
+.nbconvert-rendered {{
+    max-width: 100%;
+    overflow-x: auto;
+    background: var(--notebook-bg);
+    color: var(--notebook-fg);
+}}
+
+.nbconvert-rendered .input_area {{
+    background: var(--code-block-bg);
+    border: 1px solid var(--code-block-border);
+    border-radius: 4px;
+    padding: 5px;
+    margin: 5px 0;
+}}
+
+.nbconvert-rendered .output_area {{
+    margin: 10px 0;
+    background: var(--notebook-bg);
+}}
+
+.nbconvert-rendered pre {{
+    background: var(--code-block-bg);
+    padding: 10px;
+    border-radius: 4px;
+    overflow-x: auto;
+    color: var(--notebook-fg);
+}}
+
+.nbconvert-rendered code {{
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    background: var(--code-block-bg);
+    color: var(--notebook-fg);
+}}
+
+/* Use theme colors for notebook code blocks */
+.nbconvert-rendered .highlight {{
+    background: var(--code-block-bg) !important;
+}}
+
+.nbconvert-rendered .highlight pre {{
+    background: var(--code-block-bg) !important;
+    color: var(--notebook-fg) !important;
+}}
+
+/* Ensure input cells use theme colors */
+.nbconvert-rendered .input {{
+    background: var(--notebook-bg);
+}}
+
+.nbconvert-rendered .input_area pre {{
+    background: var(--code-block-bg) !important;
+    color: var(--notebook-fg) !important;
+}}
+
+
+/* Handle k3d and other widget placeholders */
+.nbconvert-rendered .widget-area {{
+    background: #f0f0f0;
+    border: 2px dashed #ccc;
+    padding: 20px;
+    text-align: center;
+    margin: 10px 0;
+    border-radius: 8px;
+}}
+
+.nbconvert-rendered .widget-area::before {{
+    content: "Interactive widget - Please download the notebook or open in Colab to interact";
+    color: #666;
+    font-style: italic;
+}}
+</style>
+```
+"""
+        else:
+            # Fallback to nbviewer iframe (original implementation)
+            embed_html = f"""# {safe_notebook_title}
 
 ```{{=html}}
 <div class="jupyter-notebook-embed">
