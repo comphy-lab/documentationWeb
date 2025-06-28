@@ -65,7 +65,7 @@ Save snapshots at regular intervals for flow visualization
 */
 event writingFiles (t=0.; t += tsnap; t < tmax+tsnap) {
   char filename[100];
-  sprintf(filename, "intermediate/snapshot-%5.4f", t);  
+  snprintf(filename, sizeof(filename), "intermediate/snapshot-%5.4f", t);  
   dump(file=filename);
 }
 
@@ -119,7 +119,7 @@ int main() {
 
   // Create a folder named intermediate where all the simulation snapshots are stored.
   char comm[80];
-  sprintf (comm, "mkdir -p intermediate");
+  snprintf (comm, sizeof(comm), "mkdir -p intermediate");
   system(comm);
   
   // Run simulation

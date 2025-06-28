@@ -133,7 +133,12 @@ Interface facets are written to standard error (ferr) in a format suitable
 for visualization with tools like gnuplot or paraview.
 */
 int main(int a, char const *arguments[]) {
-  sprintf(filename, "%s", arguments[1]);
+  if (a < 2) {
+    fprintf(stderr, "Usage: %s simulation_file.dump\n", arguments[0]);
+    return 1;
+  }
+  
+  snprintf(filename, sizeof(filename), "%s", arguments[1]);
 
   f[bottom] = dirichlet(1.);
   restore(file=filename);
