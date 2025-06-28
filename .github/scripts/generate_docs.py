@@ -4,12 +4,17 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any, Union
 try:
     from nbconvert import HTMLExporter
-    from nbconvert.preprocessors import ExtractOutputPreprocessor
-    import nbformat
     NBCONVERT_AVAILABLE = True
 except ImportError:
     NBCONVERT_AVAILABLE = False
     print("Warning: nbconvert not available. Falling back to nbviewer embedding.")
+
+try:
+    from bs4 import BeautifulSoup
+    BS4_AVAILABLE = True
+except ImportError:
+    BS4_AVAILABLE = False
+    print("Warning: BeautifulSoup4 not available. Some notebook rendering features may be limited.")
 
 # Parse args
 parser = argparse.ArgumentParser(description='Generate docs from source files')
@@ -395,26 +400,30 @@ def process_jupyter_notebook(file_path: Path) -> str:
                 
                 # Extract just the notebook content (remove full HTML structure)
                 # We'll embed this within our existing page structure
-                from bs4 import BeautifulSoup
-                soup = BeautifulSoup(body, 'html.parser')
-                
-                # Find the main notebook container
-                notebook_container = soup.find('div', {'id': 'notebook-container'})
-                if not notebook_container:
-                    # Fallback to finding the body content
-                    notebook_container = soup.find('body')
+                if BS4_AVAILABLE:
+                    soup = BeautifulSoup(body, 'html.parser')
+                    
+                    # Find the main notebook container
+                    notebook_container = soup.find('div', {'id': 'notebook-container'})
+                    if not notebook_container:
+                        # Fallback to finding the body content
+                        notebook_container = soup.find('body')
+                        if notebook_container:
+                            # Remove script tags from body to avoid conflicts
+                            for script in notebook_container.find_all('script'):
+                                script.decompose()
+                    
                     if notebook_container:
-                        # Remove script tags from body to avoid conflicts
-                        for script in notebook_container.find_all('script'):
-                            script.decompose()
-                
-                if notebook_container:
-                    notebook_html_content = str(notebook_container)
-                    # Wrap in a div with our custom class for styling
-                    notebook_html_content = f'<div class="nbconvert-rendered">{notebook_html_content}</div>'
-                    debug_print(f"Successfully converted notebook {notebook_filename} with nbconvert")
+                        notebook_html_content = str(notebook_container)
+                        # Wrap in a div with our custom class for styling
+                        notebook_html_content = f'<div class="nbconvert-rendered">{notebook_html_content}</div>'
+                        debug_print(f"Successfully converted notebook {notebook_filename} with nbconvert")
+                    else:
+                        debug_print(f"Could not find notebook container in nbconvert output for {notebook_filename}")
                 else:
-                    debug_print(f"Could not find notebook container in nbconvert output for {notebook_filename}")
+                    # If BeautifulSoup is not available, use the full HTML output
+                    notebook_html_content = f'<div class="nbconvert-rendered">{body}</div>'
+                    debug_print(f"BeautifulSoup not available, using full HTML output for {notebook_filename}")
                     
             except Exception as e:
                 debug_print(f"Failed to convert notebook {notebook_filename} with nbconvert: {str(e)}")
