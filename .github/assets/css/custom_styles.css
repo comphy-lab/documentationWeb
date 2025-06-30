@@ -3,59 +3,130 @@
  * Organized and optimized for readability and maintainability
  */
 
-/* -----------------------------------------------------------------------------
- * 1. CSS Variables and Base Styles
- * ----------------------------------------------------------------------------- */
+/* =============================================================================
+ * CSS VARIABLES
+ * ============================================================================= */
 
- :root {
-  /* Light theme variables */
+:root {
+  /* Typography */
+  --font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  --font-size-base: 1.6rem;
+  --line-height-base: 1.6;
+  
+  /* Spacing Scale */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* Colors - Light Theme */
   --color-background: #ffffff;
   --color-text: #24292e;
-  --subtle-bg: #f8f9fa;
-  --code-block-bg: #f5f7f9;
-  --code-block-border: #e3e8ee;
-  --link-color: #1a73e8;
-  --link-hover: #0d47a1;
-  --heading-color: #2c3e50;
+  --color-heading: #2c3e50;
+  --color-link: #1a73e8;
+  --color-link-hover: #0d47a1;
+  --color-accent: #2563eb;
+  
+  /* Surfaces - Light Theme */
+  --surface-subtle: #f8f9fa;
+  --surface-elevated: #ffffff;
+  --surface-code: #f5f7f9;
+  
+  /* Borders - Light Theme */
   --border-color: #e9ecef;
+  --border-color-subtle: #e3e8ee;
+  --border-radius-sm: 3px;
+  --border-radius-md: 6px;
+  --border-radius-lg: 8px;
+  --border-radius-xl: 12px;
+  
+  /* Shadows - Light Theme */
+  --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 4px 18px rgba(0, 0, 0, 0.06);
+  
+  /* Component Specific - Light Theme */
   --nav-item-bg: rgba(255, 255, 255, 0.25);
   --nav-item-color: #1a1a1a;
   --nav-item-shadow: rgba(0, 0, 0, 0.1);
   --nav-item-hover-bg: rgba(255, 255, 255, 0.35);
   --nav-item-hover-shadow: rgba(0, 0, 0, 0.4);
+  
+  /* Notebook Specific - Light Theme */
   --notebook-bg: #f8fafc;
   --notebook-border: #e3e8ee;
   --notebook-fg: #1e293b;
-  --color-accent: #2563eb;
+  
+  /* Code Highlighting - Light Theme */
+  --syntax-keyword: #cf222e;
+  --syntax-type: #8250df;
+  --syntax-number: #0550ae;
+  --syntax-string: #0a3069;
+  --syntax-comment: #57606a;
+  --syntax-function: #8250df;
+  --syntax-operator: #0550ae;
+  --syntax-preprocessor: #953800;
 }
 
-/* Dark theme variables */
+/* Dark theme overrides */
 [data-theme="dark"] {
+  /* Colors - Dark Theme */
   --color-background: #181f2a;
   --color-text: #e3eafe;
-  --subtle-bg: #1e1e1e;
-  --code-block-bg: #1e1e1e;
-  --code-block-border: #2d2d2d;
-  --link-color: #7ea6ff;
-  --link-hover: #a5c7ff;
-  --heading-color: #e0e0e0;
+  --color-heading: #e0e0e0;
+  --color-link: #7ea6ff;
+  --color-link-hover: #a5c7ff;
+  --color-accent: #60a5fa;
+  
+  /* Surfaces - Dark Theme */
+  --surface-subtle: #1e1e1e;
+  --surface-elevated: #232d3f;
+  --surface-code: #1e1e1e;
+  
+  /* Borders - Dark Theme */
   --border-color: #404040;
+  --border-color-subtle: #2d2d2d;
+  
+  /* Shadows - Dark Theme */
+  --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 4px 18px rgba(0, 0, 0, 0.3);
+  
+  /* Component Specific - Dark Theme */
   --nav-item-bg: rgba(30, 30, 30, 0.6);
   --nav-item-color: #ffffff;
   --nav-item-shadow: rgba(0, 0, 0, 0.4);
   --nav-item-hover-bg: rgba(40, 40, 40, 0.8);
   --nav-item-hover-shadow: rgba(0, 0, 0, 0.6);
+  
+  /* Notebook Specific - Dark Theme */
   --notebook-bg: #181f2a;
   --notebook-border: #22304a;
   --notebook-fg: #e3eafe;
-  --color-accent: #60a5fa;
+  
+  /* Code Highlighting - Dark Theme */
+  --syntax-keyword: #569cd6;
+  --syntax-type: #4ec9b0;
+  --syntax-number: #b5cea8;
+  --syntax-string: #ce9178;
+  --syntax-comment: #6a9955;
+  --syntax-function: #dcdcaa;
+  --syntax-operator: #d4d4d4;
+  --syntax-preprocessor: #c586c0;
 }
 
-/* Core body styles */
+/* =============================================================================
+ * BASE STYLES
+ * ============================================================================= */
+
+/* Reset and Base */
 body {
   font-family: var(--font-primary);
-  font-size: 1.6rem;
-  line-height: 1.6;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
   color: var(--color-text);
   background-color: var(--color-background);
   -webkit-font-smoothing: antialiased;
@@ -64,70 +135,77 @@ body {
   padding: 0;
 }
 
-/* -----------------------------------------------------------------------------
- * 2. Layout and Content Containers
- * ----------------------------------------------------------------------------- */
+/* Typography Base */
+code, pre {
+  font-family: var(--font-mono);
+}
 
-/* Main content spacing */
+/* =============================================================================
+ * LAYOUT
+ * ============================================================================= */
+
+/* Main Content Container */
 main.content {
   padding-top: 100px; /* Account for fixed header */
 }
 
 .page-content {
-  padding: 2rem;
+  padding: var(--spacing-xl);
   max-width: 1200px;
-  margin: 0 auto 3rem auto;
+  margin: 0 auto var(--spacing-2xl) auto;
 }
 
-/* Light mode background pattern */
+/* Light mode page styling */
 :root:not([data-theme="dark"]) .page-content {
-  background-color: #ffffff;
+  background-color: var(--surface-elevated);
   background-image: linear-gradient(to bottom, rgba(248, 249, 250, 0.5) 1px, transparent 1px);
   background-size: 100% 32px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
   padding: 2.5rem;
 }
 
-/* Dark mode page container */
+/* Dark mode page styling */
 [data-theme="dark"] .page-content {
-  background-color: #181f2a;
+  background-color: var(--color-background);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  border-radius: 8px;
+  border-radius: var(--border-radius-lg);
 }
 
-/* -----------------------------------------------------------------------------
- * 3. Typography and Headings
- * ----------------------------------------------------------------------------- */
+/* =============================================================================
+ * TYPOGRAPHY
+ * ============================================================================= */
 
+/* Headings */
 .page-content h1 {
   margin-top: 0;
-  padding-top: 1rem;
+  padding-top: var(--spacing-md);
   font-size: 2.8rem;
-  color: var(--heading-color);
+  color: var(--color-heading);
   border-bottom: 2px solid var(--border-color);
-  padding-bottom: 0.5rem;
+  padding-bottom: var(--spacing-sm);
 }
 
 .page-content h2 {
-  margin-top: 2rem;
+  margin-top: var(--spacing-xl);
   font-size: 2.4rem;
-  color: var(--heading-color);
+  color: var(--color-heading);
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.3rem;
   text-shadow: none;
 }
 
 .page-content h3 {
-  margin-top: 1.5rem;
+  margin-top: var(--spacing-lg);
   font-size: 2rem;
-  color: var(--heading-color);
+  color: var(--color-heading);
 }
 
-/* -----------------------------------------------------------------------------
- * 4. Documentation Link Buttons
- * ----------------------------------------------------------------------------- */
+/* =============================================================================
+ * COMPONENTS
+ * ============================================================================= */
 
+/* Documentation Link Button */
 .doc-link-button {
   display: block;
   width: 100%;
@@ -172,58 +250,32 @@ main.content {
   color: #0d47a1;
 }
 
-/* Dark mode button styles */
-[data-theme="dark"] .doc-link-button {
-  background: #1b2330;
-  color: #e3eafe;
-  border: 1.5px solid #334155;
-  box-shadow: 0 2px 10px rgba(45, 114, 233, 0.10);
-}
+/* =============================================================================
+ * CODE BLOCKS
+ * ============================================================================= */
 
-[data-theme="dark"] .doc-link-button::before {
-  color: #7ea6ff;
-}
-
-[data-theme="dark"] .doc-link-button:hover, 
-[data-theme="dark"] .doc-link-button:focus {
-  background: #232d3f;
-  border-color: #4462a6;
-  color: #a5c7ff;
-  box-shadow: 0 4px 18px rgba(45, 114, 233, 0.22);
-}
-
-[data-theme="dark"] .doc-link-button:active {
-  background: #16203a;
-  border-color: #233a6a;
-  color: #7ea6ff;
-}
-
-/* -----------------------------------------------------------------------------
- * 5. Code Block Styling
- * ----------------------------------------------------------------------------- */
-
-/* Base code block styles */
-pre.sourceCode, 
-.sourceCode pre, 
+/* Base code block container */
+.sourceCode,
+div.sourceCode,
+pre.sourceCode,
+.sourceCode pre,
 .markdown-body .sourceCode pre,
 .markdown-body pre.sourceCode,
-pre code.sourceCode,
-.sourceCode,
-div.sourceCode {
-  background-color: var(--code-block-bg);
-  color: #333333;
-  border: 1px solid var(--code-block-border);
-  border-radius: 6px;
-  padding: 1em;
-  margin: 1.5em 0;
+pre code.sourceCode {
+  background-color: var(--surface-code);
+  color: var(--color-text);
+  border: 1px solid var(--border-color-subtle);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  margin: var(--spacing-lg) 0;
   overflow-x: auto;
   line-height: 1.4;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Code within blocks */
-pre.sourceCode code, 
-.sourceCode code, 
+.sourceCode code,
+pre.sourceCode code,
 pre code.sourceCode,
 div.sourceCode code {
   background-color: transparent;
@@ -233,78 +285,32 @@ div.sourceCode code {
   font-size: 0.9em;
 }
 
-/* Font for all code */
-code, pre {
-  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-}
-
 /* Inline code */
 :not(pre) > code {
   background-color: rgba(175, 184, 193, 0.2);
   color: #0550ae;
   padding: 0.2em 0.4em;
-  border-radius: 3px;
+  border-radius: var(--border-radius-sm);
   font-size: 0.85em;
   font-weight: 500;
 }
 
-/* Dark mode inline code */
-[data-theme="dark"] :not(pre) > code {
-  background-color: #2d2d2d;
-  color: #e0e0e0;
-}
-
-/* Dark mode code blocks */
-[data-theme="dark"] pre.sourceCode,
-[data-theme="dark"] .sourceCode pre,
-[data-theme="dark"] .markdown-body .sourceCode pre,
-[data-theme="dark"] .markdown-body pre.sourceCode,
-[data-theme="dark"] pre code.sourceCode,
-[data-theme="dark"] .sourceCode,
-[data-theme="dark"] div.sourceCode {
-  background-color: #1e1e1e;
-  color: #e0e0e0;
-  border-color: #2d2d2d;
-}
-
-/* -----------------------------------------------------------------------------
- * 6. Syntax Highlighting
- * ----------------------------------------------------------------------------- */
-
-/* Light theme syntax highlighting */
-.sourceCode .kw { color: #cf222e; } /* Keyword - bright red */
-.sourceCode .dt { color: #8250df; } /* DataType - rich purple */
+/* Syntax Highlighting */
+.sourceCode .kw { color: var(--syntax-keyword); }
+.sourceCode .dt { color: var(--syntax-type); }
 .sourceCode .dv, 
 .sourceCode .bn, 
-.sourceCode .fl { color: #0550ae; } /* Numbers - rich blue */
+.sourceCode .fl { color: var(--syntax-number); }
 .sourceCode .ch, 
-.sourceCode .st { color: #0a3069; } /* String - darker blue */
-.sourceCode .co { color: #57606a; font-style: italic; } /* Comment - medium grey */
-.sourceCode .fu { color: #8250df; } /* Function - rich purple */
-.sourceCode .im { color: #0550ae; } /* Import - rich blue */
-.sourceCode .op { color: #0550ae; } /* Operator - rich blue */
-.sourceCode .cf { color: #cf222e; } /* ControlFlow - bright red */
-.sourceCode .pp { color: #953800; } /* Preprocessor - burnt orange */
+.sourceCode .st { color: var(--syntax-string); }
+.sourceCode .co { color: var(--syntax-comment); font-style: italic; }
+.sourceCode .fu { color: var(--syntax-function); }
+.sourceCode .im { color: var(--syntax-number); }
+.sourceCode .op { color: var(--syntax-operator); }
+.sourceCode .cf { color: var(--syntax-keyword); }
+.sourceCode .pp { color: var(--syntax-preprocessor); }
 
-/* Dark theme syntax highlighting overrides */
-[data-theme="dark"] .sourceCode .im { color: #7ccdfd; } /* Import/Include - light blue */
-[data-theme="dark"] .sourceCode .st { color: #ce9178; } /* String - light orange/pink */
-[data-theme="dark"] .sourceCode .kw { color: #569cd6; } /* Keyword - blue */
-[data-theme="dark"] .sourceCode .dt { color: #4ec9b0; } /* DataType - teal */
-[data-theme="dark"] .sourceCode .dv, 
-[data-theme="dark"] .sourceCode .bn, 
-[data-theme="dark"] .sourceCode .fl { color: #b5cea8; } /* Numbers - light green */
-[data-theme="dark"] .sourceCode .ch { color: #ce9178; } /* Char - same as string */
-[data-theme="dark"] .sourceCode .co { color: #6a9955; } /* Comment - green */
-[data-theme="dark"] .sourceCode .fu { color: #dcdcaa; } /* Function - yellow */
-[data-theme="dark"] .sourceCode .op { color: #d4d4d4; } /* Operator - light grey */
-[data-theme="dark"] .sourceCode .cf { color: #c586c0; } /* ControlFlow - purple */
-[data-theme="dark"] .sourceCode .pp { color: #c586c0; } /* Preprocessor - purple */
-
-/* -----------------------------------------------------------------------------
- * 7. Copy Button for Code Blocks
- * ----------------------------------------------------------------------------- */
-
+/* Copy Button */
 .code-block-container {
   position: relative;
 }
@@ -316,7 +322,7 @@ code, pre {
   padding: 3px 8px;
   background-color: #f8f8f8;
   border: 1px solid #e1e4e8;
-  border-radius: 3px;
+  border-radius: var(--border-radius-sm);
   font-size: 12px;
   cursor: pointer;
   z-index: 10;
@@ -331,28 +337,18 @@ code, pre {
   color: white;
 }
 
-/* Dark theme copy button */
-[data-theme="dark"] .copy-button {
-  background-color: #2d2d2d;
-  border-color: #404040;
-  color: #e0e0e0;
-}
+/* =============================================================================
+ * NAVIGATION
+ * ============================================================================= */
 
-[data-theme="dark"] .copy-button:hover {
-  background-color: #404040;
-}
-
-/* -----------------------------------------------------------------------------
- * 8. Header and Navigation
- * ----------------------------------------------------------------------------- */
-
+/* Header Logo */
 .s-header__logo {
   display: flex;
   align-items: center;
   justify-content: flex-start;
 }
 
-/* Documentation button styling */
+/* Documentation Button in Header */
 .documentation-button {
   display: flex;
   align-items: center;
@@ -361,17 +357,17 @@ code, pre {
   padding: 0.8rem 1.6rem;
   height: 40px;
   border-radius: 5px;
-  margin-left: 1rem;
+  margin-left: var(--spacing-md);
   text-decoration: none;
   font-weight: 600;
-  font-size: 1.6rem;
+  font-size: var(--font-size-base);
   transition: all 0.3s ease;
   backdrop-filter: blur(8px);
   box-shadow: 0 2px 10px var(--nav-item-shadow);
 }
 
 .documentation-button i {
-  margin-right: 0.5rem;
+  margin-right: var(--spacing-sm);
   font-size: 1.2rem;
 }
 
@@ -388,34 +384,21 @@ code, pre {
   box-shadow: 0 4px 12px var(--nav-item-hover-shadow);
 }
 
-/* Dark mode nav links */
-[data-theme="dark"] .s-header__nav-list a,
-[data-theme="dark"] .s-header__nav-list a:visited,
-[data-theme="dark"] .s-header__nav-list a:link {
-  color: #ffffff;
-}
-
-[data-theme="dark"] .s-header__nav-list a:hover {
-  color: #ffffff;
-  background: var(--nav-item-hover-bg);
-}
-
-/* -----------------------------------------------------------------------------
- * 9. Repository Structure Sitemap
- * ----------------------------------------------------------------------------- */
+/* =============================================================================
+ * REPOSITORY STRUCTURE SITEMAP
+ * ============================================================================= */
 
 .repository-structure {
-  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-family: var(--font-mono);
   line-height: 1.5;
   margin: 30px 0;
   padding: 20px;
-  background-color: var(--subtle-bg);
+  background-color: var(--surface-subtle);
   border: 1px solid #e1e4e8;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
-/* Repository structure lists */
 .repository-structure ul,
 .repository-structure ol {
   list-style-type: none;
@@ -441,7 +424,6 @@ code, pre {
   content: "└── ";
 }
 
-/* Nested lists indentation */
 .repository-structure li li {
   padding-left: 40px;
 }
@@ -450,29 +432,14 @@ code, pre {
   left: 16px;
 }
 
-/* Folder styling */
 .repository-structure li > strong {
-  color: #0366d6; /* Blue color for folders */
+  color: #0366d6;
   font-weight: bold;
 }
 
-/* File styling */
 .repository-structure li li > strong {
   color: var(--color-text);
   font-weight: bold;
-}
-
-/* Dark mode adjustments */
-[data-theme="dark"] .repository-structure {
-  border-color: #2d2d2d;
-}
-
-[data-theme="dark"] .repository-structure li::before {
-  color: #8b949e;
-}
-
-[data-theme="dark"] .repository-structure li > strong {
-  color: #58a6ff;
 }
 
 .repository-structure a {
@@ -484,21 +451,21 @@ code, pre {
   text-decoration: underline;
 }
 
-/* -----------------------------------------------------------------------------
- * 10. Jupyter Notebook Styling
- * ----------------------------------------------------------------------------- */
+/* =============================================================================
+ * JUPYTER NOTEBOOK
+ * ============================================================================= */
 
+/* Notebook Container */
 .jupyter-notebook-embed,
 .notebook-preview {
-  margin: 2em 0;
-  padding: 1.5em;
-  border-radius: 12px;
+  margin: var(--spacing-xl) 0;
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-xl);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   background-color: var(--notebook-bg);
   border: 1.5px solid var(--notebook-border);
   color: var(--notebook-fg);
-  margin-bottom: 2em;
 }
 
 .jupyter-notebook-embed h2,
@@ -512,14 +479,15 @@ code, pre {
   padding-bottom: 0.5em;
 }
 
-/* Notebook action buttons */
+/* Notebook Action Buttons Container */
 .notebook-action-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin: 1.5em 0 1em 0;
+  margin: var(--spacing-lg) 0 var(--spacing-md) 0;
 }
 
+/* Base Button Style */
 .notebook-btn,
 .download-btn,
 .view-btn,
@@ -528,7 +496,7 @@ code, pre {
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  border-radius: 8px;
+  border-radius: var(--border-radius-lg);
   font-weight: 600;
   text-decoration: none;
   transition: all 0.2s ease;
@@ -537,7 +505,7 @@ code, pre {
   cursor: pointer;
 }
 
-/* Button base styles */
+/* Button Variants */
 .download-btn {
   background: linear-gradient(90deg, #2563eb 60%, #3b82f6 100%);
   color: #fff;
@@ -586,12 +554,12 @@ code, pre {
   box-shadow: 0 4px 16px rgba(16, 185, 129, 0.13);
 }
 
-/* Notebook preview section */
+/* Notebook Preview Section */
 .notebook-preview {
-  margin: 1.5em 0;
-  padding: 1em;
+  margin: var(--spacing-lg) 0;
+  padding: var(--spacing-md);
   background-color: #f8fafc;
-  border-radius: 6px;
+  border-radius: var(--border-radius-md);
 }
 
 .notebook-preview h3 {
@@ -602,17 +570,17 @@ code, pre {
 }
 
 .notebook-preview ul {
-  margin-left: 1.5em;
+  margin-left: var(--spacing-lg);
   padding-left: 0;
 }
 
 .notebook-preview ul li {
-  margin-bottom: 0.5em;
+  margin-bottom: var(--spacing-sm);
 }
 
-/* Notebook tip box */
+/* Notebook Tip */
 .notebook-tip {
-  margin-top: 1.5em;
+  margin-top: var(--spacing-lg);
   padding: 0.75em 1em;
   background-color: #ecfdf5;
   border-left: 4px solid #10b981;
@@ -628,193 +596,23 @@ code, pre {
   color: #047857;
 }
 
-/* Dark mode notebook styles - vibrant buttons */
-[data-theme="dark"] .notebook-btn {
-  color: #ffffff !important;
-}
-
-[data-theme="dark"] .notebook-action-buttons a,
-[data-theme="dark"] .notebook-action-buttons .notebook-btn {
-  color: #ffffff !important;
-  text-decoration: none !important;
-}
-
-[data-theme="dark"] .notebook-action-buttons a:hover,
-[data-theme="dark"] .notebook-action-buttons a:focus,
-[data-theme="dark"] .notebook-action-buttons a:visited,
-[data-theme="dark"] .notebook-action-buttons a:active {
-  color: #ffffff !important;
-}
-
-/* Force white text on all notebook button states */
-[data-theme="dark"] .notebook-preview .notebook-btn,
-[data-theme="dark"] .jupyter-notebook-embed .notebook-btn {
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
-}
-
-[data-theme="dark"] .notebook-preview,
-[data-theme="dark"] .jupyter-notebook-embed {
-  background-color: #1e1e2d;
-  color: #e3eafe;
-  border: 1.5px solid #2d3a53;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-}
-
-[data-theme="dark"] .notebook-preview > *:not(.notebook-tip):not(h3):not(.notebook-action-buttons) {
-  background: #232d3f;
-  color: #e3eafe;
-  border-radius: 8px;
-  border: 1.5px solid #2d3a53;
-  margin-bottom: 1.2em;
-  box-shadow: 0 1px 8px 0 rgba(35, 43, 58, 0.27);
-  padding: 1em 1.5em;
-}
-
-[data-theme="dark"] .notebook-preview h3,
-[data-theme="dark"] .jupyter-notebook-embed h2 {
-  color: #ffffff;
-  text-shadow: 0 2px 8px rgba(59, 130, 246, 0.13);
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  border-bottom: 1px solid #3b4a63;
-}
-
-[data-theme="dark"] .notebook-preview strong,
-[data-theme="dark"] .notebook-preview b {
-  color: #ffffff;
-  font-weight: 700;
-}
-
-/* Fix button styling in dark mode */
-[data-theme="dark"] .notebook-btn {
-  color: #ffffff;
-  font-weight: 700;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-}
-
-[data-theme="dark"] .download-btn {
-  background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
-  color: #ffffff !important;
-  border: 1.5px solid #3b82f6;
-  box-shadow: 0 2px 10px 0 rgba(37, 99, 235, 0.2);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-[data-theme="dark"] .download-btn span, 
-[data-theme="dark"] .download-btn i { 
-  color: #ffffff !important;
-  font-weight: 700;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-[data-theme="dark"] .download-btn:hover, 
-[data-theme="dark"] .download-btn:focus {
-  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
-  color: #fff;
-  border-color: #60a5fa;
-  box-shadow: 0 4px 20px 0 rgba(37, 99, 235, 0.33);
-}
-
-[data-theme="dark"] .view-btn {
-  background: linear-gradient(90deg, #7c3aed 0%, #a78bfa 100%);
-  color: #ffffff !important;
-  border: 1.5px solid #a78bfa;
-  box-shadow: 0 2px 10px 0 rgba(124, 58, 237, 0.2);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-[data-theme="dark"] .view-btn span, 
-[data-theme="dark"] .view-btn i { 
-  color: #ffffff !important;
-  font-weight: 700;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-[data-theme="dark"] .view-btn:hover, 
-[data-theme="dark"] .view-btn:focus {
-  background: linear-gradient(90deg, #a78bfa 0%, #7c3aed 100%);
-  color: #fff;
-  border-color: #c4b5fd;
-  box-shadow: 0 4px 20px 0 rgba(124, 58, 237, 0.33);
-}
-
-[data-theme="dark"] .colab-btn {
-  background: linear-gradient(90deg, #047857 0%, #10b981 100%);
-  color: #ffffff !important;
-  border: 2px solid #34d399;
-  box-shadow: 0 2px 10px 0 rgba(5, 150, 105, 0.4);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-[data-theme="dark"] .colab-btn span, 
-[data-theme="dark"] .colab-btn i { 
-  color: #ffffff !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-[data-theme="dark"] .colab-btn:hover, 
-[data-theme="dark"] .colab-btn:focus {
-  background: linear-gradient(90deg, #10b981 0%, #047857 100%);
-  color: #fff;
-  border-color: #6ee7b7;
-  box-shadow: 0 4px 20px 0 rgba(5, 150, 105, 0.5);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
-}
-
-[data-theme="dark"] .notebook-tip {
-  background: #193c34;
-  border-left: 4px solid #10b981;
-  color: #d1fae5;
-}
-
-[data-theme="dark"] .notebook-tip strong {
-  color: #6ee7b7;
-}
-
-/* Fix iframe background in dark mode */
-[data-theme="dark"] .embedded-notebook iframe {
-  background-color: #181f2a;
-  border: 1px solid #2d3a53;
-}
-
-/* Fix error message colors in dark mode */
-[data-theme="dark"] .notebook-error-message {
-  background-color: #1e1e2d;
-  border-color: #2d3a53;
-  color: #e3eafe;
-}
-
-[data-theme="dark"] .notebook-error-message i {
-  color: #f87171;
-}
-
-[data-theme="dark"] .notebook-error-message h4 {
-  color: #f9fafb;
-}
-
 /* Notebook Code Blocks */
-.jp-CodeMirrorEditor .highlight,
-.cm-s-jupyter .highlight,
-.highlight.hl-ipython3,
 .jupyter-notebook-embed .highlight,
-.notebook-preview .highlight {
-  background-color: var(--code-block-bg);
+.notebook-preview .highlight,
+.highlight.hl-ipython3 {
+  background-color: var(--surface-code);
   color: var(--color-text);
-  border: 1px solid var(--code-block-border);
-  border-radius: 6px;
-  padding: 1em;
+  border: 1px solid var(--border-color-subtle);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
   margin: 0;
   overflow-x: auto;
   line-height: 1.4;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow-sm);
 }
 
-/* Ensure pre elements inside highlight divs are transparent */
 .highlight pre,
-.highlight.hl-ipython3 pre,
-.jp-CodeMirrorEditor .highlight pre {
+.highlight.hl-ipython3 pre {
   background-color: transparent;
   color: inherit;
   border: none;
@@ -823,42 +621,26 @@ code, pre {
   box-shadow: none;
 }
 
-/* Dark mode notebook code blocks - removed redundant rules since we use CSS variables above */
+/* Notebook Syntax Highlighting */
+.highlight.hl-ipython3 .kn { color: var(--syntax-keyword); }
+.highlight.hl-ipython3 .nn { color: var(--syntax-type); }
+.highlight.hl-ipython3 .k { color: var(--syntax-keyword); }
+.highlight.hl-ipython3 .n { color: var(--color-text); }
+.highlight.hl-ipython3 .w { color: var(--color-text); }
+.highlight.hl-ipython3 .c1 { color: var(--syntax-comment); font-style: italic; }
+.highlight.hl-ipython3 .sd { color: var(--syntax-string); }
+.highlight.hl-ipython3 .s1 { color: var(--syntax-string); }
+.highlight.hl-ipython3 .nf { color: var(--syntax-function); }
+.highlight.hl-ipython3 .p { color: var(--color-text); }
+.highlight.hl-ipython3 .mi { color: var(--syntax-number); }
+.highlight.hl-ipython3 .mf { color: var(--syntax-number); }
+.highlight.hl-ipython3 .o { color: var(--syntax-operator); }
 
-/* Syntax highlighting for notebook code - Light theme */
-.highlight.hl-ipython3 .kn { color: #cf222e; } /* import/from keywords */
-.highlight.hl-ipython3 .nn { color: #8250df; } /* module names */
-.highlight.hl-ipython3 .k { color: #cf222e; } /* keywords like 'as' */
-.highlight.hl-ipython3 .n { color: #24292e; } /* names */
-.highlight.hl-ipython3 .w { color: #24292e; } /* whitespace */
-.highlight.hl-ipython3 .c1 { color: #57606a; font-style: italic; } /* comments */
-.highlight.hl-ipython3 .sd { color: #0a3069; } /* docstrings */
-.highlight.hl-ipython3 .s1 { color: #0a3069; } /* single-quoted strings */
-.highlight.hl-ipython3 .nf { color: #8250df; } /* function names */
-.highlight.hl-ipython3 .p { color: #24292e; } /* punctuation */
-.highlight.hl-ipython3 .mi { color: #0550ae; } /* integers */
-.highlight.hl-ipython3 .mf { color: #0550ae; } /* floats */
-.highlight.hl-ipython3 .o { color: #0550ae; } /* operators */
+/* =============================================================================
+ * FILE ICONS AND TABLES
+ * ============================================================================= */
 
-/* Dark mode syntax highlighting for notebooks */
-[data-theme="dark"] .highlight.hl-ipython3 .kn { color: #569cd6; }
-[data-theme="dark"] .highlight.hl-ipython3 .nn { color: #4ec9b0; }
-[data-theme="dark"] .highlight.hl-ipython3 .k { color: #569cd6; }
-[data-theme="dark"] .highlight.hl-ipython3 .n { color: #d4d4d4; }
-[data-theme="dark"] .highlight.hl-ipython3 .w { color: #d4d4d4; }
-[data-theme="dark"] .highlight.hl-ipython3 .c1 { color: #6a9955; }
-[data-theme="dark"] .highlight.hl-ipython3 .sd { color: #ce9178; }
-[data-theme="dark"] .highlight.hl-ipython3 .s1 { color: #ce9178; }
-[data-theme="dark"] .highlight.hl-ipython3 .nf { color: #dcdcaa; }
-[data-theme="dark"] .highlight.hl-ipython3 .p { color: #d4d4d4; }
-[data-theme="dark"] .highlight.hl-ipython3 .mi { color: #b5cea8; }
-[data-theme="dark"] .highlight.hl-ipython3 .mf { color: #b5cea8; }
-[data-theme="dark"] .highlight.hl-ipython3 .o { color: #d4d4d4; }
-
-/* -----------------------------------------------------------------------------
- * 11. File Icons and Tables
- * ----------------------------------------------------------------------------- */
-
+/* File Icons */
 .file-icon {
   width: 24px;
   text-align: center;
@@ -870,7 +652,7 @@ code, pre {
   color: white;
   font-weight: bold;
   padding: 1px 4px;
-  border-radius: 3px;
+  border-radius: var(--border-radius-sm);
   font-size: 0.85em;
 }
 
@@ -880,7 +662,7 @@ code, pre {
   color: white;
   font-weight: bold;
   padding: 1px 4px;
-  border-radius: 3px;
+  border-radius: var(--border-radius-sm);
   font-size: 0.85em;
 }
 
@@ -890,15 +672,15 @@ code, pre {
   color: white;
   font-weight: bold;
   padding: 1px 4px;
-  border-radius: 3px;
+  border-radius: var(--border-radius-sm);
   font-size: 0.85em;
 }
 
-/* Documentation file tables */
+/* Documentation Tables */
 .documentation-files {
   width: 100%;
   border-collapse: collapse;
-  margin: 1em 0;
+  margin: var(--spacing-md) 0;
 }
 
 .documentation-files td {
@@ -916,10 +698,254 @@ code, pre {
   font-size: 0.9em;
 }
 
-[data-theme="dark"] .documentation-files td {
-  border-color: #2d2d2d;
-}
+/* =============================================================================
+ * DARK MODE OVERRIDES
+ * All dark mode specific styles consolidated here
+ * ============================================================================= */
 
-[data-theme="dark"] .documentation-files .file-desc {
-  color: #8b949e;
+[data-theme="dark"] {
+  /* Inline Code */
+  :not(pre) > code {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+  }
+  
+  /* Navigation */
+  .s-header__nav-list a,
+  .s-header__nav-list a:visited,
+  .s-header__nav-list a:link {
+    color: #ffffff;
+  }
+  
+  .s-header__nav-list a:hover {
+    color: #ffffff;
+    background: var(--nav-item-hover-bg);
+  }
+  
+  /* Doc Link Button */
+  .doc-link-button {
+    background: #1b2330;
+    color: #e3eafe;
+    border: 1.5px solid #334155;
+    box-shadow: 0 2px 10px rgba(45, 114, 233, 0.10);
+  }
+  
+  .doc-link-button::before {
+    color: #7ea6ff;
+  }
+  
+  .doc-link-button:hover, 
+  .doc-link-button:focus {
+    background: #232d3f;
+    border-color: #4462a6;
+    color: #a5c7ff;
+    box-shadow: 0 4px 18px rgba(45, 114, 233, 0.22);
+  }
+  
+  .doc-link-button:active {
+    background: #16203a;
+    border-color: #233a6a;
+    color: #7ea6ff;
+  }
+  
+  /* Copy Button */
+  .copy-button {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    color: #e0e0e0;
+  }
+  
+  .copy-button:hover {
+    background-color: #404040;
+  }
+  
+  /* Repository Structure */
+  .repository-structure {
+    border-color: #2d2d2d;
+  }
+  
+  .repository-structure li::before {
+    color: #8b949e;
+  }
+  
+  .repository-structure li > strong {
+    color: #58a6ff;
+  }
+  
+  /* Documentation Tables */
+  .documentation-files td {
+    border-color: #2d2d2d;
+  }
+  
+  .documentation-files .file-desc {
+    color: #8b949e;
+  }
+  
+  /* Notebook Styles */
+  .notebook-btn {
+    color: #ffffff !important;
+  }
+  
+  .notebook-action-buttons a,
+  .notebook-action-buttons .notebook-btn {
+    color: #ffffff !important;
+    text-decoration: none !important;
+  }
+  
+  .notebook-action-buttons a:hover,
+  .notebook-action-buttons a:focus,
+  .notebook-action-buttons a:visited,
+  .notebook-action-buttons a:active {
+    color: #ffffff !important;
+  }
+  
+  .notebook-preview .notebook-btn,
+  .jupyter-notebook-embed .notebook-btn {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+  
+  .notebook-preview,
+  .jupyter-notebook-embed {
+    background-color: #1e1e2d;
+    color: #e3eafe;
+    border: 1.5px solid #2d3a53;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  }
+  
+  .notebook-preview > *:not(.notebook-tip):not(h3):not(.notebook-action-buttons) {
+    background: #232d3f;
+    color: #e3eafe;
+    border-radius: var(--border-radius-lg);
+    border: 1.5px solid #2d3a53;
+    margin-bottom: 1.2em;
+    box-shadow: 0 1px 8px 0 rgba(35, 43, 58, 0.27);
+    padding: 1em 1.5em;
+  }
+  
+  .notebook-preview h3,
+  .jupyter-notebook-embed h2 {
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(59, 130, 246, 0.13);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    border-bottom: 1px solid #3b4a63;
+  }
+  
+  .notebook-preview strong,
+  .notebook-preview b {
+    color: #ffffff;
+    font-weight: 700;
+  }
+  
+  /* Notebook Buttons Dark Mode */
+  .notebook-btn {
+    color: #ffffff;
+    font-weight: 700;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+  }
+  
+  .download-btn {
+    background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+    color: #ffffff !important;
+    border: 1.5px solid #3b82f6;
+    box-shadow: 0 2px 10px 0 rgba(37, 99, 235, 0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  
+  .download-btn span, 
+  .download-btn i { 
+    color: #ffffff !important;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  
+  .download-btn:hover, 
+  .download-btn:focus {
+    background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+    color: #fff;
+    border-color: #60a5fa;
+    box-shadow: 0 4px 20px 0 rgba(37, 99, 235, 0.33);
+  }
+  
+  .view-btn {
+    background: linear-gradient(90deg, #7c3aed 0%, #a78bfa 100%);
+    color: #ffffff !important;
+    border: 1.5px solid #a78bfa;
+    box-shadow: 0 2px 10px 0 rgba(124, 58, 237, 0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  
+  .view-btn span, 
+  .view-btn i { 
+    color: #ffffff !important;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  
+  .view-btn:hover, 
+  .view-btn:focus {
+    background: linear-gradient(90deg, #a78bfa 0%, #7c3aed 100%);
+    color: #fff;
+    border-color: #c4b5fd;
+    box-shadow: 0 4px 20px 0 rgba(124, 58, 237, 0.33);
+  }
+  
+  .colab-btn {
+    background: linear-gradient(90deg, #047857 0%, #10b981 100%);
+    color: #ffffff !important;
+    border: 2px solid #34d399;
+    box-shadow: 0 2px 10px 0 rgba(5, 150, 105, 0.4);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  
+  .colab-btn span, 
+  .colab-btn i { 
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  
+  .colab-btn:hover, 
+  .colab-btn:focus {
+    background: linear-gradient(90deg, #10b981 0%, #047857 100%);
+    color: #fff;
+    border-color: #6ee7b7;
+    box-shadow: 0 4px 20px 0 rgba(5, 150, 105, 0.5);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+  }
+  
+  .notebook-tip {
+    background: #193c34;
+    border-left: 4px solid #10b981;
+    color: #d1fae5;
+  }
+  
+  .notebook-tip strong {
+    color: #6ee7b7;
+  }
+  
+  /* Notebook iFrame */
+  .embedded-notebook iframe {
+    background-color: #181f2a;
+    border: 1px solid #2d3a53;
+  }
+  
+  /* Error Messages */
+  .notebook-error-message {
+    background-color: #1e1e2d;
+    border-color: #2d3a53;
+    color: #e3eafe;
+  }
+  
+  .notebook-error-message i {
+    color: #f87171;
+  }
+  
+  .notebook-error-message h4 {
+    color: #f9fafb;
+  }
+  
+  /* Dark mode syntax overrides */
+  .sourceCode .im { color: #7ccdfd; }
 }

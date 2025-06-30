@@ -2066,12 +2066,8 @@ def copy_assets(assets_dir: Path, docs_dir: Path) -> bool:
                     shutil.copy2(logo_file, dest_path)
                     debug_print(f"Copied {logo_file} to {dest_path}")
         
-        # Copy custom CSS to root
-        if css_dir.exists():
-            custom_styles_path = css_dir / "custom_styles.css"
-            if custom_styles_path.exists():
-                shutil.copy2(custom_styles_path, docs_dir / "custom_styles.css")
-                debug_print(f"Copied custom_styles.css to root directory")
+        # NOTE: custom_styles.css is already copied to docs/assets/css/ above
+        # No need to copy it to root since all HTML files reference assets/css/custom_styles.css
         
         # Create favicon files
         logos_dir = assets_dir / "logos"
