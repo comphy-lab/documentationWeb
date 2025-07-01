@@ -13,6 +13,9 @@ This extends the classic benchmark case with a passive tracer to visualize flow 
 
 #include "navier-stokes/centered.h"
 #include "dye-injection.h"
+#include <sys/stat.h>  // For mkdir()
+#include <errno.h>     // For errno checking
+#include <string.h>    // For strerror()
 
 // Constants
 #define LEVEL   8       // Grid refinement level
@@ -65,7 +68,7 @@ Save snapshots at regular intervals for flow visualization
 */
 event writingFiles (t=0.; t += tsnap; t < tmax+tsnap) {
   char filename[100];
-  sprintf(filename, "intermediate/snapshot-%5.4f", t);  
+  snprintf(filename, sizeof(filename), "intermediate/snapshot-%5.4f", t);  
   dump(file=filename);
 }
 
@@ -118,9 +121,13 @@ int main() {
   yInjection = 0.40;        // Y position (center of cavity)
 
   // Create a folder named intermediate where all the simulation snapshots are stored.
-  char comm[80];
-  sprintf (comm, "mkdir -p intermediate");
-  system(comm);
+  // Using mkdir() directly instead of system() for security
+  if (mkdir("intermediate", 0755) != 0) {
+    // Directory might already exist, which is fine
+    if (errno != EEXIST) {
+      fprintf(stderr, "Error creating intermediate directory: %s\n", strerror(errno));
+    }
+  }
   
   // Run simulation
   run();
