@@ -21,7 +21,7 @@ The codebase implements a classical lid driven cavity flow problem with dye inje
 └── postProcess/                Project-specific post-processing tools
     ├── LidDrivenCavity-Newtonian-dyeInjection.ipynb  Jupyter notebook for analysis and visualization
     ├── LidDrivenCavity-Newtonian-dyeInjection.py     Python script for post-processing
-    ├── Visulization3D.ipynb     Jupyter notebook for 3D visualization
+    ├── Visualization3D.ipynb     Jupyter notebook for 3D visualization
     └── getData-LidDriven.c     Data extraction utility
 ```
 
