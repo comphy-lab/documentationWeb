@@ -32,8 +32,13 @@ jobs:
       
       - name: Commit and push changes directly (bypassing branch protection)
         run: |
+          set -euo pipefail
+          
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          
+          # Fetch and pull latest changes BEFORE staging
+          git pull origin main --rebase
           
           # Add changes
           git add docs/assets/js/search_db.json
@@ -41,9 +46,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            # Fetch and pull latest changes before committing
-            git pull origin main --rebase
-            
             # Commit changes
             git commit -m "Update search database from comphy-search repository [skip-deploy]"
             
