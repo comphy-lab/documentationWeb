@@ -58,8 +58,9 @@ jobs:
                 echo "Push successful"
                 break
               else
-                echo "Push failed, retrying... (attempt $((RETRY_COUNT + 2))/$MAX_RETRIES)"
+                echo "Push failed, retrying... (attempt $((RETRY_COUNT + 1))/$MAX_RETRIES)"
                 RETRY_COUNT=$((RETRY_COUNT + 1))
+                sleep 2
                 
                 # Pull latest changes and rebase our commit on top
                 git pull --rebase origin main
