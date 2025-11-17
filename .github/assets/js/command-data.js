@@ -245,8 +245,13 @@
           return node;
         }
         
-        // Sanitize the temporary element and all its children
-        sanitizeNode(temp);
+        // Sanitize each child node since the wrapper div isn't an allowed tag
+        Array.from(temp.childNodes).forEach(child => {
+          const sanitizedChild = sanitizeNode(child);
+          if (sanitizedChild !== child) {
+            temp.replaceChild(sanitizedChild, child);
+          }
+        });
         
         // Return the sanitized HTML
         return temp.innerHTML;
@@ -308,7 +313,13 @@
   
   // Use the shared search database function from search-helper.js
   window.searchDatabaseForCommandPalette = async function(query) {
-    return window.searchHelper.searchDatabaseForCommandPalette(query);
+    const helper = window.searchHelper;
+    const searchFn = helper && helper.searchDatabaseForCommandPalette;
+    if (typeof searchFn !== 'function') {
+      console.warn('searchHelper.searchDatabaseForCommandPalette unavailable; returning empty result.');
+      return [];
+    }
+    return searchFn.call(helper, query);
   };
   
   // Add page-specific command function
@@ -328,7 +339,7 @@
             const { modal, content } = window.createModal(true); // true to make content focusable for keyboard events
             
             // Collect all unique tags from the page
-            const tagElements = document.querySelectorAll('tags span');
+            const tagElements = document.querySelectorAll('.tags span');
             const tags = new Set();
             tagElements.forEach(tag => {
               tags.add(tag.textContent);
@@ -431,7 +442,7 @@
                 const originalTag = btn.getAttribute('data-original-tag') || btn.textContent;
                 
                 // Find the actual tag in the document and simulate a click on it
-                const matchingTag = Array.from(document.querySelectorAll('tags span')).find(
+                const matchingTag = Array.from(document.querySelectorAll('.tags span')).find(
                   tag => tag.textContent === originalTag
                 );
                 
