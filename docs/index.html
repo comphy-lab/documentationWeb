@@ -443,7 +443,7 @@
                 <div class="repository-structure">
                 <ul>
                 <li><strong><a
-                href="http://basilisk.fr/src/">basilisk/src/</a></strong>
+                href="https://basilisk.fr/src/">basilisk/src/</a></strong>
                 - Core Basilisk CFD library (reference only, do not
                 modify)</li>
                 <li><strong><a
@@ -650,8 +650,8 @@
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&quot;dye-injection.h&quot;</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Constants</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LEVEL   </span><span class="dv">8</span><span class="pp">       </span><span class="co">// Grid refinement level</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#define MAXDT   </span><span class="op">(</span><span class="fl">1e-4</span><span class="op">)</span><span class="pp">  </span><span class="co">// Maximum timestep</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LEVEL   8       </span><span class="co">// Grid refinement level</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#define MAXDT   (1e-4)  </span><span class="co">// Maximum timestep</span></span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">// Global variables</span></span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> imax <span class="op">=</span> <span class="fl">1e5</span><span class="op">;</span>                   <span class="co">// Maximum iterations</span></span>
@@ -696,7 +696,7 @@
 <span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a><span class="co">*/</span></span>
 <span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>event writingFiles <span class="op">(</span>t<span class="op">=</span><span class="fl">0.</span><span class="op">;</span> t <span class="op">+=</span> tsnap<span class="op">;</span> t <span class="op">&lt;</span> tmax<span class="op">+</span>tsnap<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>  <span class="dt">char</span> filename<span class="op">[</span><span class="dv">100</span><span class="op">];</span></span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>  sprintf<span class="op">(</span>filename<span class="op">,</span> <span class="st">&quot;intermediate/snapshot-</span><span class="sc">%5.4f</span><span class="st">&quot;</span><span class="op">,</span> t<span class="op">);</span>  </span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>  sprintf<span class="op">(</span>filename<span class="op">,</span> <span class="st">&quot;intermediate/snapshot-%5.4f&quot;</span><span class="op">,</span> t<span class="op">);</span>  </span>
 <span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>  dump<span class="op">(</span>file<span class="op">=</span>filename<span class="op">);</span></span>
 <span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a></span>
@@ -842,7 +842,7 @@
 
         <footer class="site-footer">
             <div class="footer-left">
-              <a href="http://basilisk.fr/sandbox/vatsal/" target="_blank" rel="noopener noreferrer">
+              <a href="https://basilisk.fr/sandbox/vatsal/" target="_blank" rel="noopener noreferrer">
                 <img src="./assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
               </a>
               <a href="https://pof.tnw.utwente.nl/" target="_blank" rel="noopener noreferrer">
