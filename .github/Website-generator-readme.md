@@ -2,9 +2,9 @@
 
 ## Sitemap
 
-```
+```plaintext
 .github/
-├── README.md                  # This file
+├── Website-generator-readme.md    # This file
 ├── assets/                    # Website assets
 │   ├── css/                   # CSS stylesheets
 │   │   ├── academicons-1.7.0/ # Academic icons
@@ -33,7 +33,7 @@
 
 ## Overview
 
-This directory contains all the necessary files and scripts for generating and deploying the documentation of codes develped by CoMPhy Lab. The website is generated from source code files in the repository and is deployed at [comphy-lab.org/repositoryName](https://comphy-lab.org/repositoryName).
+This directory contains all the necessary files and scripts for generating and deploying the documentation of codes develped by CoMPhy Lab. The website is generated from source code files in the repository and is deployed at [comphy-lab.org/Drop-Impact](https://comphy-lab.org/Drop-Impact).
 
 ## Website Generation Process
 
