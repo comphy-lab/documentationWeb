@@ -145,6 +145,56 @@ def extract_seo_metadata(file_path: Path, content: str) -> Dict[str, str]:
 
     return metadata
 
+def parse_git_remote() -> tuple[str, str]:
+    """
+    Parses the git remote URL to extract GitHub organization and repository name.
+
+    Supports both SSH (git@github.com:org/repo.git) and HTTPS (https://github.com/org/repo.git) formats.
+
+    Returns:
+        A tuple of (organization, repository_name). If parsing fails or git remote is not configured,
+        returns ("comphy-lab", "unknown-repo") as fallback defaults.
+    """
+    try:
+        result = subprocess.run(
+            ['git', 'remote', 'get-url', 'origin'],
+            capture_output=True,
+            text=True,
+            check=True,
+            cwd=Path(__file__).parent.parent.parent
+        )
+        remote_url = result.stdout.strip()
+        debug_print(f"Git remote URL: {remote_url}")
+
+        # Parse SSH format: git@github.com:org/repo.git
+        ssh_match = re.match(r'git@github\.com:([^/]+)/(.+?)(?:\.git)?$', remote_url)
+        if ssh_match:
+            org = ssh_match.group(1)
+            repo = ssh_match.group(2)
+            debug_print(f"Parsed from SSH format: org={org}, repo={repo}")
+            return (org, repo)
+
+        # Parse HTTPS format: https://github.com/org/repo.git
+        https_match = re.match(r'https://github\.com/([^/]+)/(.+?)(?:\.git)?$', remote_url)
+        if https_match:
+            org = https_match.group(1)
+            repo = https_match.group(2)
+            debug_print(f"Parsed from HTTPS format: org={org}, repo={repo}")
+            return (org, repo)
+
+        print(f"Warning: Could not parse git remote URL: {remote_url}")
+        print("Using fallback values: org=comphy-lab, repo=unknown-repo")
+        return ("comphy-lab", "unknown-repo")
+
+    except subprocess.CalledProcessError as e:
+        print(f"Warning: Could not get git remote URL: {e}")
+        print("Using fallback values: org=comphy-lab, repo=unknown-repo")
+        return ("comphy-lab", "unknown-repo")
+    except Exception as e:
+        print(f"Warning: Unexpected error parsing git remote: {e}")
+        print("Using fallback values: org=comphy-lab, repo=unknown-repo")
+        return ("comphy-lab", "unknown-repo")
+
 # Configuration
 REPO_ROOT = Path(__file__).parent.parent.parent
 SOURCE_DIRS = ['src-local', 'simulationCases', 'postProcess']
@@ -160,6 +210,10 @@ CSS_PATH = REPO_ROOT / '.github' / 'assets' / 'css' / 'custom_styles.css'
 
 # Get repository name from directory
 REPO_NAME = REPO_ROOT.name
+
+# Auto-detect GitHub organization and repository from git remote
+GITHUB_ORG, GITHUB_REPO = parse_git_remote()
+debug_print(f"Auto-detected: GitHub org={GITHUB_ORG}, repo={GITHUB_REPO}")
 
 # Read domain from CNAME file or use default
 try:
@@ -442,11 +496,11 @@ def process_jupyter_notebook(file_path: Path) -> str:
         <a href="{notebook_filename}" download class="notebook-btn download-btn">
             <i class="fa-solid fa-download"></i> Download Notebook
         </a>
-        <a href="https://nbviewer.org/github/comphy-lab/{REPO_NAME}/blob/main/{notebook_path}" 
+        <a href="https://nbviewer.org/github/{GITHUB_ORG}/{REPO_NAME}/blob/main/{notebook_path}"
            target="_blank" class="notebook-btn view-btn">
             <i class="fa-solid fa-eye"></i> View in nbviewer
         </a>
-        <a href="https://colab.research.google.com/github/comphy-lab/{REPO_NAME}/blob/main/{notebook_path}" 
+        <a href="https://colab.research.google.com/github/{GITHUB_ORG}/{REPO_NAME}/blob/main/{notebook_path}"
            target="_blank" class="notebook-btn colab-btn">
             <i class="fa-solid fa-play"></i> Open in Colab
         </a>
@@ -562,11 +616,11 @@ def process_jupyter_notebook(file_path: Path) -> str:
         <a href="{notebook_filename}" download class="notebook-btn download-btn">
             <i class="fa-solid fa-download"></i> Download Notebook
         </a>
-        <a href="https://nbviewer.org/github/comphy-lab/{REPO_NAME}/blob/main/{notebook_path}" 
+        <a href="https://nbviewer.org/github/{GITHUB_ORG}/{REPO_NAME}/blob/main/{notebook_path}"
            target="_blank" class="notebook-btn view-btn">
             <i class="fa-solid fa-eye"></i> View in nbviewer
         </a>
-        <a href="https://colab.research.google.com/github/comphy-lab/{REPO_NAME}/blob/main/{notebook_path}" 
+        <a href="https://colab.research.google.com/github/{GITHUB_ORG}/{REPO_NAME}/blob/main/{notebook_path}"
            target="_blank" class="notebook-btn colab-btn">
             <i class="fa-solid fa-play"></i> Open in Colab
         </a>
@@ -590,8 +644,8 @@ def process_jupyter_notebook(file_path: Path) -> str:
     <div class="embedded-notebook">
         <h3>Notebook Preview</h3>
         <div id="notebook-container-{notebook_filename.replace('.', '-')}" >
-            <iframe id="notebook-iframe-{notebook_filename.replace('.', '-')}" 
-                    src="https://nbviewer.org/github/comphy-lab/{REPO_NAME}/blob/main/{notebook_path}" 
+            <iframe id="notebook-iframe-{notebook_filename.replace('.', '-')}"
+                    src="https://nbviewer.org/github/{GITHUB_ORG}/{REPO_NAME}/blob/main/{notebook_path}"
                     width="100%" height="800px" frameborder="0"
                     onload="checkIframeLoaded('{notebook_filename.replace('.', '-')}')"
                     onerror="handleIframeError('{notebook_filename.replace('.', '-')}')"></iframe>
@@ -836,6 +890,9 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
         '-V', f'image={seo_metadata.get("image", "")}',
         '-V', f'asset_path_prefix={asset_path_prefix}',
         '-V', f'repo_name={REPO_NAME}',
+        '-V', f'github_org={GITHUB_ORG}',
+        '-V', f'github_repo={GITHUB_REPO}',
+        '-V', f'base_domain={BASE_DOMAIN}',
         '-V', f'source_path={source_path if source_path else ""}',
     ]
     
@@ -993,8 +1050,14 @@ def post_process_python_shell_html(html_content: str) -> str:
     processed_html = re.sub(r'<script[^>]*>\s*window\.basePath\s*=.*?</script>', '', processed_html, flags=re.DOTALL)
     processed_html = re.sub(r'<script[^>]*>\s*function\s+assetPath.*?</script>', '', processed_html, flags=re.DOTALL)
 
-    # Add repoName variable
-    repo_script = f'\n<script>window.repoName = "{REPO_NAME}";</script>\n'
+    # Add repository and organization metadata variables
+    repo_script = f'''
+<script>
+window.repoName = "{REPO_NAME}";
+window.githubOrg = "{GITHUB_ORG}";
+window.baseDomain = "{BASE_DOMAIN}";
+</script>
+'''
     processed_html = re.sub(r'<body[^>]*>', lambda m: m.group(0) + repo_script, processed_html)
 
     return processed_html
@@ -1161,11 +1224,17 @@ def post_process_c_html(html_content: str, file_path: Path,
     cleaned_html = re.sub(r'<script[^>]*>\s*// Helper function to create dynamic asset paths.*?</script>', '', cleaned_html, flags=re.DOTALL)
     cleaned_html = re.sub(r'<script[^>]*>\s*window\.basePath\s*=.*?</script>', '', cleaned_html, flags=re.DOTALL)
     cleaned_html = re.sub(r'<script[^>]*>\s*function\s+assetPath.*?</script>', '', cleaned_html, flags=re.DOTALL)
-    
-    # Add repoName variable
-    repo_script = f'\n<script>window.repoName = "{REPO_NAME}";</script>\n'
+
+    # Add repository and organization metadata variables
+    repo_script = f'''
+<script>
+window.repoName = "{REPO_NAME}";
+window.githubOrg = "{GITHUB_ORG}";
+window.baseDomain = "{BASE_DOMAIN}";
+</script>
+'''
     cleaned_html = re.sub(r'<body[^>]*>', lambda m: m.group(0) + repo_script, cleaned_html)
-    
+
     return cleaned_html
 
 def insert_css_link_in_html(html_file_path: Path, css_path: Path, is_root: bool = True) -> bool:
@@ -1776,6 +1845,9 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
         '--template', str(TEMPLATE_PATH),
         '-V', f'wikititle={WIKI_TITLE}',
         '-V', f'reponame={REPO_NAME}',
+        '-V', f'github_org={GITHUB_ORG}',
+        '-V', f'github_repo={GITHUB_REPO}',
+        '-V', f'base_domain={BASE_DOMAIN}',
         '-V', 'base=/',
         '-V', 'notitle=true',
         '-V', f'pagetitle={WIKI_TITLE}',
