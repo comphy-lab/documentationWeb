@@ -98,7 +98,7 @@ def fix_html_file(file_path, verbose=False, dry_run=False):
 
     Returns:
         FixResult: Tuple containing the approximate number of replacements and
-            whether the file processing failed due to an OSError
+            whether the file processing failed due to an OSError or UnicodeError
     """
     try:
         # Read the file

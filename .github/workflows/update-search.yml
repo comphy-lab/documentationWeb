@@ -39,14 +39,27 @@ jobs:
           fi
       
       - name: Copy search database
+        if: success()
         run: |
           SEARCH_REPO="${SEARCH_REPO:-comphy-search}"
+
+          # Check if search repository directory exists
+          if [ ! -d "${SEARCH_REPO}" ]; then
+            echo "Warning: ${SEARCH_REPO} directory not found (clone may have failed)"
+            echo "Search functionality will be limited"
+            exit 0
+          fi
+
+          # Ensure target directory exists
+          mkdir -p docs/assets/js
+
           if [ -f "${SEARCH_REPO}/search_db.json" ]; then
             cp "${SEARCH_REPO}/search_db.json" docs/assets/js/search_db.json
             echo "Search database copied successfully"
           else
             echo "Warning: search_db.json not found in ${SEARCH_REPO}"
-            exit 1
+            echo "Search functionality will be limited"
+            exit 0
           fi
       
       - name: Commit and push changes directly
