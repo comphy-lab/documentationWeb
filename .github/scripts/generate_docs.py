@@ -1745,7 +1745,20 @@ def generate_directory_index(directory_name: str, directory_path: Path, generate
         # Replace asset prefix based on depth
         asset_path_prefix = calculate_asset_prefix(index_path, docs_dir)
         html_content = html_content.replace("$asset_path_prefix$", asset_path_prefix)
-        
+
+        # Replace GitHub organization and repository variables
+        html_content = html_content.replace("$github_org$", GITHUB_ORG)
+        html_content = html_content.replace("$github_repo$", GITHUB_REPO)
+        html_content = html_content.replace("$base_domain$", BASE_DOMAIN)
+        html_content = html_content.replace("$reponame$", REPO_NAME)
+
+        # Handle source_path conditionals - directory index pages have no source file
+        # Replace specific known patterns to avoid regex issues with nested variables
+        # 1. The href edit path: $if(source_path)$/edit/main/$source_path$$endif$ -> empty
+        html_content = html_content.replace('$if(source_path)$/edit/main/$source_path$$endif$', '')
+        # 2. The link text with else: keep "View repository"
+        html_content = html_content.replace('$if(source_path)$Edit this page$else$View repository$endif$', 'View repository')
+
         # Handle conditional blocks
         if "$if(tabs)$" in html_content:
             html_content = re.sub(r'\$if\(tabs\)\$(.*?)\$tabs\$(.*?)\$endif\$', '', html_content, flags=re.DOTALL)

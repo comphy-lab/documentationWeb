@@ -484,8 +484,8 @@
               <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" rel="noopener noreferrer" aria-label="Bluesky Profile">
                 <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
               </a>
-              <a href="https://github.com/$github_org$/$if(reponame)$$reponame$$else$Documentation$endif$" class="edit-link" aria-label="Edit this page on GitHub">
-                <i class="fa-brands fa-github"></i> Edit this page
+              <a href="https://github.com/$github_org$/$if(reponame)$$reponame$$else$Documentation$endif$$if(source_path)$/edit/main/$source_path$$endif$" class="edit-link" aria-label="Edit this page on GitHub">
+                <i class="fa-brands fa-github"></i> $if(source_path)$Edit this page$else$View repository$endif$
               </a>
             </div>
           </footer>
