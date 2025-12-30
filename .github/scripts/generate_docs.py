@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os, subprocess, re, shutil, argparse, html, json
 from pathlib import Path
-from typing import Dict, List, Optional, Any, Union
+from typing import Dict, List, Optional, Any, Tuple, Union
 try:
     from nbconvert import HTMLExporter
     NBCONVERT_AVAILABLE = True
@@ -145,7 +145,7 @@ def extract_seo_metadata(file_path: Path, content: str) -> Dict[str, str]:
 
     return metadata
 
-def parse_git_remote() -> tuple[str, str]:
+def parse_git_remote() -> Tuple[str, str]:
     """
     Parses the git remote URL to extract GitHub organization and repository name.
 
