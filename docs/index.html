@@ -337,7 +337,11 @@
   </script>
 </head>
 <body id="top">
-<script>window.repoName = "documentationWeb";</script>
+<script>
+window.repoName = "documentationWeb";
+window.githubOrg = "comphy-lab";
+window.baseDomain = "https://comphy-lab.org";
+</script>
 
 
     <!-- Preloader with theme variables applied -->
@@ -388,6 +392,7 @@
                             </svg>
                         </div>
                     </li>
+                    <!-- NOTE: The following links are organization-specific. Customize for your organization. -->
                     <li style="background: none;"><a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" style="background: none; padding: 0;" aria-label="Google Scholar Profile"><i class="ai ai-google-scholar" style="font-size: 1.75em;"></i></a></li>
                     <li style="background: none;"><a href="https://github.com/comphy-lab" style="background: none; padding: 0;" aria-label="GitHub Organization"><i class="fa-brands fa-github" style="font-size: 1.75em"></i></a></li>
                     <li><a href="https://comphy-lab.org/#about" class="smoothscroll">About</a></li>
@@ -443,7 +448,7 @@
                 <div class="repository-structure">
                 <ul>
                 <li><strong><a
-                href="http://basilisk.fr/src/">basilisk/src/</a></strong>
+                href="https://basilisk.fr/src/">basilisk/src/</a></strong>
                 - Core Basilisk CFD library (reference only, do not
                 modify)</li>
                 <li><strong><a
@@ -650,8 +655,8 @@
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&quot;dye-injection.h&quot;</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Constants</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LEVEL   </span><span class="dv">8</span><span class="pp">       </span><span class="co">// Grid refinement level</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#define MAXDT   </span><span class="op">(</span><span class="fl">1e-4</span><span class="op">)</span><span class="pp">  </span><span class="co">// Maximum timestep</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LEVEL   8       </span><span class="co">// Grid refinement level</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#define MAXDT   (1e-4)  </span><span class="co">// Maximum timestep</span></span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">// Global variables</span></span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> imax <span class="op">=</span> <span class="fl">1e5</span><span class="op">;</span>                   <span class="co">// Maximum iterations</span></span>
@@ -696,7 +701,7 @@
 <span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a><span class="co">*/</span></span>
 <span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>event writingFiles <span class="op">(</span>t<span class="op">=</span><span class="fl">0.</span><span class="op">;</span> t <span class="op">+=</span> tsnap<span class="op">;</span> t <span class="op">&lt;</span> tmax<span class="op">+</span>tsnap<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>  <span class="dt">char</span> filename<span class="op">[</span><span class="dv">100</span><span class="op">];</span></span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>  sprintf<span class="op">(</span>filename<span class="op">,</span> <span class="st">&quot;intermediate/snapshot-</span><span class="sc">%5.4f</span><span class="st">&quot;</span><span class="op">,</span> t<span class="op">);</span>  </span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>  sprintf<span class="op">(</span>filename<span class="op">,</span> <span class="st">&quot;intermediate/snapshot-%5.4f&quot;</span><span class="op">,</span> t<span class="op">);</span>  </span>
 <span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>  dump<span class="op">(</span>file<span class="op">=</span>filename<span class="op">);</span></span>
 <span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a></span>
@@ -810,7 +815,10 @@
                 <h3 id="root-directory">Root Directory</h3>
                 <ul>
                 <li><a
+                href="default.params.html">default.params</a></li>
+                <li><a
                 href="reset_install_requirements.sh.html">reset_install_requirements.sh</a></li>
+                <li><a href="sweep.params.html">sweep.params</a></li>
                 </ul>
                 <h3 id="postprocess">postProcess</h3>
                 <ul>
@@ -842,7 +850,7 @@
 
         <footer class="site-footer">
             <div class="footer-left">
-              <a href="http://basilisk.fr/sandbox/vatsal/" target="_blank" rel="noopener noreferrer">
+              <a href="https://basilisk.fr/sandbox/vatsal/" target="_blank" rel="noopener noreferrer">
                 <img src="./assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
               </a>
               <a href="https://pof.tnw.utwente.nl/" target="_blank" rel="noopener noreferrer">
@@ -862,6 +870,7 @@
               </p>
             </div>
             <div class="footer-right">
+              <!-- NOTE: Social media links below are organization-specific. Customize for your organization. -->
               <a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" aria-label="Google Scholar Profile">
                 <i class="ai ai-google-scholar" style="font-size: 2.5em; color: white;"></i>
               </a>
@@ -878,7 +887,7 @@
                 <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
               </a>
               <a href="https://github.com/comphy-lab/documentationWeb" class="edit-link" aria-label="Edit this page on GitHub">
-                <i class="fa-brands fa-github"></i> Edit this page
+                <i class="fa-brands fa-github"></i> View repository
               </a>
             </div>
           </footer>

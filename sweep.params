@@ -1,0 +1,19 @@
+# Parameter sweep configuration
+# Used for running multiple simulations with varying parameters
+
+# Sweep variable
+sweep_var=We
+
+# Sweep range
+We_min=10
+We_max=1000
+We_steps=10
+We_spacing=log    # linear or log
+
+# Fixed parameters (override defaults)
+Oh=0.02
+LEVEL=10
+
+# Sweep output
+output_dir=sweep_results
+parallel_jobs=4

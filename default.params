@@ -1,0 +1,21 @@
+# Default simulation parameters for drop impact
+# These values serve as baseline configuration
+
+# Physical parameters
+We=100          # Weber number
+Oh=0.01         # Ohnesorge number
+Bo=0.1          # Bond number
+
+# Geometry parameters
+R0=1.0          # Initial drop radius (normalized)
+H0=0.5          # Initial drop height above surface
+
+# Numerical parameters
+LEVEL=9         # Maximum refinement level
+MINLEVEL=5      # Minimum refinement level
+tmax=10.0       # Maximum simulation time
+dtmax=0.01      # Maximum time step
+
+# Output parameters
+output_interval=0.1    # Time between outputs
+save_checkpoint=true   # Save restart files

@@ -145,6 +145,56 @@ def extract_seo_metadata(file_path: Path, content: str) -> Dict[str, str]:
 
     return metadata
 
+def parse_git_remote() -> tuple[str, str]:
+    """
+    Parses the git remote URL to extract GitHub organization and repository name.
+
+    Supports both SSH (git@github.com:org/repo.git) and HTTPS (https://github.com/org/repo.git) formats.
+
+    Returns:
+        A tuple of (organization, repository_name). If parsing fails or git remote is not configured,
+        returns ("comphy-lab", "unknown-repo") as fallback defaults.
+    """
+    try:
+        result = subprocess.run(
+            ['git', 'remote', 'get-url', 'origin'],
+            capture_output=True,
+            text=True,
+            check=True,
+            cwd=Path(__file__).parent.parent.parent
+        )
+        remote_url = result.stdout.strip()
+        debug_print(f"Git remote URL: {remote_url}")
+
+        # Parse SSH format: git@github.com:org/repo.git
+        ssh_match = re.match(r'git@github\.com:([^/]+)/(.+?)(?:\.git)?$', remote_url)
+        if ssh_match:
+            org = ssh_match.group(1)
+            repo = ssh_match.group(2)
+            debug_print(f"Parsed from SSH format: org={org}, repo={repo}")
+            return (org, repo)
+
+        # Parse HTTPS format: https://github.com/org/repo.git
+        https_match = re.match(r'https://github\.com/([^/]+)/(.+?)(?:\.git)?$', remote_url)
+        if https_match:
+            org = https_match.group(1)
+            repo = https_match.group(2)
+            debug_print(f"Parsed from HTTPS format: org={org}, repo={repo}")
+            return (org, repo)
+
+        print(f"Warning: Could not parse git remote URL: {remote_url}")
+        print("Using fallback values: org=comphy-lab, repo=unknown-repo")
+        return ("comphy-lab", "unknown-repo")
+
+    except subprocess.CalledProcessError as e:
+        print(f"Warning: Could not get git remote URL: {e}")
+        print("Using fallback values: org=comphy-lab, repo=unknown-repo")
+        return ("comphy-lab", "unknown-repo")
+    except Exception as e:
+        print(f"Warning: Unexpected error parsing git remote: {e}")
+        print("Using fallback values: org=comphy-lab, repo=unknown-repo")
+        return ("comphy-lab", "unknown-repo")
+
 # Configuration
 REPO_ROOT = Path(__file__).parent.parent.parent
 SOURCE_DIRS = ['src-local', 'simulationCases', 'postProcess']
@@ -160,6 +210,10 @@ CSS_PATH = REPO_ROOT / '.github' / 'assets' / 'css' / 'custom_styles.css'
 
 # Get repository name from directory
 REPO_NAME = REPO_ROOT.name
+
+# Auto-detect GitHub organization and repository from git remote
+GITHUB_ORG, GITHUB_REPO = parse_git_remote()
+debug_print(f"Auto-detected: GitHub org={GITHUB_ORG}, repo={GITHUB_REPO}")
 
 # Read domain from CNAME file or use default
 try:
@@ -258,17 +312,17 @@ def validate_config() -> bool:
 def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
     """
     Finds all supported source files in the specified directories and root directory.
-    
-    Searches recursively within each source directory and non-recursively in the root directory for files with supported extensions (.c, .h, .py, .sh, .ipynb) or named 'Makefile', excluding files ending with '.dat'.
-    
+
+    Searches recursively within each source directory and non-recursively in the root directory for files with supported extensions (.c, .h, .py, .sh, .ipynb, .params) or named 'Makefile', excluding files ending with '.dat'.
+
     Args:
         root_dir: The root directory to search for source files.
         source_dirs: List of subdirectory names to search recursively.
-    
+
     Returns:
         A sorted list of Paths to the discovered source files.
     """
-    valid_exts = {'.c', '.h', '.py', '.sh', '.ipynb'}
+    valid_exts = {'.c', '.h', '.py', '.sh', '.ipynb', '.params'}
     valid_names = {'Makefile'}
     files = set()
 
@@ -313,6 +367,20 @@ def process_shell_file(file_path: Path) -> str:
         content = content.replace("=true", "=\\true")
         content = content.replace("=false", "=\\false")
         return f"# {file_path.name}\n\n```bash\n{content}\n```"
+
+def process_params_file(file_path: Path) -> str:
+    """
+    Reads a parameter configuration file and returns its content as a Markdown-formatted INI code block.
+
+    Parameter files (.params) use key=value syntax with # for comments, similar to INI or shell configuration files.
+    This format is used for simulation parameters in the Drop Impact project.
+    """
+    with open(file_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+        # Escape any potential variables that could conflict with Pandoc
+        content = content.replace("$", "\\$")
+        # Use 'ini' syntax highlighting for key=value configuration files
+        return f"# {file_path.name}\n\n```ini\n{content}\n```"
 
 def process_jupyter_notebook(file_path: Path) -> str:
     """
@@ -442,11 +510,11 @@ def process_jupyter_notebook(file_path: Path) -> str:
         <a href="{notebook_filename}" download class="notebook-btn download-btn">
             <i class="fa-solid fa-download"></i> Download Notebook
         </a>
-        <a href="https://nbviewer.org/github/comphy-lab/{REPO_NAME}/blob/main/{notebook_path}" 
+        <a href="https://nbviewer.org/github/{GITHUB_ORG}/{REPO_NAME}/blob/main/{notebook_path}"
            target="_blank" class="notebook-btn view-btn">
             <i class="fa-solid fa-eye"></i> View in nbviewer
         </a>
-        <a href="https://colab.research.google.com/github/comphy-lab/{REPO_NAME}/blob/main/{notebook_path}" 
+        <a href="https://colab.research.google.com/github/{GITHUB_ORG}/{REPO_NAME}/blob/main/{notebook_path}"
            target="_blank" class="notebook-btn colab-btn">
             <i class="fa-solid fa-play"></i> Open in Colab
         </a>
@@ -562,11 +630,11 @@ def process_jupyter_notebook(file_path: Path) -> str:
         <a href="{notebook_filename}" download class="notebook-btn download-btn">
             <i class="fa-solid fa-download"></i> Download Notebook
         </a>
-        <a href="https://nbviewer.org/github/comphy-lab/{REPO_NAME}/blob/main/{notebook_path}" 
+        <a href="https://nbviewer.org/github/{GITHUB_ORG}/{REPO_NAME}/blob/main/{notebook_path}"
            target="_blank" class="notebook-btn view-btn">
             <i class="fa-solid fa-eye"></i> View in nbviewer
         </a>
-        <a href="https://colab.research.google.com/github/comphy-lab/{REPO_NAME}/blob/main/{notebook_path}" 
+        <a href="https://colab.research.google.com/github/{GITHUB_ORG}/{REPO_NAME}/blob/main/{notebook_path}"
            target="_blank" class="notebook-btn colab-btn">
             <i class="fa-solid fa-play"></i> Open in Colab
         </a>
@@ -590,8 +658,8 @@ def process_jupyter_notebook(file_path: Path) -> str:
     <div class="embedded-notebook">
         <h3>Notebook Preview</h3>
         <div id="notebook-container-{notebook_filename.replace('.', '-')}" >
-            <iframe id="notebook-iframe-{notebook_filename.replace('.', '-')}" 
-                    src="https://nbviewer.org/github/comphy-lab/{REPO_NAME}/blob/main/{notebook_path}" 
+            <iframe id="notebook-iframe-{notebook_filename.replace('.', '-')}"
+                    src="https://nbviewer.org/github/{GITHUB_ORG}/{REPO_NAME}/blob/main/{notebook_path}"
                     width="100%" height="800px" frameborder="0"
                     onload="checkIframeLoaded('{notebook_filename.replace('.', '-')}')"
                     onerror="handleIframeError('{notebook_filename.replace('.', '-')}')"></iframe>
@@ -768,18 +836,20 @@ def process_c_file(file_path: Path, literate_c_script: Path) -> str:
 def prepare_pandoc_input(file_path: Path, literate_c_script: Path) -> str:
     """
     Prepares the content of a source file for Pandoc conversion based on its type.
-    
-    Selects the appropriate processing function for the given file, converting it to Markdown or HTML as needed for Pandoc input. Supports Markdown, Python, shell scripts, Jupyter notebooks, Makefiles, and C/C++ files.
+
+    Selects the appropriate processing function for the given file, converting it to Markdown or HTML as needed for Pandoc input. Supports Markdown, Python, shell scripts, parameter files (.params), Jupyter notebooks, Makefiles, and C/C++ files.
     """
     file_suffix = file_path.suffix.lower()
     file_name = file_path.name
-    
+
     if file_suffix == '.md':
         return process_markdown_file(file_path)
     elif file_suffix == '.py':
         return process_python_file(file_path)
     elif file_suffix == '.sh':
         return process_shell_file(file_path)
+    elif file_suffix == '.params':
+        return process_params_file(file_path)
     elif file_suffix == '.ipynb':
         return process_jupyter_notebook(file_path)
     elif file_name == 'Makefile':
@@ -836,6 +906,9 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
         '-V', f'image={seo_metadata.get("image", "")}',
         '-V', f'asset_path_prefix={asset_path_prefix}',
         '-V', f'repo_name={REPO_NAME}',
+        '-V', f'github_org={GITHUB_ORG}',
+        '-V', f'github_repo={GITHUB_REPO}',
+        '-V', f'base_domain={BASE_DOMAIN}',
         '-V', f'source_path={source_path if source_path else ""}',
     ]
     
@@ -993,8 +1066,14 @@ def post_process_python_shell_html(html_content: str) -> str:
     processed_html = re.sub(r'<script[^>]*>\s*window\.basePath\s*=.*?</script>', '', processed_html, flags=re.DOTALL)
     processed_html = re.sub(r'<script[^>]*>\s*function\s+assetPath.*?</script>', '', processed_html, flags=re.DOTALL)
 
-    # Add repoName variable
-    repo_script = f'\n<script>window.repoName = "{REPO_NAME}";</script>\n'
+    # Add repository and organization metadata variables
+    repo_script = f'''
+<script>
+window.repoName = "{REPO_NAME}";
+window.githubOrg = "{GITHUB_ORG}";
+window.baseDomain = "{BASE_DOMAIN}";
+</script>
+'''
     processed_html = re.sub(r'<body[^>]*>', lambda m: m.group(0) + repo_script, processed_html)
 
     return processed_html
@@ -1148,7 +1227,7 @@ def post_process_c_html(html_content: str, file_path: Path,
                 link_url = target_html_path.as_uri()
             link_title = f"Link to local documentation for {filename}"
         else:
-            link_url = f"http://basilisk.fr/src/{filename}"
+            link_url = f"https://basilisk.fr/src/{filename}"
             link_title = f"Link to Basilisk source for {filename}"
         
         return f'{prefix}<a href="{link_url}" title="{link_title}">{original_span_tag}</a>'
@@ -1161,11 +1240,17 @@ def post_process_c_html(html_content: str, file_path: Path,
     cleaned_html = re.sub(r'<script[^>]*>\s*// Helper function to create dynamic asset paths.*?</script>', '', cleaned_html, flags=re.DOTALL)
     cleaned_html = re.sub(r'<script[^>]*>\s*window\.basePath\s*=.*?</script>', '', cleaned_html, flags=re.DOTALL)
     cleaned_html = re.sub(r'<script[^>]*>\s*function\s+assetPath.*?</script>', '', cleaned_html, flags=re.DOTALL)
-    
-    # Add repoName variable
-    repo_script = f'\n<script>window.repoName = "{REPO_NAME}";</script>\n'
+
+    # Add repository and organization metadata variables
+    repo_script = f'''
+<script>
+window.repoName = "{REPO_NAME}";
+window.githubOrg = "{GITHUB_ORG}";
+window.baseDomain = "{BASE_DOMAIN}";
+</script>
+'''
     cleaned_html = re.sub(r'<body[^>]*>', lambda m: m.group(0) + repo_script, cleaned_html)
-    
+
     return cleaned_html
 
 def insert_css_link_in_html(html_file_path: Path, css_path: Path, is_root: bool = True) -> bool:
@@ -1417,10 +1502,11 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
         # Determine file type for post-processing
         is_python_file = file_path.suffix.lower() == '.py'
         is_shell_file = file_path.suffix.lower() == '.sh'
+        is_params_file = file_path.suffix.lower() == '.params'
         is_markdown_file = file_path.suffix.lower() == '.md'
-        
+
         # Apply appropriate post-processing
-        if is_python_file or is_shell_file or is_markdown_file or is_jupyter_notebook:
+        if is_python_file or is_shell_file or is_params_file or is_markdown_file or is_jupyter_notebook:
             with open(output_html_path, 'r', encoding='utf-8') as f:
                 html_content = f.read()
             
@@ -1518,11 +1604,11 @@ def convert_directory_tree_to_html(readme_content: str) -> str:
             if full_dir_path == "basilisk/src" or full_dir_path.startswith("basilisk/src/"):
                 # For basilisk/src directories, link to basilisk.fr or just show as text
                 if full_dir_path == "basilisk/src":
-                    item_html += f"**[{path}](http://basilisk.fr/src/)** - {description}"
+                    item_html += f"**[{path}](https://basilisk.fr/src/)** - {description}"
                 else:
                     # Subdirectories under basilisk/src
                     basilisk_subpath = full_dir_path.replace('basilisk/src/', '')
-                    item_html += f"**[{path}](http://basilisk.fr/src/{basilisk_subpath})** - {description}"
+                    item_html += f"**[{path}](https://basilisk.fr/src/{basilisk_subpath})** - {description}"
             else:
                 item_html += f"**[{path}]({dir_name})** - {description}"
             
@@ -1540,7 +1626,7 @@ def convert_directory_tree_to_html(readme_content: str) -> str:
             if file_path.startswith('basilisk/src/'):
                 # Link to external Basilisk documentation
                 basilisk_path = file_path.replace('basilisk/src/', '')
-                item_html += f"**[{path}](http://basilisk.fr/src/{basilisk_path})** - {description}"
+                item_html += f"**[{path}](https://basilisk.fr/src/{basilisk_path})** - {description}"
             else:
                 # Link to local documentation
                 item_html += f"**[{path}]({file_path}.html)** - {description}"
@@ -1659,7 +1745,20 @@ def generate_directory_index(directory_name: str, directory_path: Path, generate
         # Replace asset prefix based on depth
         asset_path_prefix = calculate_asset_prefix(index_path, docs_dir)
         html_content = html_content.replace("$asset_path_prefix$", asset_path_prefix)
-        
+
+        # Replace GitHub organization and repository variables
+        html_content = html_content.replace("$github_org$", GITHUB_ORG)
+        html_content = html_content.replace("$github_repo$", GITHUB_REPO)
+        html_content = html_content.replace("$base_domain$", BASE_DOMAIN)
+        html_content = html_content.replace("$reponame$", REPO_NAME)
+
+        # Handle source_path conditionals - directory index pages have no source file
+        # Replace specific known patterns to avoid regex issues with nested variables
+        # 1. The href edit path: $if(source_path)$/edit/main/$source_path$$endif$ -> empty
+        html_content = html_content.replace('$if(source_path)$/edit/main/$source_path$$endif$', '')
+        # 2. The link text with else: keep "View repository"
+        html_content = html_content.replace('$if(source_path)$Edit this page$else$View repository$endif$', 'View repository')
+
         # Handle conditional blocks
         if "$if(tabs)$" in html_content:
             html_content = re.sub(r'\$if\(tabs\)\$(.*?)\$tabs\$(.*?)\$endif\$', '', html_content, flags=re.DOTALL)
@@ -1776,6 +1875,9 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
         '--template', str(TEMPLATE_PATH),
         '-V', f'wikititle={WIKI_TITLE}',
         '-V', f'reponame={REPO_NAME}',
+        '-V', f'github_org={GITHUB_ORG}',
+        '-V', f'github_repo={GITHUB_REPO}',
+        '-V', f'base_domain={BASE_DOMAIN}',
         '-V', 'base=/',
         '-V', 'notitle=true',
         '-V', f'pagetitle={WIKI_TITLE}',

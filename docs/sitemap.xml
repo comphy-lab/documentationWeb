@@ -6,6 +6,11 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://comphy-lab.org/default.params.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://comphy-lab.org/postProcess/LidDrivenCavity-Newtonian-dyeInjection.ipynb.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -49,5 +54,10 @@
     <loc>https://comphy-lab.org/src-local/dye-injection.h.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://comphy-lab.org/sweep.params.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 </urlset>
