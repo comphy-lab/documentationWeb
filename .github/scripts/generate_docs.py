@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os, subprocess, re, shutil, argparse, html, json
 from pathlib import Path
-from typing import Dict, List, Optional, Any, Tuple, Union
+from typing import Dict, List, Tuple
 try:
     from nbconvert import HTMLExporter
     NBCONVERT_AVAILABLE = True
