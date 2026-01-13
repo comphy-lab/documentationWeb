@@ -145,6 +145,14 @@ deps/
 **/getData-LidDriven
 **/getFacets3D
 
+# Basilisk (auto-installed at build time from comphy-lab/basilisk-C)
+/basilisk/
+/patches/
+/.comphy-patches/
+/.comphy-lock
+.project_config
+/reset_install_basilisk.sh
+
 # Never exclude these files
 !*.c
 !*.h

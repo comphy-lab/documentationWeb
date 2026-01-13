@@ -1,2 +1,0 @@
-export BASILISK=/Users/vatsal/Library/CloudStorage/Dropbox/CoMPhy-Lab/documentationWeb/basilisk/src
-export PATH=$PATH:$BASILISK
