@@ -218,6 +218,15 @@ scalar new_scalar (const char * name)
 {
   return init_scalar (alloc_block_scalar (name, "", 1), NULL);
 }
+  
+scalar new_block_vertex_scalar (const char * name, int block)
+{
+  scalar s = alloc_block_scalar (name, "", block), sb;
+  int n = 0;
+  for (sb.i = s.i, n = 0; n < block; n++, sb.i++)
+    init_vertex_scalar (sb, NULL);
+  return s;
+}
 
 scalar new_vertex_scalar (const char * name)
 {
@@ -533,6 +542,17 @@ void boundary_internal (scalar * list, const char * fname, int line)
 #endif
     }
   if (flux) {
+#if PRINTBOUNDARY
+    int i = 0;
+    foreach_dimension()
+      if (listf.x) {
+	fprintf (stderr, "boundary_internal: flux %c:", 'x' + i);
+	for (scalar s in listf.x)
+	  fprintf (stderr, " %d:%s", s.i, s.name);
+	fputc ('\n', stderr);
+      }
+    i++;
+#endif
     boundary_face (listf);
     foreach_dimension()
       free (listf.x);
@@ -556,11 +576,16 @@ void cartesian_boundary_level (scalar * list, int l)
   boundary_iterate (level, list, l);
 }
 
-void cartesian_boundary_face (vectorl list)
+void cartesian_boundary_face (vectorl vl)
 {
+  scalar * listc = NULL;
   foreach_dimension()
-    for (scalar s in list.x)
+    for (scalar s in vl.x) {
       s.dirty = 2;
+      listc = list_add_depends (listc, s);
+    }
+  boundary_level (listc, -1);
+  free (listc);
 }
 
 static double symmetry (Point point, Point neighbor, scalar s, bool * data)
