@@ -12,6 +12,10 @@ Thumbs.db
 *.swp
 *~
 
+# Python cache
+__pycache__/
+*.pyc
+
 # Prerequisites
 *.d
 
@@ -144,6 +148,15 @@ deps/
 **/getData-generic-one-phase
 **/getData-LidDriven
 **/getFacets3D
+
+# Basilisk (auto-installed at build time from comphy-lab/basilisk-C)
+/basilisk/
+/patches/
+/.comphy-patches/
+/.comphy-lock
+.project_config
+/reset_install_basilisk.sh
+/reset_install_requirements.sh
 
 # Never exclude these files
 !*.c
