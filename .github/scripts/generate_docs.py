@@ -264,17 +264,56 @@ def process_template_for_assets(template_path: Path) -> str:
         print(f"Error processing template: {e}")
         return ""
 
+def install_basilisk() -> bool:
+    """
+    Auto-install basilisk from comphy-lab/basilisk-C using mode=4 (ref-locked).
+
+    Downloads and runs the reset_install_basilisk.sh script with mode=4 to fetch
+    pre-built binaries from a specific release tag. Cleans up the install script
+    after successful installation.
+
+    Returns:
+        True if installation succeeded; False otherwise.
+    """
+    print("Basilisk not found. Installing from comphy-lab/basilisk-C...")
+
+    cmds = [
+        "curl -sLO https://raw.githubusercontent.com/comphy-lab/basilisk-C/main/reset_install_basilisk.sh",
+        "chmod +x reset_install_basilisk.sh",
+        "./reset_install_basilisk.sh --mode=4 --ref=v2026-01-13 --hard"
+    ]
+
+    for cmd in cmds:
+        result = subprocess.run(cmd, shell=True, cwd=REPO_ROOT)
+        if result.returncode != 0:
+            print(f"Failed to install basilisk: {cmd}")
+            return False
+
+    # Clean up install script
+    install_script = REPO_ROOT / "reset_install_basilisk.sh"
+    if install_script.exists():
+        install_script.unlink()
+
+    print("Basilisk installed successfully.")
+    return True
+
 def validate_config() -> bool:
     """
     Validates the existence of essential directories and files required for documentation generation.
-    
+
     Checks for the presence of core directories and files, processes the HTML template for Pandoc, and creates a temporary template file for use during conversion. Updates the global template path if successful.
-    
+    Auto-installs basilisk from comphy-lab/basilisk-C if not found.
+
     Returns:
         True if all required paths exist and the template is processed successfully; False otherwise.
     """
     global TEMPLATE_PATH
-    
+
+    # Check if basilisk needs to be installed
+    if not LITERATE_C_SCRIPT.is_file():
+        if not install_basilisk():
+            return False
+
     essential_paths = [
         (BASILISK_DIR, "BASILISK_DIR"),
         (DARCSIT_DIR, "DARCSIT_DIR"),
