@@ -12,6 +12,10 @@ Thumbs.db
 *.swp
 *~
 
+# Python cache
+__pycache__/
+*.pyc
+
 # Prerequisites
 *.d
 
@@ -152,6 +156,7 @@ deps/
 /.comphy-lock
 .project_config
 /reset_install_basilisk.sh
+/reset_install_requirements.sh
 
 # Never exclude these files
 !*.c
