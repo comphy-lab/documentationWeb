@@ -14,15 +14,17 @@ The codebase implements a classical lid driven cavity flow problem with dye inje
 
 ```
 ├── basilisk/src/               Core Basilisk CFD library (reference only, do not modify)
-├── simulationCases/                  Test cases for simulation
+├── simulationCases/            Test cases for simulation
 │   └── LidDrivenCavity-Newtonian-dyeInjection.c    Lid-driven cavity with dye injection
 ├── src-local/                  Custom header files extending Basilisk functionality
 │   └── dye-injection.h         Dye injection for flow visualization
-└── postProcess/                Project-specific post-processing tools
-    ├── LidDrivenCavity-Newtonian-dyeInjection.ipynb  Jupyter notebook for analysis and visualization
-    ├── LidDrivenCavity-Newtonian-dyeInjection.py     Python script for post-processing
-    ├── Visualization3D.ipynb     Jupyter notebook for 3D visualization
-    └── getData-LidDriven.c     Data extraction utility
+├── postProcess/                Project-specific post-processing tools
+│   ├── LidDrivenCavity-Newtonian-dyeInjection.ipynb  Jupyter notebook for analysis
+│   ├── LidDrivenCavity-Newtonian-dyeInjection.py     Python script for post-processing
+│   ├── Visualization3D.ipynb   Jupyter notebook for 3D visualization
+│   └── getData-LidDriven.c     Data extraction utility
+├── runSweepHamilton.sbatch     HPC batch script for Durham Hamilton cluster
+└── runSweepSnellius.sbatch     HPC batch script for Snellius cluster
 ```
 
 ### src-local/ Directory
@@ -63,6 +65,15 @@ The [`simulationCases/`](simulationCases) directory contains simulation configur
   - Adaptive grid with level 8 refinement
   - Proper boundary conditions for the moving lid and no-slip walls
   - Regular snapshot generation for visualization
+
+### HPC Batch Scripts
+
+SLURM batch scripts for running parameter sweeps on HPC clusters:
+
+- [runSweepHamilton.sbatch](runSweepHamilton.sbatch): Configured for Durham University's Hamilton cluster (128 cores, OpenMPI)
+- [runSweepSnellius.sbatch](runSweepSnellius.sbatch): Configured for Snellius cluster (48 cores, OpenMPI 5.0.3)
+
+These scripts run Stage 2 (MPI simulation) of parameter sweeps. Stage 1 (restart file generation) must be run locally before submitting to the cluster.
 
 ## Getting Started
 
