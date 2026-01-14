@@ -36,6 +36,16 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://comphy-lab.org/runSweepHamilton.sbatch.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://comphy-lab.org/runSweepSnellius.sbatch.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://comphy-lab.org/simulationCases/LidDrivenCavity-Newtonian-dyeInjection.c.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

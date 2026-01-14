@@ -472,7 +472,7 @@ window.baseDomain = "https://comphy-lab.org";
                 <ul>
                 <li><strong><a
                 href="postProcess/LidDrivenCavity-Newtonian-dyeInjection.ipynb.html">LidDrivenCavity-Newtonian-dyeInjection.ipynb</a></strong>
-                - Jupyter notebook for analysis and visualization</li>
+                - Jupyter notebook for analysis</li>
                 <li><strong><a
                 href="postProcess/LidDrivenCavity-Newtonian-dyeInjection.py.html">LidDrivenCavity-Newtonian-dyeInjection.py</a></strong>
                 - Python script for post-processing</li>
@@ -483,6 +483,12 @@ window.baseDomain = "https://comphy-lab.org";
                 href="postProcess/getData-LidDriven.c.html">getData-LidDriven.c</a></strong>
                 - Data extraction utility</li>
                 </ul></li>
+                <li><strong><a
+                href="runSweepHamilton.sbatch.html">runSweepHamilton.sbatch</a></strong>
+                - HPC batch script for Durham Hamilton cluster</li>
+                <li><strong><a
+                href="runSweepSnellius.sbatch.html">runSweepSnellius.sbatch</a></strong>
+                - HPC batch script for Snellius cluster</li>
                 </ul>
                 </div>
                 <h3 id="src-local-directory">src-local/ Directory</h3>
@@ -556,6 +562,22 @@ window.baseDomain = "https://comphy-lab.org";
                 <li>Regular snapshot generation for visualization</li>
                 </ul></li>
                 </ul>
+                <h3 id="hpc-batch-scripts">HPC Batch Scripts</h3>
+                <p>SLURM batch scripts for running parameter sweeps on
+                HPC clusters:</p>
+                <ul>
+                <li><a
+                href="runSweepHamilton.sbatch.html">runSweepHamilton.sbatch</a>:
+                Configured for Durham University’s Hamilton cluster (128
+                cores, OpenMPI)</li>
+                <li><a
+                href="runSweepSnellius.sbatch.html">runSweepSnellius.sbatch</a>:
+                Configured for Snellius cluster (48 cores, OpenMPI
+                5.0.3)</li>
+                </ul>
+                <p>These scripts run Stage 2 (MPI simulation) of
+                parameter sweeps. Stage 1 (restart file generation) must
+                be run locally before submitting to the cluster.</p>
                 <h2 id="getting-started">Getting Started</h2>
                 <h3 id="prerequisites">Prerequisites</h3>
                 <ul>
@@ -816,6 +838,10 @@ window.baseDomain = "https://comphy-lab.org";
                 <ul>
                 <li><a
                 href="default.params.html">default.params</a></li>
+                <li><a
+                href="runSweepHamilton.sbatch.html">runSweepHamilton.sbatch</a></li>
+                <li><a
+                href="runSweepSnellius.sbatch.html">runSweepSnellius.sbatch</a></li>
                 <li><a href="sweep.params.html">sweep.params</a></li>
                 </ul>
                 <h3 id="postprocess">postProcess</h3>
