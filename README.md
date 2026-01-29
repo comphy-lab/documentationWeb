@@ -13,7 +13,7 @@ The codebase implements a classical lid driven cavity flow problem with dye inje
 ## Repository Structure
 
 ```
-├── basilisk/src/               Core Basilisk CFD library (reference only, do not modify)
+├── basilisk/                   Local Basilisk checkout (ignored; do not commit)
 ├── simulationCases/            Test cases for simulation
 │   └── LidDrivenCavity-Newtonian-dyeInjection.c    Lid-driven cavity with dye injection
 ├── src-local/                  Custom header files extending Basilisk functionality
@@ -21,8 +21,10 @@ The codebase implements a classical lid driven cavity flow problem with dye inje
 ├── postProcess/                Project-specific post-processing tools
 │   ├── LidDrivenCavity-Newtonian-dyeInjection.ipynb  Jupyter notebook for analysis
 │   ├── LidDrivenCavity-Newtonian-dyeInjection.py     Python script for post-processing
-│   ├── Visualization3D.ipynb   Jupyter notebook for 3D visualization
+│   ├── Visulization3D.ipynb    Jupyter notebook for 3D visualization
 │   └── getData-LidDriven.c     Data extraction utility
+├── docs/                       Generated documentation site output
+├── .github/                    Documentation assets, scripts, workflows
 ├── runSweepHamilton.sbatch     HPC batch script for Durham Hamilton cluster
 └── runSweepSnellius.sbatch     HPC batch script for Snellius cluster
 ```
@@ -51,6 +53,8 @@ The [`postProcess/`](postProcess) directory provides tools for analyzing and vis
   - Creates two-panel plots showing dye concentration and velocity magnitude
   - Adds streamlines to visualize flow patterns
   - Uses 'getData-LidDriven' utility to extract field data
+
+- [Visulization3D.ipynb](postProcess/Visulization3D.ipynb): Jupyter notebook for 3D visualization
 
 - [getData-LidDriven.c](postProcess/getData-LidDriven.c): C utility that extracts and processes numerical data from simulation output files
 
@@ -82,8 +86,8 @@ These scripts run Stage 2 (MPI simulation) of parameter sweeps. Stage 1 (restart
 - Basilisk C installed ([Installation instructions](http://basilisk.fr/src/INSTALL))
 - C compiler (gcc recommended)
 - Make build system
-- Python 3 with pip for documentation generation
-- BeautifulSoup4 for HTML processing (included in requirements.txt)
+- Python 3 with pip for documentation generation (see `.github/scripts/requirements.txt`)
+- Pandoc for HTML generation used by `.github/scripts/generate_docs.py`
 - Scientific visualization tools (optional: ParaView, Gnuplot, etc.)
 
 ### Installation
@@ -96,14 +100,11 @@ These scripts run Stage 2 (MPI simulation) of parameter sweeps. Stage 1 (restart
 
 2. Make sure Basilisk is properly installed and the BASILISK environment variable is set.
 
-3. Install Python dependencies (uses a virtual environment):
+3. Install Python dependencies for documentation generation:
    ```bash
-   # This will automatically set up a virtual environment and install dependencies
-   # like BeautifulSoup4 for HTML processing
-   ./reset_install_requirements.sh
-
-   # To activate the virtual environment for manual commands:
+   python3 -m venv .venv
    source .venv/bin/activate
+   pip install -r .github/scripts/requirements.txt
    ```
 
 4. Compile a test case to verify the setup:
@@ -281,16 +282,9 @@ Please include:
 - Additional functionality in the codebase
 - Improvements to existing materials
 
-#### Example Request:
-[Report here](https://github.com/comphy-lab/documentationWeb/issues/new?template=example_request.md)
-- For requesting specific examples that demonstrate:
-- Particular Basilisk features
-- Solutions to common problems
-- Implementation of specific physics or numerical methods
-
-#### General Question:
-[Report here](https://github.com/comphy-lab/documentationWeb/issues/new?template=general_question.md)
-- For any other questions
+#### Question/Discussion:
+[Report here](https://github.com/comphy-lab/documentationWeb/issues/new?template=question.md)
+- For any other questions or discussions
 
 ### How to Create an Issue
 

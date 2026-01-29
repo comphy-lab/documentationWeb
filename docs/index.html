@@ -447,10 +447,8 @@ window.baseDomain = "https://comphy-lab.org";
                 <h2 id="repository-structure">Repository Structure</h2>
                 <div class="repository-structure">
                 <ul>
-                <li><strong><a
-                href="https://basilisk.fr/src/">basilisk/src/</a></strong>
-                - Core Basilisk CFD library (reference only, do not
-                modify)</li>
+                <li><strong><a href="basilisk">basilisk/</a></strong> -
+                Local Basilisk checkout (ignored; do not commit)</li>
                 <li><strong><a
                 href="simulationCases">simulationCases/</a></strong> -
                 Test cases for simulation
@@ -477,12 +475,16 @@ window.baseDomain = "https://comphy-lab.org";
                 href="postProcess/LidDrivenCavity-Newtonian-dyeInjection.py.html">LidDrivenCavity-Newtonian-dyeInjection.py</a></strong>
                 - Python script for post-processing</li>
                 <li><strong><a
-                href="postProcess/Visualization3D.ipynb.html">Visualization3D.ipynb</a></strong>
+                href="postProcess/Visulization3D.ipynb.html">Visulization3D.ipynb</a></strong>
                 - Jupyter notebook for 3D visualization</li>
                 <li><strong><a
                 href="postProcess/getData-LidDriven.c.html">getData-LidDriven.c</a></strong>
                 - Data extraction utility</li>
                 </ul></li>
+                <li><strong><a href="docs">docs/</a></strong> -
+                Generated documentation site output</li>
+                <li><strong><a href=".github">.github/</a></strong> -
+                Documentation assets, scripts, workflows</li>
                 <li><strong><a
                 href="runSweepHamilton.sbatch.html">runSweepHamilton.sbatch</a></strong>
                 - HPC batch script for Durham Hamilton cluster</li>
@@ -514,9 +516,9 @@ window.baseDomain = "https://comphy-lab.org";
                 directory provides tools for analyzing and visualizing
                 simulation results:</p>
                 <ul>
-                <li><a
+                <li><p><a
                 href="postProcess/LidDrivenCavity-Newtonian-dyeInjection.ipynb">LidDrivenCavity-Newtonian-dyeInjection.ipynb</a>:
-                Jupyter notebook that:
+                Jupyter notebook that:</p>
                 <ul>
                 <li>Provides interactive analysis of simulation
                 results</li>
@@ -525,9 +527,9 @@ window.baseDomain = "https://comphy-lab.org";
                 document</li>
                 <li>Allows for reproducible analysis workflow</li>
                 </ul></li>
-                <li><a
+                <li><p><a
                 href="postProcess/LidDrivenCavity-Newtonian-dyeInjection.py.html">LidDrivenCavity-Newtonian-dyeInjection.py</a>:
-                Python script for generating visualizations that:
+                Python script for generating visualizations that:</p>
                 <ul>
                 <li>Processes simulation timesteps in parallel</li>
                 <li>Creates two-panel plots showing dye concentration
@@ -536,10 +538,13 @@ window.baseDomain = "https://comphy-lab.org";
                 <li>Uses ‘getData-LidDriven’ utility to extract field
                 data</li>
                 </ul></li>
-                <li><a
+                <li><p><a
+                href="postProcess/Visulization3D.ipynb">Visulization3D.ipynb</a>:
+                Jupyter notebook for 3D visualization</p></li>
+                <li><p><a
                 href="postProcess/getData-LidDriven.c.html">getData-LidDriven.c</a>:
                 C utility that extracts and processes numerical data
-                from simulation output files</li>
+                from simulation output files</p></li>
                 </ul>
                 <h3 id="simulationcases-directory">simulationCases/
                 Directory</h3>
@@ -586,9 +591,10 @@ window.baseDomain = "https://comphy-lab.org";
                 instructions</a>)</li>
                 <li>C compiler (gcc recommended)</li>
                 <li>Make build system</li>
-                <li>Python 3 with pip for documentation generation</li>
-                <li>BeautifulSoup4 for HTML processing (included in
-                requirements.txt)</li>
+                <li>Python 3 with pip for documentation generation (see
+                <code>.github/scripts/requirements.txt</code>)</li>
+                <li>Pandoc for HTML generation used by
+                <code>.github/scripts/generate_docs.py</code></li>
                 <li>Scientific visualization tools (optional: ParaView,
                 Gnuplot, etc.)</li>
                 </ul>
@@ -600,15 +606,12 @@ window.baseDomain = "https://comphy-lab.org";
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> comphy-lab</span></code></pre></div></div></li>
                 <li><p>Make sure Basilisk is properly installed and the
                 BASILISK environment variable is set.</p></li>
-                <li><p>Install Python dependencies (uses a virtual
-                environment):</p>
+                <li><p>Install Python dependencies for documentation
+                generation:</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This will automatically set up a virtual environment and install dependencies</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># like BeautifulSoup4 for HTML processing</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">./reset_install_requirements.sh</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># To activate the virtual environment for manual commands:</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span></code></pre></div></div></li>
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> venv .venv</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-r</span> .github/scripts/requirements.txt</span></code></pre></div></div></li>
                 <li><p>Compile a test case to verify the setup:</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
                 class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> simulationCases</span>
@@ -795,17 +798,10 @@ window.baseDomain = "https://comphy-lab.org";
                 functionality - New examples or tutorials - Additional
                 functionality in the codebase - Improvements to existing
                 materials</p>
-                <h4 id="example-request">Example Request:</h4>
+                <h4 id="questiondiscussion">Question/Discussion:</h4>
                 <p><a
-                href="https://github.com/comphy-lab/documentationWeb/issues/new?template=example_request.md">Report
-                here</a> - For requesting specific examples that
-                demonstrate: - Particular Basilisk features - Solutions
-                to common problems - Implementation of specific physics
-                or numerical methods</p>
-                <h4 id="general-question">General Question:</h4>
-                <p><a
-                href="https://github.com/comphy-lab/documentationWeb/issues/new?template=general_question.md">Report
-                here</a> - For any other questions</p>
+                href="https://github.com/comphy-lab/documentationWeb/issues/new?template=question.md">Report
+                here</a> - For any other questions or discussions</p>
                 <h3 id="how-to-create-an-issue">How to Create an
                 Issue</h3>
                 <ol type="1">
