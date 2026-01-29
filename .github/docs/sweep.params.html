@@ -59,20 +59,20 @@
       --color-primary: #0066cc;
       --color-secondary: #036;
       --color-accent: #0099ff;
-
+      
       /* UI elements */
       --color-header-bg: #f5f5f5;
       --color-footer-bg: #2d2e33;
       --color-border: #e0e0e0;
       --color-input-bg: #f9f9f9;
-
+      
       /* Component colors */
       --color-preloader-bg: #ffffff;
       --color-loader: #0066cc;
       --color-card-bg: #ffffff;
       --color-code-bg: #f5f5f5;
     }
-
+    
     /* Dark theme variables applied via media query when JS is disabled */
     @media (prefers-color-scheme: dark) {
       :root:not(.theme-set) {
@@ -82,13 +82,13 @@
         --color-primary: #4d9fff;
         --color-secondary: #88ccff;
         --color-accent: #00bfff;
-
+        
         /* UI elements - dark mode */
         --color-header-bg: #121212;
         --color-footer-bg: #121212;
         --color-border: #333;
         --color-input-bg: #2d2d2d;
-
+        
         /* Component colors - dark mode */
         --color-preloader-bg: #1a1a1a;
         --color-loader: #4d9fff;
@@ -96,7 +96,7 @@
         --color-code-bg: #2d2d2d;
       }
     }
-
+    
     /* When JS sets the theme explicitly via data attribute */
     [data-theme="dark"] {
       /* Base colors - dark mode */
@@ -105,36 +105,36 @@
       --color-primary: #4d9fff;
       --color-secondary: #88ccff;
       --color-accent: #00bfff;
-
+      
       /* UI elements - dark mode */
       --color-header-bg: #121212;
       --color-footer-bg: #121212;
       --color-border: #333;
       --color-input-bg: #2d2d2d;
-
+      
       /* Component colors - dark mode */
       --color-preloader-bg: #1a1a1a;
       --color-loader: #4d9fff;
       --color-card-bg: #222;
       --color-code-bg: #2d2d2d;
     }
-
+    
     /* Prevent transition flashes during initial load */
     html:not(.transitions-enabled) * {
       transition: none !important;
     }
-
+    
     /* Apply theme to preloader and early elements */
     #preloader {
       background-color: var(--color-preloader-bg);
       color: var(--color-text);
     }
-
+    
     #loader {
       border-color: var(--color-loader);
       border-top-color: transparent;
     }
-
+    
     /* Noscript warning */
     .noscript-warning {
       background-color: var(--color-primary);
@@ -147,7 +147,7 @@
       right: 0;
       z-index: 1000;
     }
-
+    
     /* Theme indicator for no-JS */
     .theme-indicator {
       padding: 5px 10px;
@@ -156,12 +156,12 @@
       color: var(--color-text);
       text-align: center;
     }
-
+    
     /* Hide JS-only elements when no JS */
     .no-js .js-only {
       display: none !important;
     }
-
+    
     /* Show no-JS alternatives */
     .js .no-js-only {
       display: none !important;
@@ -171,8 +171,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="base-url" content="..">
-  <title>src-local/dye-injection.h | Test documentation: Lid driven cavity using dye injection</title>
-
+  <title>sweep.params | Test documentation: Lid driven cavity using dye injection</title>
+  
   <!-- Critical CSS for fastest paint -->
   <style>
       .s-intro__title {
@@ -182,19 +182,19 @@
       .s-header {
           visibility: visible;
       }
-
+      
       /* Ensure theme toggle properly styled immediately */
       .theme-toggle {
           background-color: var(--color-background);
           color: var(--color-text);
       }
-
+      
       /* Control SVG visibility based on theme */
       [data-theme="dark"] .theme-toggle-icon.sun,
       :root:not([data-theme="dark"]) .theme-toggle-icon.moon {
           display: block;
       }
-
+      
       [data-theme="dark"] .theme-toggle-icon.moon,
       :root:not([data-theme="dark"]) .theme-toggle-icon.sun {
           display: none;
@@ -202,25 +202,25 @@
   </style>
 
   <!-- Critical Meta Tags -->
-  <meta name="description" content="This module introduces a circular tracer (dye) into the flow at a specified time and location. The dye then advects with the flow, allowing visualization of ...">
+  <meta name="description" content="sweepvar=We">
   <meta name="author" content="CoMPhy Lab">
   <meta name="robots" content="index, follow">
-  <meta name="keywords" content="injection, tracer.h">
+  <meta name="keywords" content="sweep">
   <meta name="msapplication-TileColor" content="#da532c">
   <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
 
   <!-- Preload critical resources -->
-  <link rel="preload" href="../assets/js/main.js" as="script">
-  <link rel="preload" href="../assets/css/fontello/css/fontello.css" as="style">
-  <link rel="preload" href="../assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
+  <link rel="preload" href="./assets/js/main.js" as="script">
+  <link rel="preload" href="./assets/css/fontello/css/fontello.css" as="style">
+  <link rel="preload" href="./assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
 
   <!-- Base stylesheets -->
-  <link rel="stylesheet" href="../assets/css/styles.css">
-  <link rel="stylesheet" href="../assets/css/custom_styles.css">
-  <link rel="stylesheet" href="../assets/css/command-palette.css">
-  <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css">
-  <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css">
+  <link rel="stylesheet" href="./assets/css/styles.css">
+  <link rel="stylesheet" href="./assets/css/custom_styles.css">
+  <link rel="stylesheet" href="./assets/css/command-palette.css">
+  <link rel="stylesheet" href="./assets/css/fontello/css/fontello.css">
+  <link rel="stylesheet" href="./assets/css/academicons-1.7.0/css/academicons.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
   <!-- Font optimization -->
@@ -233,27 +233,27 @@
   </style>
 
   <!-- Favicon -->
-  <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="../assets/favicon/favicon-96x96.png">
-  <link rel="icon" type="image/svg+xml" href="../assets/favicon/favicon.svg">
-  <link rel="shortcut icon" href="../assets/favicon/favicon.ico">
-  <link rel="manifest" href="../assets/favicon/site.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="./assets/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg">
+  <link rel="shortcut icon" href="./assets/favicon/favicon.ico">
+  <link rel="manifest" href="./assets/favicon/site.webmanifest">
 
   <!-- Scripts with proper loading attributes -->
-  <script src="../assets/js/jquery.min.js"></script>
-  <script src="../assets/js/jquery-ui.packed.js"></script>
-  <script src="../assets/js/plots.js"></script>
+  <script src="./assets/js/jquery.min.js"></script>
+  <script src="./assets/js/jquery-ui.packed.js"></script>
+  <script src="./assets/js/plots.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
   <!-- Config script must load before other scripts -->
-  <script src="../assets/js/config.js"></script>
-  <script defer src="../assets/js/html-sanitizer.js"></script>
-  <script defer src="../assets/js/search-helper.js"></script>
-  <script defer src="../assets/js/command-palette.js"></script>
-  <script defer src="../assets/js/command-data.js"></script>
-  <script defer src="../assets/js/main.js"></script>
-  <script defer src="../assets/js/theme-toggle.js"></script>
+  <script src="./assets/js/config.js"></script>
+  <script defer src="./assets/js/html-sanitizer.js"></script>
+  <script defer src="./assets/js/search-helper.js"></script>
+  <script defer src="./assets/js/command-palette.js"></script>
+  <script defer src="./assets/js/command-data.js"></script>
+  <script defer src="./assets/js/main.js"></script>
+  <script defer src="./assets/js/theme-toggle.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
-
+  
   <!-- Optimize page load performance -->
   <script>
     // Preconnect to critical domains
@@ -261,21 +261,21 @@
       'https://cdnjs.cloudflare.com',
       'https://cdn.jsdelivr.net'
     ];
-
+    
     preconnectDomains.forEach(domain => {
       const link = document.createElement('link');
       link.rel = 'preconnect';
       link.href = domain;
       link.crossOrigin = 'anonymous';
       document.head.appendChild(link);
-
+      
       // Also add DNS prefetch as fallback
       const dnsLink = document.createElement('link');
       dnsLink.rel = 'dns-prefetch';
       dnsLink.href = domain;
       document.head.appendChild(dnsLink);
     });
-
+    
     // Detect when document is fully loaded to remove preloader
     window.addEventListener('load', function() {
       const preloader = document.getElementById('preloader');
@@ -302,11 +302,11 @@
         document.head.appendChild(link);
         return link;
       }
-
+      
       // Check if we're on localhost
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         // Use hardcoded version numbers for reliable loading
-
+        
         // Load Font Awesome using multiple CDNs to maximize reliability for local development
         loadStylesheet('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css');
         // Backup CDN if the first one fails
@@ -327,7 +327,7 @@
       // Mark page as JS-enabled and manage transitions
       document.documentElement.classList.remove('no-js');
       document.documentElement.classList.add('js');
-
+      
       // Allow CSS transitions after initial load to prevent transition flashes
       window.addEventListener('DOMContentLoaded', () => {
           setTimeout(() => {
@@ -340,7 +340,7 @@
 <script>
 window.repoName = "documentationWeb";
 window.githubOrg = "comphy-lab";
-window.baseDomain = "https://comphy-lab.org";
+window.baseDomain = "https://comphy-lab.org/documentationWeb";
 </script>
 
 
@@ -359,7 +359,7 @@ window.baseDomain = "https://comphy-lab.org";
         <header class="s-header">
             <div class="s-header__logo">
                 <a class="logo" href="/">
-                    <img src="../assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
+                    <img src="./assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
                 </a>
                 <a class="documentation-button" href="/documentationWeb">
                     <i class="fa-solid fa-book-open"></i>
@@ -418,82 +418,55 @@ window.baseDomain = "https://comphy-lab.org";
 
         <!-- Main content -->
         <main class="content">
-
+            
             <div class="page-content">
-
-                                <h1 class="page-title">src-local/dye-injection.h</h1>
-
-
+                
+                                <h1 class="page-title">sweep.params</h1>
+                
+                                
                                 <div class="raw-file-button-container">
-                    <a href="https://github.com/comphy-lab/documentationWeb/raw/main/src-local/dye-injection.h" class="raw-file-button" target="_blank" rel="noopener noreferrer">
+                    <a href="https://github.com/comphy-lab/documentationWeb/raw/main/sweep.params" class="raw-file-button" target="_blank" rel="noopener noreferrer">
                         <i class="fa-brands fa-github"></i> See raw file
                     </a>
                 </div>
-
-                <h1 id="dye-injection-for-flow-visualization">dye
-                Injection for Flow Visualization</h1>
-                <p>This module introduces a circular tracer (dye) into
-                the flow at a specified time and location. The dye then
-                advects with the flow, allowing visualization of flow
-                patterns. This is useful for visualizing complex flow
-                structures in simulations like lid-driven cavity
-                flow.</p>
-                <h2 id="parameters">Parameters</h2>
-                <ul>
-                <li><code>tInjection</code>: time at which to inject the
-                dye</li>
-                <li><code>xInjection</code>, <code>yInjection</code>:
-                position where the dye is injected</li>
-                <li><code>dyeRadius</code>: radius of the circular
-                dye</li>
-                </ul>
+                
+                <h1 id="sweep.params">sweep.params</h1>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/tracer.h" title="Link to Basilisk source for tracer.h"><span class="im">"tracer.h"</span></a></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">// dye tracer parameters (can be overridden by the user)</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> tInjection <span class="op">=</span> <span class="fl">0.1</span><span class="op">;</span>  <span class="co">// Default injection time</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> xInjection <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span>  <span class="co">// Default X-position for injection</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> yInjection <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span>  <span class="co">// Default Y-position for injection</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> dyeRadius <span class="op">=</span> <span class="fl">0.05</span><span class="op">;</span>  <span class="co">// Default radius of the circular dye</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">// Define the scalar field for the dye</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>scalar T<span class="op">[];</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>scalar <span class="op">*</span> tracers <span class="op">=</span> <span class="op">{</span>T<span class="op">};</span></span>
+                class="sourceCode ini"><code class="sourceCode ini"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parameter sweep configuration</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Used for running multiple simulations with varying parameters</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Sweep variable</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="dt">sweep_var</span><span class="ot">=</span><span class="st">We</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Sweep range</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="dt">We_min</span><span class="ot">=</span><span class="dv">10</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="dt">We_max</span><span class="ot">=</span><span class="dv">1000</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="dt">We_steps</span><span class="ot">=</span><span class="dv">10</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="dt">We_spacing</span><span class="ot">=</span><span class="st">log    # linear or log</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">// Initialize the dye tracer to zero everywhere</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>event init <span class="op">(</span>t <span class="op">=</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  foreach<span class="op">()</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    T<span class="op">[]</span> <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">// Inject the dye at the specified time</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>event inject_dye <span class="op">(</span>t <span class="op">=</span> tInjection<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  fprintf<span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;Injecting dye at t = %g, position = (%g, %g), radius = %g</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>          t<span class="op">,</span> xInjection<span class="op">,</span> yInjection<span class="op">,</span> dyeRadius<span class="op">);</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Set dye concentration to 1.0 within the circular region</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  foreach<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> dist <span class="op">=</span> sqrt<span class="op">(</span>sq<span class="op">(</span>x <span class="op">-</span> xInjection<span class="op">)</span> <span class="op">+</span> sq<span class="op">(</span>y <span class="op">-</span> yInjection<span class="op">));</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>dist <span class="op">&lt;=</span> dyeRadius<span class="op">)</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>      T<span class="op">[]</span> <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Fixed parameters (override defaults)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="dt">Oh</span><span class="ot">=</span><span class="fl">0.02</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="dt">LEVEL</span><span class="ot">=</span><span class="dv">10</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Sweep output</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="dt">output_dir</span><span class="ot">=</span><span class="st">sweep_results</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="dt">parallel_jobs</span><span class="ot">=</span><span class="dv">4</span></span></code></pre></div></div>
             </div>
         </main>
 
         <footer class="site-footer">
             <div class="footer-left">
               <a href="https://basilisk.fr/sandbox/vatsal/" target="_blank" rel="noopener noreferrer">
-                <img src="../assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
+                <img src="./assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
               </a>
               <a href="https://pof.tnw.utwente.nl/" target="_blank" rel="noopener noreferrer">
-                <img src="../assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
+                <img src="./assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
               </a>
               <a href="https://www.utwente.nl/" target="_blank" rel="noopener noreferrer">
-                <img src="../assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
+                <img src="./assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
               </a>
               <a href="https://www.vatsalsanjay.com/" target="_blank" rel="noopener noreferrer">
-                <img src="../assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
+                <img src="./assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
               </a>
             </div>
             <div class="footer-center">
@@ -519,7 +492,7 @@ window.baseDomain = "https://comphy-lab.org";
               <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" rel="noopener noreferrer" aria-label="Bluesky Profile">
                 <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
               </a>
-              <a href="https://github.com/comphy-lab/documentationWeb/edit/main/src-local/dye-injection.h" class="edit-link" aria-label="Edit this page on GitHub">
+              <a href="https://github.com/comphy-lab/documentationWeb/edit/main/sweep.params" class="edit-link" aria-label="Edit this page on GitHub">
                 <i class="fa-brands fa-github"></i> Edit this page
               </a>
             </div>

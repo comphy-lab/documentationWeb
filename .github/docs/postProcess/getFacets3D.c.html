@@ -171,7 +171,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="base-url" content="..">
-  <title>simulationCases/Makefile | Test documentation: Lid driven cavity using dye injection</title>
+  <title>postProcess/getFacets3D.c | Test documentation: Lid driven cavity using dye injection</title>
 
   <!-- Critical CSS for fastest paint -->
   <style>
@@ -202,10 +202,10 @@
   </style>
 
   <!-- Critical Meta Tags -->
-  <meta name="description" content="ifeq (\$(wildcard ../.projectconfig),) \$(error '../.projectconfig not found') endif BASILISK := \$(shell . ../.projectconfig && echo \$\$BASILISK) ifeq (\$(...">
+  <meta name="description" content="This module provides functionality for extracting and outputting interface facets from volume fraction fields in computational fluid dynamics simulations. It...">
   <meta name="author" content="CoMPhy Lab">
   <meta name="robots" content="index, follow">
-  <meta name="keywords" content="makefile">
+  <meta name="keywords" content="ensures, fractions.h, getfacets3d, grid/octree.h, implements, iterates, navier-stokes/centered.h">
   <meta name="msapplication-TileColor" content="#da532c">
   <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
@@ -340,7 +340,7 @@
 <script>
 window.repoName = "documentationWeb";
 window.githubOrg = "comphy-lab";
-window.baseDomain = "https://comphy-lab.org";
+window.baseDomain = "https://comphy-lab.org/documentationWeb";
 </script>
 
 
@@ -421,40 +421,186 @@ window.baseDomain = "https://comphy-lab.org";
 
             <div class="page-content">
 
-                                <h1 class="page-title">simulationCases/Makefile</h1>
+                                <h1 class="page-title">postProcess/getFacets3D.c</h1>
 
 
                                 <div class="raw-file-button-container">
-                    <a href="https://github.com/comphy-lab/documentationWeb/raw/main/simulationCases/Makefile" class="raw-file-button" target="_blank" rel="noopener noreferrer">
+                    <a href="https://github.com/comphy-lab/documentationWeb/raw/main/postProcess/getFacets3D.c" class="raw-file-button" target="_blank" rel="noopener noreferrer">
                         <i class="fa-brands fa-github"></i> See raw file
                     </a>
                 </div>
 
-                <h1 id="makefile">Makefile</h1>
+                <h1 id="facet-output-visualization-tool">Facet Output
+                Visualization Tool</h1>
+                <p>This module provides functionality for extracting and
+                outputting interface facets from volume fraction fields
+                in computational fluid dynamics simulations. It is
+                designed to work with the Basilisk C framework for
+                solving partial differential equations on adaptive
+                octree/quadtree grids.</p>
+                <h2 id="overview">Overview</h2>
+                <p>The tool reads volume fraction data from saved
+                simulation files and extracts the interface geometry
+                using facet reconstruction algorithms. The extracted
+                facets can be visualized or processed for further
+                analysis of multiphase flow interfaces.</p>
+                <h2 id="authors">Authors</h2>
+                <ul>
+                <li>Vatsal Sanjay (vatsalsanjay@gmail.com)</li>
+                <li>Physics of Fluids Group</li>
+                </ul>
+                <h2 id="dependencies">Dependencies</h2>
+                <ul>
+                <li>Basilisk C framework</li>
+                <li>Octree grid implementation</li>
+                <li>Navier-Stokes centered solver</li>
+                <li>Volume fraction utilities</li>
+                </ul>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if .project_config exists</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ifeq</span> <span class="er">(</span><span class="ex">\$</span><span class="er">(</span><span class="ex">wildcard</span> ../.project_config<span class="kw">)</span><span class="ex">,</span><span class="kw">)</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">\$</span><span class="er">(</span><span class="ex">error</span> <span class="st">&quot;../.project_config not found&quot;</span><span class="kw">)</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">endif</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">BASILISK</span> := <span class="dt">\$</span><span class="er">(</span><span class="ex">shell</span> . ../.project_config <span class="kw">&amp;&amp;</span> <span class="bu">echo</span> <span class="dt">\$\$</span>BASILISK<span class="kw">)</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">ifeq</span> <span class="er">(</span><span class="ex">\$</span><span class="er">(</span><span class="fu">strip</span> <span class="dt">\$</span><span class="er">(</span><span class="ex">BASILISK</span><span class="kw">))</span><span class="ex">,</span><span class="kw">)</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="ex">\$</span><span class="er">(</span><span class="ex">error</span> <span class="st">&quot;BASILISK not set in .project_config&quot;</span><span class="kw">)</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">endif</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">CFLAGS</span> += <span class="at">-O2</span> <span class="at">-disable-dimensions</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">CFLAGS</span> += <span class="at">-I\$</span><span class="er">(</span><span class="ex">PWD</span><span class="kw">)</span><span class="ex">/src-local</span> <span class="at">-I\$</span><span class="er">(</span><span class="ex">PWD</span><span class="kw">)</span><span class="ex">/../src-local</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ex">.PHONY:</span> fix-permissions</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Fix permissions for runtest script</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ex">fix-permissions:</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@chmod</span> +x <span class="dt">\$</span><span class="er">(</span><span class="ex">BASILISK</span><span class="kw">)</span><span class="ex">/src/runtest</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Make all test targets depend on fix-permissions</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="ex">%.tst:</span> fix-permissions</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="ex">include</span> <span class="dt">\$</span><span class="er">(</span><span class="ex">BASILISK</span><span class="kw">)</span><span class="ex">/Makefile.defs</span></span></code></pre></div></div>
+                class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/grid/octree.h" title="Link to Basilisk source for grid/octree.h"><span class="im">"grid/octree.h"</span></a></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/navier-stokes/centered.h" title="Link to Basilisk source for navier-stokes/centered.h"><span class="im">"navier-stokes/centered.h"</span></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/fractions.h" title="Link to Basilisk source for fractions.h"><span class="im">"fractions.h"</span></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>scalar f<span class="op">[];</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dt">char</span> filename<span class="op">[</span><span class="dv">80</span><span class="op">];</span></span></code></pre></div></div>
+                <h3 id="output_facets_v2">output_facets_v2</h3>
+                <p>Extracts and outputs the facets (interface
+                segments/polygons) from a volume fraction field. This
+                function implements a marching squares/cubes-like
+                algorithm to reconstruct interfaces from volume fraction
+                data.</p>
+                <p>The function iterates through all grid cells and
+                identifies those containing an interface (where the
+                volume fraction is between 0 and 1). For each interface
+                cell, it: 1. Computes the interface normal using
+                neighboring cell data 2. Calculates the plane constant α
+                for the linear interface approximation 3. Extracts the
+                intersection points between the interface and cell edges
+                4. Outputs the facet vertices to the specified file</p>
+                <h4 id="parameters">Parameters</h4>
+                <ul>
+                <li><code>c</code>: Volume fraction scalar field
+                containing the interface data</li>
+                <li><code>fp</code>: Output file pointer for writing
+                facet coordinates (default: stdout)</li>
+                <li><code>s</code>: Face vector field for surface
+                tension calculations (default: {{-1}})</li>
+                </ul>
+                <h4 id="output-format">Output Format</h4>
+                <p>The output format depends on the spatial dimension: -
+                <strong>1D</strong>: Single x-coordinate of the
+                interface position - <strong>2D</strong>: Line segments
+                as pairs of (x,y) coordinates, blank line separated -
+                <strong>3D</strong>: Polygon vertices as (x,y,z)
+                coordinates, blank line separated</p>
+                <h4 id="implementation-notes">Implementation Notes</h4>
+                <ul>
+                <li>Only processes cells with volume fraction in range
+                (1e-6, 1-1e-6) to avoid numerical issues near pure
+                phases</li>
+                <li>Uses the PLIC (Piecewise Linear Interface
+                Calculation) method for interface reconstruction</li>
+                <li>Facet extraction tolerance is set to 1.1 for robust
+                polygon generation in 3D cases</li>
+                </ul>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>trace</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> output_facets_v2<span class="op">(</span>scalar c<span class="op">,</span> <span class="dt">FILE</span> <span class="op">*</span> fp <span class="op">=</span> stdout<span class="op">,</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                      face vector s <span class="op">=</span> <span class="op">{{-</span><span class="dv">1</span><span class="op">}})</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  foreach<span class="op">()</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>c<span class="op">[]</span> <span class="op">&gt;</span> <span class="fl">1e-6</span> <span class="op">&amp;&amp;</span> c<span class="op">[]</span> <span class="op">&lt;</span> <span class="fl">1.</span> <span class="op">-</span> <span class="fl">1e-6</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      coord n <span class="op">=</span> facet_normal<span class="op">(</span>point<span class="op">,</span> c<span class="op">,</span> s<span class="op">);</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">double</span> alpha <span class="op">=</span> plane_alpha<span class="op">(</span>c<span class="op">[],</span> n<span class="op">);</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="pp">#if dimension ==</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>      fprintf<span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;%g</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> x <span class="op">+</span> Delta<span class="op">*</span>alpha<span class="op">/</span>n<span class="op">.</span>x<span class="op">);</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="pp">#elif dimension ==</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>      coord segment<span class="op">[</span><span class="dv">2</span><span class="op">];</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>facets<span class="op">(</span>n<span class="op">,</span> alpha<span class="op">,</span> segment<span class="op">)</span> <span class="op">==</span> <span class="dv">2</span><span class="op">)</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        fprintf<span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;%g %g</span><span class="sc">\n</span><span class="st">%g %g</span><span class="sc">\n\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>                x <span class="op">+</span> segment<span class="op">[</span><span class="dv">0</span><span class="op">].</span>x<span class="op">*</span>Delta<span class="op">,</span> y <span class="op">+</span> segment<span class="op">[</span><span class="dv">0</span><span class="op">].</span>y<span class="op">*</span>Delta<span class="op">,</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                x <span class="op">+</span> segment<span class="op">[</span><span class="dv">1</span><span class="op">].</span>x<span class="op">*</span>Delta<span class="op">,</span> y <span class="op">+</span> segment<span class="op">[</span><span class="dv">1</span><span class="op">].</span>y<span class="op">*</span>Delta<span class="op">);</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="pp">#else </span><span class="co">// dimension ==</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>      coord v<span class="op">[</span><span class="dv">12</span><span class="op">];</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>      <span class="dt">int</span> m <span class="op">=</span> facets<span class="op">(</span>n<span class="op">,</span> alpha<span class="op">,</span> v<span class="op">,</span> <span class="fl">1.1</span><span class="op">);</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> m<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        fprintf<span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;%g %g %g</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>                x <span class="op">+</span> v<span class="op">[</span>i<span class="op">].</span>x<span class="op">*</span>Delta<span class="op">,</span> y <span class="op">+</span> v<span class="op">[</span>i<span class="op">].</span>y<span class="op">*</span>Delta<span class="op">,</span> z <span class="op">+</span> v<span class="op">[</span>i<span class="op">].</span>z<span class="op">*</span>Delta<span class="op">);</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>m <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>        fputc<span class="op">(</span><span class="ch">&#39;\n&#39;</span><span class="op">,</span> fp<span class="op">);</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  fflush<span class="op">(</span>fp<span class="op">);</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+                <h3 id="main">main</h3>
+                <p>Entry point for the facet extraction tool. Processes
+                a saved simulation file specified as a command-line
+                argument and outputs the extracted facets to standard
+                error.</p>
+                <h4 id="command-line-usage">Command Line Usage</h4>
+                <div class="code-block-container"><pre><code>./program_name simulation_file.dump</code></pre></div>
+                <h4 id="parameters-1">Parameters</h4>
+                <ul>
+                <li><code>a</code>: Number of command line
+                arguments</li>
+                <li><code>arguments</code>: Array of command line
+                argument strings
+                <ul>
+                <li><code>arguments[1]</code>: Path to the input
+                simulation file</li>
+                </ul></li>
+                </ul>
+                <h4 id="processing-steps">Processing Steps</h4>
+                <ol type="1">
+                <li>Reads the filename from command line arguments</li>
+                <li>Sets boundary conditions for the volume fraction
+                field</li>
+                <li>Restores the simulation state from the saved
+                file</li>
+                <li>Ensures proper prolongation operators for adaptive
+                mesh refinement</li>
+                <li>Calls output_facets_v2 to extract and output
+                interface facets</li>
+                </ol>
+                <h4 id="boundary-conditions">Boundary Conditions</h4>
+                <ul>
+                <li>Bottom boundary: Dirichlet condition with f = 1
+                (fully filled)</li>
+                </ul>
+                <h4 id="tree-grid-handling">Tree Grid Handling</h4>
+                <p>For adaptive (tree) grids, the function ensures that
+                the volume fraction field uses the appropriate
+                <code>fraction_refine</code> prolongation operator. This
+                is crucial for maintaining conservation properties
+                during mesh refinement and coarsening operations.</p>
+                <h4 id="output">Output</h4>
+                <p>Interface facets are written to standard error (ferr)
+                in a format suitable for visualization with tools like
+                gnuplot or paraview.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(</span><span class="dt">int</span> a<span class="op">,</span> <span class="dt">char</span> <span class="dt">const</span> <span class="op">*</span>arguments<span class="op">[])</span> <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>a <span class="op">&lt;</span> <span class="dv">2</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    fprintf<span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;Usage: %s simulation_file.dump</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> arguments<span class="op">[</span><span class="dv">0</span><span class="op">]);</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  snprintf<span class="op">(</span>filename<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span>filename<span class="op">),</span> <span class="st">&quot;%s&quot;</span><span class="op">,</span> arguments<span class="op">[</span><span class="dv">1</span><span class="op">]);</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  f<span class="op">[</span>bottom<span class="op">]</span> <span class="op">=</span> dirichlet<span class="op">(</span><span class="fl">1.</span><span class="op">);</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  restore<span class="op">(</span>file<span class="op">=</span>filename<span class="op">);</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="pp">#if TREE</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Ensure proper prolongation for volume fraction fields on adaptive grids</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> <span class="op">(*</span> prolongation<span class="op">)(</span>Point<span class="op">,</span> scalar<span class="op">)</span> <span class="op">=</span> f<span class="op">.</span>prolongation<span class="op">;</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>prolongation <span class="op">!=</span> fraction_refine<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    f<span class="op">.</span>prolongation <span class="op">=</span> fraction_refine<span class="op">;</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    f<span class="op">.</span>dirty <span class="op">=</span> true<span class="op">;</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="pp">#endif </span><span class="co">// TREE</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  output_facets_v2<span class="op">(</span>f<span class="op">,</span> ferr<span class="op">);</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
             </div>
         </main>
 
@@ -496,7 +642,7 @@ window.baseDomain = "https://comphy-lab.org";
               <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" rel="noopener noreferrer" aria-label="Bluesky Profile">
                 <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
               </a>
-              <a href="https://github.com/comphy-lab/documentationWeb/edit/main/simulationCases/Makefile" class="edit-link" aria-label="Edit this page on GitHub">
+              <a href="https://github.com/comphy-lab/documentationWeb/edit/main/postProcess/getFacets3D.c" class="edit-link" aria-label="Edit this page on GitHub">
                 <i class="fa-brands fa-github"></i> Edit this page
               </a>
             </div>

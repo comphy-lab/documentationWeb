@@ -3,13 +3,13 @@
 ## Project Overview
 This repository contains Basilisk CFD simulation cases and post-processing
 tools for lid-driven cavity dye injection, plus generated documentation in
-`docs/`.
+`.github/docs`.
 
 ## Layout
 - `simulationCases/`: primary `.c` cases and Makefile
 - `src-local/`: project-specific headers
 - `postProcess/`: analysis scripts and notebooks
-- `docs/`: generated documentation site output
+- `.github/docs`: generated documentation site output
 - `.github/`: documentation assets, scripts, and workflows
 - `*.params`, `*.sbatch`: run configurations and cluster scripts
 - `basilisk/`: local Basilisk checkout (ignored; do not commit)
@@ -20,6 +20,6 @@ tools for lid-driven cavity dye injection, plus generated documentation in
 - Preview locally: `.github/scripts/deploy.sh`
 
 ## Editing guidance
-- Do not commit the `basilisk/` directory or generated outputs outside `docs/`.
+- Do not commit the `basilisk/` directory or generated outputs outside `.github/docs`.
 - Keep case output directories untouched unless explicitly requested.
 - C/C++ style: 2-space indent, 80-char lines, use `/**` markdown comments (no leading `*` lines).

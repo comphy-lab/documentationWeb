@@ -23,8 +23,8 @@ The codebase implements a classical lid driven cavity flow problem with dye inje
 │   ├── LidDrivenCavity-Newtonian-dyeInjection.py     Python script for post-processing
 │   ├── Visulization3D.ipynb    Jupyter notebook for 3D visualization
 │   └── getData-LidDriven.c     Data extraction utility
-├── docs/                       Generated documentation site output
 ├── .github/                    Documentation assets, scripts, workflows
+│   └── docs/                   Generated documentation site output
 ├── runSweepHamilton.sbatch     HPC batch script for Durham Hamilton cluster
 └── runSweepSnellius.sbatch     HPC batch script for Snellius cluster
 ```
