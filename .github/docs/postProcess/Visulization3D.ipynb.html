@@ -252,6 +252,8 @@
   <script defer src="../assets/js/command-data.js"></script>
   <script defer src="../assets/js/main.js"></script>
   <script defer src="../assets/js/theme-toggle.js"></script>
+  <!-- MathJax safe mode with links off: maths in page text cannot create links of any kind -->
+  <script>window.MathJax = {loader: {load: ['ui/safe']}, options: {safeOptions: {allow: {URLs: 'none'}}}};</script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
   
   <!-- Optimize page load performance -->
@@ -430,10 +432,10 @@ window.baseDomain = "https://comphy-lab.org/documentationWeb";
                     </a>
                 </div>
                 
-                <!--SEO_METADATA:{"title": "Visulization3D.ipynb", "description": "This notebook provides visualization and analysis related to Visulization3D.", "meta_tags": "<meta name=\"description\" content=\"This notebook provides visualization and analysis related to Visulization3D.\">\n"}-->
+                <!--SEO_METADATA:{"title": "Visulization3D.ipynb", "description": "This notebook provides visualization and analysis related to Visulization3D.", "meta_tags": "\u003cmeta name=\"description\" content=\"This notebook provides visualization and analysis related to Visulization3D.\"\u003e\n"}-->
                 <h1 id="visulization3d.ipynb">Visulization3D.ipynb</h1>
                 <div class="jupyter-notebook-embed">
-                    <h2>Jupyter Notebook: Visulization3D.ipynb</h2>
+                    <h2>Jupyter Notebook: Visulization3D&#46;ipynb</h2>
                     
                     <div class="notebook-action-buttons">
                         <a href="Visulization3D.ipynb" download class="notebook-btn download-btn">
@@ -451,7 +453,7 @@ window.baseDomain = "https://comphy-lab.org/documentationWeb";
                     
                     <div class="notebook-preview">
                         <h3>About this notebook</h3>
-                        <p>This notebook provides visualization and analysis related to Visulization3D.</p>
+                        <p>This notebook provides visualization and analysis related to Visulization3D&#46;</p>
                         
                         <h3>Key Features:</h3>
                         <ul>
@@ -469,20 +471,14 @@ window.baseDomain = "https://comphy-lab.org/documentationWeb";
                     <div class="embedded-notebook">
                         <h3>Notebook Content</h3>
                         <div class="notebook-content-wrapper">
-                            <div class="nbconvert-rendered"><body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<script>
-window.repoName = "documentationWeb";
-window.githubOrg = "comphy-lab";
-window.baseDomain = "https://comphy-lab.org/documentationWeb";
-</script>
-
+                            <div class="nbconvert-rendered">
                 <main><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-                <div class="jp-Cell-inputWrapper" tabindex="0">
+                <div class="jp-Cell-inputWrapper">
                 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
                 </div>
                 <div class="jp-InputArea jp-Cell-inputArea">
                 <div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
-                <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+                <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
                 <div class="cm-editor cm-s-jupyter">
                 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
                 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -494,22 +490,22 @@ window.baseDomain = "https://comphy-lab.org/documentationWeb";
                 </div>
                 </div>
                 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-                <div class="jp-Cell-inputWrapper" tabindex="0">
+                <div class="jp-Cell-inputWrapper">
                 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
                 </div>
                 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-                </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-                <h3 id="Test">Test<a class="anchor-link" href="#Test">¶</a></h3>
+                </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput">
+                <h3>Test<a class="anchor-link">¶</a></h3>
                 </div>
                 </div>
                 </div>
                 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-                <div class="jp-Cell-inputWrapper" tabindex="0">
+                <div class="jp-Cell-inputWrapper">
                 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
                 </div>
                 <div class="jp-InputArea jp-Cell-inputArea">
                 <div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
-                <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+                <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
                 <div class="cm-editor cm-s-jupyter">
                 <div class="highlight hl-ipython3"><pre><span></span><span class="n">plot</span> <span class="o">=</span> <span class="n">k3d</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
                 <span class="n">plot</span> <span class="o">+=</span> <span class="n">k3d</span><span class="o">.</span><span class="n">line</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
@@ -526,7 +522,7 @@ window.baseDomain = "https://comphy-lab.org/documentationWeb";
                 <div class="jp-OutputArea jp-Cell-outputArea">
                 <div class="jp-OutputArea-child">
                 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-                <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+                <div class="jp-RenderedText jp-OutputArea-output">
                 <pre>Output()</pre>
                 </div>
                 </div>
@@ -534,37 +530,37 @@ window.baseDomain = "https://comphy-lab.org/documentationWeb";
                 </div>
                 </div>
                 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-                <div class="jp-Cell-inputWrapper" tabindex="0">
+                <div class="jp-Cell-inputWrapper">
                 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
                 </div>
                 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-                </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-                <h3 id="Trial-1">Trial 1<a class="anchor-link" href="#Trial-1">¶</a></h3>
+                </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput">
+                <h3>Trial 1<a class="anchor-link">¶</a></h3>
                 </div>
                 </div>
                 </div>
                 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-                <div class="jp-Cell-inputWrapper" tabindex="0">
+                <div class="jp-Cell-inputWrapper">
                 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
                 </div>
                 <div class="jp-InputArea jp-Cell-inputArea">
                 <div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
-                <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+                <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
                 <div class="cm-editor cm-s-jupyter">
                 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">getFacets3D</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-                    <span class="n">exe</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"./getFacets3D"</span><span class="p">,</span> <span class="n">filename</span><span class="p">]</span>
+                    <span class="n">exe</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;./getFacets3D&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">]</span>
                     <span class="n">p</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">exe</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
                     <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
-                    <span class="n">temp1</span> <span class="o">=</span> <span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span>
+                    <span class="n">temp1</span> <span class="o">=</span> <span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
 
-                    <span class="n">lines</span> <span class="o">=</span> <span class="n">temp1</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+                    <span class="n">lines</span> <span class="o">=</span> <span class="n">temp1</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#x27;</span><span class="se">\n</span><span class="s1">&#x27;</span><span class="p">)</span>
 
                     <span class="n">all_points</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="n">all_indices</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="n">current_index</span> <span class="o">=</span> <span class="mi">0</span>
 
                     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">''</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#x27;&#x27;</span><span class="p">:</span>
                             <span class="c1"># Move to next plane</span>
                             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_points</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">current_index</span><span class="p">:</span>
                                 <span class="c1"># Calculate indices for the previous plane</span>
@@ -598,15 +594,15 @@ window.baseDomain = "https://comphy-lab.org/documentationWeb";
                 </div>
                 </div>
                 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-                <div class="jp-Cell-inputWrapper" tabindex="0">
+                <div class="jp-Cell-inputWrapper">
                 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
                 </div>
                 <div class="jp-InputArea jp-Cell-inputArea">
                 <div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
-                <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+                <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
                 <div class="cm-editor cm-s-jupyter">
                 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Example usage</span>
-                <span class="n">points</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="n">getFacets3D</span><span class="p">(</span><span class="s2">"dump"</span><span class="p">)</span>
+                <span class="n">points</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="n">getFacets3D</span><span class="p">(</span><span class="s2">&quot;dump&quot;</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">))</span>
                 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">))</span>
                 </pre></div>
@@ -620,7 +616,7 @@ window.baseDomain = "https://comphy-lab.org/documentationWeb";
                 <div class="jp-OutputArea jp-Cell-outputArea">
                 <div class="jp-OutputArea-child">
                 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-                <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+                <div class="jp-RenderedText jp-OutputArea-output">
                 <pre>1655813
                 2544717
                 </pre>
@@ -629,12 +625,12 @@ window.baseDomain = "https://comphy-lab.org/documentationWeb";
                 </div>
                 </div>
                 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-                <div class="jp-Cell-inputWrapper" tabindex="0">
+                <div class="jp-Cell-inputWrapper">
                 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
                 </div>
                 <div class="jp-InputArea jp-Cell-inputArea">
                 <div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
-                <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+                <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
                 <div class="cm-editor cm-s-jupyter">
                 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Plotting with k3d</span>
                 <span class="n">plot</span> <span class="o">=</span> <span class="n">k3d</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
@@ -652,19 +648,19 @@ window.baseDomain = "https://comphy-lab.org/documentationWeb";
                 <div class="jp-OutputArea jp-Cell-outputArea">
                 <div class="jp-OutputArea-child">
                 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-                <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+                <div class="jp-RenderedText jp-OutputArea-output">
                 <pre>Output()</pre>
                 </div>
                 </div>
                 </div>
                 </div>
                 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-                <div class="jp-Cell-inputWrapper" tabindex="0">
+                <div class="jp-Cell-inputWrapper">
                 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
                 </div>
                 <div class="jp-InputArea jp-Cell-inputArea">
                 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-                <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+                <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor">
                 <div class="cm-editor cm-s-jupyter">
                 <div class="highlight hl-ipython3"><pre><span></span> 
                 </pre></div>
@@ -674,77 +670,7 @@ window.baseDomain = "https://comphy-lab.org/documentationWeb";
                 </div>
                 </div>
                 </main>
-                
-<script type="text/javascript">
-document.addEventListener('DOMContentLoaded', function() {
-    // Add copy button to each code block container
-    const codeBlocks = document.querySelectorAll('.code-block-container pre');
-    codeBlocks.forEach(function(codeBlock, index) {
-        // Create button element
-        const button = document.createElement('button');
-        button.className = 'copy-button';
-        button.textContent = 'Copy';
-        button.setAttribute('aria-label', 'Copy code to clipboard');
-        button.setAttribute('data-copy-state', 'copy');
-        
-        // Get the code block container (parent of the pre)
-        const container = codeBlock.parentNode;
-        
-        // Add the button to the container
-        container.appendChild(button);
-        
-        // Set up click event
-        button.addEventListener('click', async function() {
-            const codeText = codeBlock.textContent;
-            
-            try {
-                // Try to use the modern clipboard API first
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    await navigator.clipboard.writeText(codeText);
-                    updateButtonState(button, 'success');
-                } else {
-                    // Fall back to the deprecated execCommand method
-                    const textarea = document.createElement('textarea');
-                    textarea.value = codeText;
-                    textarea.style.position = 'fixed';  // Prevent scrolling to the bottom
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    
-                    const successful = document.execCommand('copy');
-                    document.body.removeChild(textarea);
-                    
-                    if (successful) {
-                        updateButtonState(button, 'success');
-                    } else {
-                        updateButtonState(button, 'error');
-                    }
-                }
-            } catch (err) {
-                console.error('Copy failed:', err);
-                updateButtonState(button, 'error');
-            }
-        });
-    });
-    
-    // Function to update button state
-    function updateButtonState(button, state) {
-        if (state === 'success') {
-            button.textContent = 'Copied!';
-            button.classList.add('copied');
-        } else if (state === 'error') {
-            button.textContent = 'Error!';
-            button.classList.add('error');
-        }
-        
-        // Reset button state after 2 seconds
-        setTimeout(function() {
-            button.textContent = 'Copy';
-            button.classList.remove('copied', 'error');
-        }, 2000);
-    }
-});
-</script>
-        </body></div>
+                </div>
                         </div>
                     </div>
                 </div>
@@ -884,5 +810,75 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 
-</body>
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    // Add copy button to each code block container
+    const codeBlocks = document.querySelectorAll('.code-block-container pre');
+    codeBlocks.forEach(function(codeBlock, index) {
+        // Create button element
+        const button = document.createElement('button');
+        button.className = 'copy-button';
+        button.textContent = 'Copy';
+        button.setAttribute('aria-label', 'Copy code to clipboard');
+        button.setAttribute('data-copy-state', 'copy');
+        
+        // Get the code block container (parent of the pre)
+        const container = codeBlock.parentNode;
+        
+        // Add the button to the container
+        container.appendChild(button);
+        
+        // Set up click event
+        button.addEventListener('click', async function() {
+            const codeText = codeBlock.textContent;
+            
+            try {
+                // Try to use the modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(codeText);
+                    updateButtonState(button, 'success');
+                } else {
+                    // Fall back to the deprecated execCommand method
+                    const textarea = document.createElement('textarea');
+                    textarea.value = codeText;
+                    textarea.style.position = 'fixed';  // Prevent scrolling to the bottom
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    
+                    if (successful) {
+                        updateButtonState(button, 'success');
+                    } else {
+                        updateButtonState(button, 'error');
+                    }
+                }
+            } catch (err) {
+                console.error('Copy failed:', err);
+                updateButtonState(button, 'error');
+            }
+        });
+    });
+    
+    // Function to update button state
+    function updateButtonState(button, state) {
+        if (state === 'success') {
+            button.textContent = 'Copied!';
+            button.classList.add('copied');
+        } else if (state === 'error') {
+            button.textContent = 'Error!';
+            button.classList.add('error');
+        }
+        
+        // Reset button state after 2 seconds
+        setTimeout(function() {
+            button.textContent = 'Copy';
+            button.classList.remove('copied', 'error');
+        }, 2000);
+    }
+});
+</script>
+        </body>
 </html>
